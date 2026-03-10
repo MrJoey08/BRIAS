@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BRIAS</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;1,500&family=Noto+Serif+Display:wght@600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#2a2a2a;--sidebar:#232323;--sidebar-hover:#2c2c2c;--sidebar-active:#343434;
+  --border:#353535;--surface:#333;--text:#e8e8e8;--text-sub:#9a9a9a;
+  --text-muted:#636363;--text-dim:#4e4e4e;--input-bg:#252525;
+  --input-border:#393939;--input-focus:#4a4a4a;
+  --orange:#e8764a;--pink:#d44a7a;
+  --grad:linear-gradient(135deg,#e8764a,#d44a7a);
+  --font:'DM Sans',-apple-system,sans-serif;
+  --font-display:'Noto Serif Display',Georgia,serif;
+  --font-logo:'Lora',Georgia,serif;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh;overflow:hidden;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+textarea::placeholder,input::placeholder{color:var(--text-dim);}
+
+@keyframes bDot{0%,60%,100%{opacity:.25;transform:scale(.8);}30%{opacity:1;transform:scale(1.15);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+/* Layout */
+.app{display:flex;height:100vh;}
+
+/* Sidebar */
+.sidebar{width:260px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:width .2s ease;overflow:hidden;}
+.sidebar.collapsed{width:0;border-right:none;}
+.sidebar-header{padding:0 10px;display:flex;align-items:center;gap:6px;height:52px;border-bottom:1px solid var(--border);min-width:260px;}
+.sidebar-header .logo{flex:1;display:flex;align-items:center;}
+.sidebar-header .logo span{font-family:var(--font-logo);font-size:23px;font-weight:500;font-style:italic;letter-spacing:.01em;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.sb-btn{width:34px;height:34px;border-radius:8px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-sub);}
+.sb-btn:hover{background:var(--sidebar-hover);}
+.sb-btn.new-chat{border:1px solid var(--border);}
+.chat-list{flex:1;overflow-y:auto;padding:8px 6px;}
+.chat-list-label{font-size:11px;color:var(--text-dim);padding:4px 10px 6px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;}
+.chat-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;margin-bottom:1px;transition:background .12s;}
+.chat-item:hover{background:var(--sidebar-hover);}
+.chat-item.active{background:var(--sidebar-active);}
+.chat-item .ci-title{font-size:13px;color:var(--text-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;}
+.chat-item.active .ci-title{color:var(--text);font-weight:500;}
+.chat-item .ci-del{width:22px;height:22px;border-radius:5px;border:none;background:transparent;cursor:pointer;display:none;align-items:center;justify-content:center;}
+.chat-item:hover .ci-del{display:flex;}
+.chat-item .ci-del:hover{background:#3a2222;}
+.chat-item .ci-del:hover svg{stroke:#e06060;}
+.sidebar-footer{padding:10px 12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.sf-avatar{width:28px;height:28px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;}
+.sf-name{font-size:13px;font-weight:500;}
+.sf-sub{font-size:11px;color:var(--text-dim);}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;}
+.topbar{height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;}
+.messages{flex:1;overflow-y:auto;padding:20px 16px;}
+.messages-inner{max-width:700px;margin:0 auto;}
+
+/* Welcome */
+.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:16px;animation:fadeUp .5s ease;}
+.welcome-logo{position:relative;height:83px;margin:0 auto;}
+.welcome-logo .letter{font-family:var(--font-display);font-size:72px;font-weight:600;line-height:1.15;position:absolute;top:0;color:var(--text-muted);transition:left .7s cubic-bezier(.34,1.4,.64,1),color .5s ease;user-select:none;}
+.welcome-logo.phase1 .letter-a,.welcome-logo.phase1 .letter-i{color:var(--orange);}
+.welcome-logo.phase2 .letter-a,.welcome-logo.phase2 .letter-i{color:var(--pink);}
+.welcome-logo.phase3 .letter{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.welcome-sub{color:var(--text-muted);font-size:16px;}
+
+/* Messages */
+.msg{display:flex;margin-bottom:8px;animation:fadeUp .25s ease;}
+.msg.user{justify-content:flex-end;}
+.msg-inner{display:flex;gap:10px;max-width:72%;align-items:flex-start;}
+.msg.user .msg-inner{flex-direction:row-reverse;}
+.msg-avatar{width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;}
+.msg.assistant .msg-avatar{background:var(--grad);}
+.msg.user .msg-avatar{background:var(--surface);}
+.msg-avatar span{font-family:var(--font-display);font-size:11px;color:#fff;font-weight:600;}
+.msg-body{display:flex;flex-direction:column;gap:4px;min-width:0;}
+.msg-bubble{padding:10px 16px;font-size:14px;line-height:1.6;word-break:break-word;}
+.msg.user .msg-bubble{background:var(--surface);border-radius:18px 18px 4px 18px;}
+.msg.assistant .msg-bubble{border:1px solid var(--border);border-radius:18px 18px 18px 4px;}
+
+/* Message action buttons */
+.msg-actions{display:flex;gap:4px;opacity:0;transition:opacity .15s;padding:0 4px;}
+.msg:hover .msg-actions{opacity:1;}
+.msg.user .msg-actions{justify-content:flex-end;}
+.msg-act-btn{width:24px;height:24px;border-radius:6px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-dim);transition:background .12s,color .12s;}
+.msg-act-btn:hover{background:var(--surface);color:var(--text-sub);}
+.msg-act-btn.copied{color:var(--orange);}
+
+/* Edit mode */
+.msg-edit-wrap{display:none;padding:0 4px;}
+.msg-edit-wrap.active{display:block;}
+.msg-edit-area{width:100%;background:var(--input-bg);border:1px solid var(--input-focus);border-radius:10px;color:var(--text);font-family:var(--font);font-size:14px;line-height:1.6;padding:8px 12px;resize:none;outline:none;min-height:60px;}
+.msg-edit-btns{display:flex;gap:6px;margin-top:6px;justify-content:flex-end;}
+.edit-confirm-btn{padding:5px 14px;border:none;border-radius:8px;background:var(--grad);color:#fff;font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;}
+.edit-cancel-btn{padding:5px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text-sub);font-family:var(--font);font-size:13px;cursor:pointer;}
+.edit-cancel-btn:hover{background:var(--surface);}
+
+/* Typing cursor */
+.cursor{display:inline-block;width:2px;height:14px;background:var(--orange);margin-left:2px;vertical-align:middle;animation:blink .7s step-end infinite;}
+.typing-dots{display:flex;gap:5px;align-items:center;padding:2px 0;}
+.typing-dots span{width:5px;height:5px;border-radius:50%;background:var(--text-muted);}
+.typing-dots span:nth-child(1){animation:bDot 1.4s ease-in-out 0s infinite;}
+.typing-dots span:nth-child(2){animation:bDot 1.4s ease-in-out .16s infinite;}
+.typing-dots span:nth-child(3){animation:bDot 1.4s ease-in-out .32s infinite;}
+
+/* Input */
+.input-area{padding:10px 20px 18px;}
+.input-box{display:flex;align-items:flex-end;gap:10px;background:var(--input-bg);border:1px solid var(--input-border);border-radius:16px;padding:10px 14px;max-width:720px;margin:0 auto;transition:border-color .2s;}
+.input-box:focus-within{border-color:var(--input-focus);}
+.input-box textarea{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:var(--font);font-size:14px;line-height:24px;resize:none;height:24px;max-height:140px;}
+.input-footer{text-align:center;font-size:11px;color:var(--text-dim);margin-top:8px;opacity:.4;}
+
+/* Action button (send / stop) */
+.action-btn{width:32px;height:32px;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.action-btn.send-active{background:var(--grad);}
+.action-btn.send-inactive{background:var(--surface);opacity:.3;cursor:default;}
+.action-btn.stop{background:transparent;border:1.5px solid var(--text-dim);}
+.action-btn.stop:hover{border-color:var(--text-sub);}
+.action-btn.stop:hover .stop-sq{background:var(--text-sub);}
+.stop-sq{width:10px;height:10px;border-radius:2px;background:var(--text-dim);transition:background .15s;}
+
+/* Auth */
+.auth-screen{display:flex;align-items:center;justify-content:center;height:100vh;background:var(--bg);}
+.auth-box{width:360px;padding:40px;}
+.auth-logo{text-align:center;margin-bottom:32px;}
+.auth-logo span{font-family:var(--font-display);font-size:48px;font-weight:600;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.auth-box input{width:100%;padding:12px 16px;background:var(--input-bg);border:1px solid var(--input-border);border-radius:10px;color:var(--text);font-family:var(--font);font-size:14px;margin-bottom:12px;outline:none;}
+.auth-box input:focus{border-color:var(--input-focus);}
+.auth-submit{width:100%;padding:12px;border:none;border-radius:10px;background:var(--grad);color:#fff;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;}
+.auth-submit:hover{opacity:.9;}
+.auth-switch{text-align:center;margin-top:16px;font-size:13px;color:var(--text-sub);}
+.auth-switch a{color:var(--orange);cursor:pointer;}
+.auth-error{color:#e06060;font-size:13px;margin-bottom:12px;}
+.hidden{display:none!important;}
+</style>
+</head>
+<body>
+
+<!-- Auth -->
+<div id="authScreen" class="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo"><span>BRIAS</span></div>
+    <div id="authError" class="auth-error hidden"></div>
+    <input id="authUser" type="text" placeholder="Gebruikersnaam" autocomplete="username">
+    <input id="authPass" type="password" placeholder="Wachtwoord" autocomplete="current-password">
+    <button class="auth-submit" id="authSubmit" onclick="doAuth()">Inloggen</button>
+    <div class="auth-switch"><span id="authSwitch">Geen account? <a onclick="toggleAuth()">Registreer</a></span></div>
+  </div>
+</div>
+
+<!-- App -->
+<div id="appScreen" class="app hidden">
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <button class="sb-btn" onclick="toggleSidebar()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+      </button>
+      <div class="logo"><span>BRIAS</span></div>
+      <button class="sb-btn new-chat" onclick="newChat()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </div>
+    <div class="chat-list">
+      <div class="chat-list-label">Gesprekken</div>
+      <div id="chatList"></div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sf-avatar">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9a9a9a" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div style="flex:1">
+        <div class="sf-name" id="sfName">—</div>
+        <div class="sf-sub">lokaal · llama.cpp</div>
+      </div>
+      <button class="sb-btn" onclick="doLogout()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4e4e4e" stroke-width="1.5" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <button class="sb-btn" id="topbarToggle" onclick="toggleSidebar()" style="position:absolute;left:12px;display:none;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="messages" id="msgContainer">
+      <div class="messages-inner" id="msgInner">
+        <div class="welcome" id="welcomeScreen">
+          <div class="welcome-logo" id="welcomeLogo"></div>
+          <div class="welcome-sub">Waar kan ik je mee helpen?</div>
+        </div>
+      </div>
+    </div>
+    <div class="input-area">
+      <div class="input-box">
+        <textarea id="msgInput" rows="1" placeholder="Stuur een bericht..."
+          oninput="autoResize(this);updateBtn();" onkeydown="handleKey(event)"></textarea>
+        <button class="action-btn send-inactive" id="actionBtn" onclick="handleActionBtn()">
+          <svg id="iconSend" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
+          </svg>
+          <div id="iconStop" class="stop-sq" style="display:none;"></div>
+        </button>
+      </div>
+      <div class="input-footer">Brias kan fouten maken. Alles draait lokaal op jouw hardware.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── CONFIG — change this to your backend URL ─────────────
+const API = 'http://localhost:8080';
+
+// ─── State ────────────────────────────────────────────────
+let authMode = 'login';
+let token = localStorage.getItem('brias_token') || null;
+let username = localStorage.getItem('brias_username') || null;
+let chats = [];
+let activeChatId = null;
+let isStreaming = false;
+
+// ─── API helper ───────────────────────────────────────────
+function api(path, opts = {}) {
+  return fetch(API + path, {
+    ...opts,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? {'Authorization': 'Bearer ' + token} : {}),
+      ...(opts.headers || {})
+    }
+  });
+}
+
+// ─── Init ─────────────────────────────────────────────────
+async function init() {
+  if (token) {
+    const r = await api('/api/me');
+    const d = await r.json();
+    if (d.logged_in) { showApp(); return; }
+    token = null; localStorage.removeItem('brias_token');
+  }
+  showAuth();
+}
+
+function showAuth() {
+  document.getElementById('authScreen').classList.remove('hidden');
+  document.getElementById('appScreen').classList.add('hidden');
+}
+async function showApp() {
+  document.getElementById('authScreen').classList.add('hidden');
+  document.getElementById('appScreen').classList.remove('hidden');
+  document.getElementById('sfName').textContent = username || '—';
+  await loadChats();
+  if (chats.length === 0) await newChat();
+  else runWelcomeAnim();
+}
+
+// ─── Auth ─────────────────────────────────────────────────
+function toggleAuth() {
+  authMode = authMode === 'login' ? 'register' : 'login';
+  document.getElementById('authSubmit').textContent = authMode === 'login' ? 'Inloggen' : 'Registreren';
+  document.getElementById('authSwitch').innerHTML = authMode === 'login'
+    ? 'Geen account? <a onclick="toggleAuth()">Registreer</a>'
+    : 'Al een account? <a onclick="toggleAuth()">Inloggen</a>';
+  document.getElementById('authError').classList.add('hidden');
+}
+async function doAuth() {
+  const u = document.getElementById('authUser').value.trim();
+  const p = document.getElementById('authPass').value;
+  const errEl = document.getElementById('authError');
+  if (!u || !p) { errEl.textContent = 'Vul alle velden in'; errEl.classList.remove('hidden'); return; }
+  const r = await api(authMode === 'login' ? '/api/login' : '/api/register', {
+    method: 'POST', body: JSON.stringify({username: u, password: p})
+  });
+  const d = await r.json();
+  if (!r.ok) { errEl.textContent = d.detail; errEl.classList.remove('hidden'); return; }
+  token = d.token; username = d.username;
+  localStorage.setItem('brias_token', token);
+  localStorage.setItem('brias_username', username);
+  showApp();
+}
+function doLogout() {
+  token = null; username = null;
+  localStorage.removeItem('brias_token'); localStorage.removeItem('brias_username');
+  chats = []; activeChatId = null; showAuth();
+}
+
+// ─── Chats ────────────────────────────────────────────────
+async function loadChats() {
+  chats = await api('/api/chats').then(r => r.json());
+  renderChatList();
+  if (chats.length > 0 && !activeChatId) selectChat(chats[0].id);
+}
+async function newChat() {
+  const c = await api('/api/chats', {method:'POST', body:JSON.stringify({title:'Nieuw gesprek'})}).then(r => r.json());
+  chats.unshift({...c, created_at: new Date().toISOString(), updated_at: new Date().toISOString()});
+  renderChatList(); selectChat(c.id); runWelcomeAnim();
+}
+async function deleteChat(id, e) {
+  e.stopPropagation();
+  await api('/api/chats/' + id, {method:'DELETE'});
+  chats = chats.filter(c => c.id !== id);
+  if (activeChatId === id) { activeChatId = null; chats.length > 0 ? selectChat(chats[0].id) : newChat(); }
+  renderChatList();
+}
+async function selectChat(id) {
+  activeChatId = id; renderChatList();
+  const msgs = await api('/api/chats/' + id + '/messages').then(r => r.json());
+  renderMessages(msgs);
+}
+function renderChatList() {
+  document.getElementById('chatList').innerHTML = chats.map(c => `
+    <div class="chat-item ${c.id===activeChatId?'active':''}" onclick="selectChat('${c.id}')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="${c.id===activeChatId?'var(--orange)':'var(--text-dim)'}" stroke-width="1.5" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span class="ci-title">${esc(c.title)}</span>
+      <button class="ci-del" onclick="deleteChat('${c.id}',event)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      </button>
+    </div>`).join('');
+}
+
+// ─── Messages ─────────────────────────────────────────────
+function renderMessages(msgs) {
+  const inner = document.getElementById('msgInner');
+  if (msgs.length === 0) {
+    inner.innerHTML = `<div class="welcome" id="welcomeScreen"><div class="welcome-logo" id="welcomeLogo"></div><div class="welcome-sub">Waar kan ik je mee helpen?</div></div>`;
+    runWelcomeAnim(); return;
+  }
+  inner.innerHTML = msgs.map(m => msgHtml(m.id, m.role, m.content)).join('');
+  scrollBottom();
+}
+
+function msgHtml(id, role, content) {
+  const isUser = role === 'user';
+  const avatarContent = isUser
+    ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9a9a9a" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`
+    : `<span>B</span>`;
+
+  const copyBtn = `
+    <button class="msg-act-btn" onclick="copyMsg(this,'${id}')" title="Kopieer">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+    </button>`;
+
+  const editBtn = isUser ? `
+    <button class="msg-act-btn" onclick="startEdit('${id}')" title="Bewerken">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    </button>` : '';
+
+  return `<div class="msg ${role}" id="msg-${id}">
+    <div class="msg-inner">
+      <div class="msg-avatar">${avatarContent}</div>
+      <div class="msg-body">
+        <div class="msg-bubble" id="bubble-${id}">${esc(content)}</div>
+        <div class="msg-actions">${copyBtn}${editBtn}</div>
+        ${isUser ? `<div class="msg-edit-wrap" id="edit-${id}">
+          <textarea class="msg-edit-area" id="editarea-${id}">${esc(content)}</textarea>
+          <div class="msg-edit-btns">
+            <button class="edit-cancel-btn" onclick="cancelEdit('${id}')">Annuleer</button>
+            <button class="edit-confirm-btn" onclick="confirmEdit('${id}')">Verstuur</button>
+          </div>
+        </div>` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── Copy ─────────────────────────────────────────────────
+async function copyMsg(btn, id) {
+  const bubble = document.getElementById('bubble-' + id);
+  if (!bubble) return;
+  await navigator.clipboard.writeText(bubble.textContent);
+  btn.classList.add('copied');
+  setTimeout(() => btn.classList.remove('copied'), 1500);
+}
+
+// ─── Edit ─────────────────────────────────────────────────
+function startEdit(id) {
+  const bubble = document.getElementById('bubble-' + id);
+  const editWrap = document.getElementById('edit-' + id);
+  const editArea = document.getElementById('editarea-' + id);
+  if (!editWrap) return;
+  editArea.value = bubble.textContent;
+  bubble.style.display = 'none';
+  document.getElementById('msg-' + id).querySelector('.msg-actions').style.display = 'none';
+  editWrap.classList.add('active');
+  editArea.style.height = 'auto';
+  editArea.style.height = editArea.scrollHeight + 'px';
+  editArea.focus();
+}
+function cancelEdit(id) {
+  document.getElementById('bubble-' + id).style.display = '';
+  document.getElementById('msg-' + id).querySelector('.msg-actions').style.display = '';
+  document.getElementById('edit-' + id).classList.remove('active');
+}
+async function confirmEdit(id) {
+  const editArea = document.getElementById('editarea-' + id);
+  const newContent = editArea.value.trim();
+  if (!newContent) return;
+
+  // Optimistically update bubble
+  const bubble = document.getElementById('bubble-' + id);
+  bubble.textContent = newContent;
+  cancelEdit(id);
+
+  // Send edit to server — this deletes all messages after this one
+  const r = await api('/api/messages/' + id, {method:'PATCH', body: JSON.stringify({content: newContent})});
+  if (!r.ok) { alert('Bewerken mislukt'); return; }
+  const d = await r.json();
+
+  // Remove all messages after this one in the DOM
+  const msgEl = document.getElementById('msg-' + id);
+  let next = msgEl.nextElementSibling;
+  while (next) { const n = next.nextElementSibling; next.remove(); next = n; }
+
+  // Now send the edited message as a new AI request
+  await sendAsStream(newContent, d.chat_id);
+}
+
+// ─── Button state ─────────────────────────────────────────
+function setStopMode(on) {
+  const btn = document.getElementById('actionBtn');
+  document.getElementById('iconSend').style.display = on ? 'none' : 'block';
+  document.getElementById('iconStop').style.display = on ? 'block' : 'none';
+  btn.className = 'action-btn ' + (on ? 'stop' : (document.getElementById('msgInput').value.trim() ? 'send-active' : 'send-inactive'));
+}
+function updateBtn() {
+  if (isStreaming) return;
+  const has = document.getElementById('msgInput').value.trim().length > 0;
+  document.getElementById('actionBtn').className = 'action-btn ' + (has ? 'send-active' : 'send-inactive');
+}
+function handleActionBtn() {
+  if (isStreaming) stopGen(); else sendMessage();
+}
+async function stopGen() {
+  if (activeChatId) await api('/api/chats/' + activeChatId + '/abort', {method:'POST'});
+}
+
+// ─── Send ─────────────────────────────────────────────────
+async function sendMessage() {
+  const input = document.getElementById('msgInput');
+  const content = input.value.trim();
+  if (!content || isStreaming || !activeChatId) return;
+  input.value = ''; autoResize(input); updateBtn();
+  await sendAsStream(content, activeChatId);
+}
+
+async function sendAsStream(content, chatId) {
+  isStreaming = true; setStopMode(true);
+  const welcome = document.getElementById('welcomeScreen');
+  if (welcome) welcome.remove();
+  const inner = document.getElementById('msgInner');
+
+  // Add user bubble (only if not an edit — edit already updated it)
+  // We detect edit by checking if content already has a bubble in the DOM
+  const isEdit = !!document.querySelector(`[data-edit-content="${content}"]`);
+  if (!isEdit) {
+    // Add temporary user message (will get proper ID from meta)
+    inner.insertAdjacentHTML('beforeend', `<div class="msg user" id="msg-pending">
+      <div class="msg-inner"><div class="msg-avatar">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9a9a9a" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div><div class="msg-body"><div class="msg-bubble">${esc(content)}</div></div></div></div>`);
+    scrollBottom();
+  }
+
+  // Typing indicator
+  inner.insertAdjacentHTML('beforeend', `<div class="msg assistant" id="typingMsg">
+    <div class="msg-inner"><div class="msg-avatar"><span>B</span></div>
+    <div class="msg-body"><div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div></div></div></div>`);
+  scrollBottom();
+
+  try {
+    const resp = await api('/api/chats/' + chatId + '/messages/stream', {
+      method: 'POST', body: JSON.stringify({content})
+    });
+    if (!resp.ok) throw new Error('Server error');
+
+    const reader = resp.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '', streamBubble = null, streamText = '', gotMeta = false;
+
+    while (true) {
+      const {value, done} = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, {stream: true});
+      const lines = buf.split('\n'); buf = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        let msg; try { msg = JSON.parse(line.slice(6)); } catch { continue; }
+
+        if (msg.type === 'meta') {
+          gotMeta = true;
+          // Replace pending user bubble with real one (with correct id)
+          const pending = document.getElementById('msg-pending');
+          if (pending) { pending.outerHTML = msgHtml(msg.user_msg_id, 'user', content); }
+          // Remove typing indicator
+          document.getElementById('typingMsg')?.remove();
+          // Update title
+          if (msg.title) { const c = chats.find(x => x.id === chatId); if (c) { c.title = msg.title; renderChatList(); } }
+          // Create streaming bubble
+          inner.insertAdjacentHTML('beforeend', `<div class="msg assistant" id="streamMsg">
+            <div class="msg-inner"><div class="msg-avatar"><span>B</span></div>
+            <div class="msg-body"><div class="msg-bubble" id="streamBubble"><span class="cursor"></span></div></div>
+            </div></div>`);
+          streamBubble = document.getElementById('streamBubble');
+          scrollBottom();
+
+        } else if (msg.type === 'token') {
+          if (!gotMeta) {
+            gotMeta = true;
+            document.getElementById('typingMsg')?.remove();
+            inner.insertAdjacentHTML('beforeend', `<div class="msg assistant" id="streamMsg">
+              <div class="msg-inner"><div class="msg-avatar"><span>B</span></div>
+              <div class="msg-body"><div class="msg-bubble" id="streamBubble"><span class="cursor"></span></div></div>
+              </div></div>`);
+            streamBubble = document.getElementById('streamBubble');
+          }
+          streamText += msg.text;
+          streamBubble.innerHTML = esc(streamText) + '<span class="cursor"></span>';
+          scrollBottom();
+
+        } else if (msg.type === 'done') {
+          if (streamBubble) {
+            const finalId = 'ai-' + Date.now();
+            const streamEl = document.getElementById('streamMsg');
+            if (streamEl) {
+              streamEl.outerHTML = msgHtml(finalId, 'assistant', msg.full_text || streamText);
+            }
+          }
+        } else if (msg.type === 'error') {
+          document.getElementById('typingMsg')?.remove();
+          inner.insertAdjacentHTML('beforeend', msgHtml('err-' + Date.now(), 'assistant', msg.text));
+          scrollBottom();
+        }
+      }
+    }
+  } catch {
+    document.getElementById('typingMsg')?.remove();
+    inner.insertAdjacentHTML('beforeend', msgHtml('err-' + Date.now(), 'assistant', 'er ging iets mis... probeer het nog eens 💙'));
+    scrollBottom();
+  } finally {
+    isStreaming = false; setStopMode(false); scrollBottom();
+  }
+}
+
+// ─── Welcome animation ────────────────────────────────────
+function runWelcomeAnim() {
+  const logo = document.getElementById('welcomeLogo');
+  if (!logo) return;
+  logo.className = 'welcome-logo'; logo.innerHTML = '';
+  const cv = document.createElement('canvas');
+  const ctx = cv.getContext('2d');
+  ctx.font = `600 72px 'Noto Serif Display',Georgia,serif`;
+  const g = 72 * .02, w = {};
+  for (const ch of 'BRAIS') w[ch] = ctx.measureText(ch).width + g;
+  function cx(order) { const p={}; let x=0; for(const ch of order){p[ch]=x;x+=w[ch];}p._t=x;return p; }
+  const s = cx('BRAIS'), e = cx('BRIAS');
+  logo.style.width = s._t + 'px';
+  const sp = {};
+  for (const ch of 'BRAIS') {
+    const el = document.createElement('span');
+    el.className = 'letter letter-' + ch.toLowerCase();
+    el.textContent = ch; el.style.left = s[ch] + 'px';
+    logo.appendChild(el); sp[ch] = el;
+  }
+  setTimeout(()=> logo.classList.add('phase1'), 800);
+  setTimeout(()=>{ logo.classList.remove('phase1'); logo.classList.add('phase2'); sp.A.style.left=e.A+'px'; sp.I.style.left=e.I+'px'; logo.style.width=e._t+'px'; }, 1500);
+  setTimeout(()=>{ logo.className='welcome-logo phase3'; }, 2400);
+}
+
+// ─── Helpers ──────────────────────────────────────────────
+function scrollBottom() { const c=document.getElementById('msgContainer'); setTimeout(()=>c.scrollTop=c.scrollHeight,30); }
+function autoResize(el) { el.style.height='24px'; el.style.height=Math.min(el.scrollHeight,140)+'px'; }
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleActionBtn();} }
+function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+function toggleSidebar() {
+  const sb=document.getElementById('sidebar'), btn=document.getElementById('topbarToggle');
+  sb.classList.toggle('collapsed'); btn.style.display=sb.classList.contains('collapsed')?'flex':'none';
+}
+
+init();
+</script>
+</body>
+</html>
