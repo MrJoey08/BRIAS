@@ -171,6 +171,41 @@ textarea::placeholder,input::placeholder{color:var(--text-dim);}
   animation:fadeIn 1.5s ease 1.2s both;
 }
 
+/* Offline state */
+.auth-offline{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:40px 20px;
+  gap:14px;
+}
+.auth-offline .auth-offline-dot{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--text-muted);
+  animation:offlinePulse 2s ease-in-out infinite;
+}
+@keyframes offlinePulse{
+  0%,100%{opacity:.3;}
+  50%{opacity:.8;}
+}
+.auth-offline .auth-offline-title{
+  font-family:var(--font);
+  font-size:18px;
+  font-weight:600;
+  color:var(--text-sub);
+  letter-spacing:.15em;
+}
+.auth-offline .auth-offline-sub{
+  font-family:'Bitter',Georgia,serif;
+  font-size:15px;
+  font-weight:400;
+  color:var(--text-muted);
+  text-align:center;
+  line-height:1.5;
+}
+.auth-offline:not(.hidden) ~ #authFormInner{display:none;}
+
 /* ─── LAYOUT ─────────────────────────────────────────────── */
 .app{display:flex;height:100vh;}
 .sidebar{width:260px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:width .2s ease;overflow:hidden;}
@@ -264,20 +299,27 @@ textarea::placeholder,input::placeholder{color:var(--text-dim);}
   <div class="auth-content">
     <div class="auth-title">BRIAS</div>
     <div class="auth-typewriter">
-      <span class="auth-typewriter-text"><span class="hey">Hey, </span><span class="rest" id="twText"></span></span><span class="auth-typewriter-cursor"></span>
+      <span class="auth-typewriter-text"><span class="hey">Hey, </span><span class="rest" id="twText"></span><span class="auth-typewriter-cursor"></span></span>
     </div>
     <div class="auth-card">
-      <div id="authError" class="auth-card-error hidden"></div>
-      <div class="auth-input-group">
-        <input id="authUser" type="text" placeholder="Username" autocomplete="username">
-        <div class="auth-input-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <div class="auth-offline hidden" id="authOffline">
+        <div class="auth-offline-dot"></div>
+        <div class="auth-offline-title">OFFLINE</div>
+        <div class="auth-offline-sub">BRIAS is having her moment, she should be back soon</div>
       </div>
-      <div class="auth-input-group">
-        <input id="authPass" type="password" placeholder="Password" autocomplete="current-password">
-        <div class="auth-input-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <div id="authFormInner">
+        <div id="authError" class="auth-card-error hidden"></div>
+        <div class="auth-input-group">
+          <input id="authUser" type="text" placeholder="Username" autocomplete="username">
+          <div class="auth-input-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        </div>
+        <div class="auth-input-group">
+          <input id="authPass" type="password" placeholder="Password" autocomplete="current-password">
+          <div class="auth-input-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        </div>
+        <button class="auth-submit-btn" id="authSubmit" onclick="doAuth()">Log in</button>
+        <div class="auth-switch-text"><span id="authSwitch">No account? <a onclick="toggleAuth()">Sign up</a></span></div>
       </div>
-      <button class="auth-submit-btn" id="authSubmit" onclick="doAuth()">Log in</button>
-      <div class="auth-switch-text"><span id="authSwitch">No account? <a onclick="toggleAuth()">Sign up</a></span></div>
     </div>
   </div>
 
@@ -369,7 +411,34 @@ let authMode='login',token=localStorage.getItem('brias_token')||null,username=lo
 
 function api(path,opts={}){return fetch(API+path,{...opts,headers:{'Content-Type':'application/json',...(token?{'Authorization':'Bearer '+token}:{}),  ...(opts.headers||{})}});}
 
-async function init(){if(token){try{const r=await api('/api/me');const d=await r.json();if(d.logged_in){showApp();return;}}catch(e){}token=null;localStorage.removeItem('brias_token');}showAuth();}
+async function init(){
+  var online=await checkOnline();
+  if(token&&online){
+    try{const r=await api('/api/me');const d=await r.json();if(d.logged_in){showApp();return;}}catch(e){}
+    token=null;localStorage.removeItem('brias_token');
+  }
+  showAuth();
+  if(!online)setOffline(true);
+}
+
+async function checkOnline(){
+  try{const r=await fetch(API+'/api/me',{method:'GET',signal:AbortSignal.timeout(3000)});return true;}
+  catch(e){return false;}
+}
+
+var offlineTimer=null;
+function setOffline(off){
+  var el=document.getElementById('authOffline');
+  if(off){
+    el.classList.remove('hidden');
+    if(!offlineTimer)offlineTimer=setInterval(async function(){
+      if(await checkOnline()){setOffline(false);}
+    },5000);
+  }else{
+    el.classList.add('hidden');
+    if(offlineTimer){clearInterval(offlineTimer);offlineTimer=null;}
+  }
+}
 function showAuth(){document.getElementById('authScreen').classList.remove('hidden');document.getElementById('appScreen').classList.add('hidden');requestAnimationFrame(startAuthGlow);}
 async function showApp(){document.getElementById('authScreen').classList.add('hidden');document.getElementById('appScreen').classList.remove('hidden');document.getElementById('sfName').textContent=username||'—';await loadChats();if(chats.length===0)await newChat();else runWelcomeAnim();}
 
