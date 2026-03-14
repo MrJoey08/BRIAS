@@ -23,191 +23,49 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 textarea::placeholder,input::placeholder{color:var(--text-dim);}
-
 @keyframes bDot{0%,60%,100%{opacity:.25;transform:scale(.8);}30%{opacity:1;transform:scale(1.15);}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-
-/* ─── AUTH SCREEN ────────────────────────────────────────── */
-.auth-screen{
-  position:relative;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  height:100vh;
-  background:#1a1118;
-  overflow:hidden;
-  padding-bottom:14vh;
-}
-
-/* WebGL golvende gloed achtergrond */
-.auth-glow-canvas{
-  position:absolute;
-  inset:0;
-  z-index:0;
-  width:100%;
-  height:100%;
-}
-
-.auth-grain{
-  position:absolute;inset:0;z-index:1;opacity:.03;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size:200px;pointer-events:none;
-}
-.auth-vignette{
-  position:absolute;inset:0;z-index:1;
-  background:radial-gradient(ellipse at center,transparent 40%,rgba(10,6,8,.5) 100%);
-  pointer-events:none;
-}
-
-/* Auth layout — alles als één geheel, gecentreerd */
-.auth-content{
-  position:relative;
-  z-index:2;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  width:100%;
-  max-width:420px;
-  padding:0 24px;
-}
-
-/* BRIAS titel */
-.auth-title{
-  font-family:var(--font-display);
-  font-size:clamp(96px, 20vw, 164px);
-  font-weight:600;
-  letter-spacing:.03em;
-  background:linear-gradient(135deg,#e8764a 20%,#d44a7a 80%);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  background-clip:text;
-  margin-bottom:2px;
-  line-height:1.05;
-  text-align:center;
-  filter:drop-shadow(0 0 40px rgba(10,5,8,.9)) drop-shadow(0 0 80px rgba(10,5,8,.7));
-  animation:titleReveal .8s cubic-bezier(.16,1,.3,1) both;
-}
-@keyframes titleReveal{
-  from{opacity:0;transform:translateY(20px) scale(.95);}
-  to{opacity:1;transform:translateY(0) scale(1);}
-}
-
-/* Typewriter */
-.auth-typewriter{
-  height:32px;
-  margin-bottom:28px;
-  display:flex;align-items:center;justify-content:center;
-  animation:fadeIn 1s ease .6s both;
-}
-.auth-typewriter-text{
-  font-family:'Bitter',Georgia,serif;font-size:17px;font-weight:500;letter-spacing:.01em;
-  white-space:nowrap;overflow:hidden;
-  text-shadow:0 0 20px rgba(10,5,8,1),0 0 40px rgba(10,5,8,.9),0 0 80px rgba(10,5,8,.7);
-}
-@media(max-width:480px){
-  .auth-screen{padding-bottom:0;overflow-y:auto;overflow-x:hidden;}
-  .auth-content{padding-top:0;margin-top:-18vh;}
-  .auth-typewriter{height:52px;margin-bottom:24px;align-items:flex-start;max-width:80vw;}
-  .auth-typewriter-text{white-space:normal;text-align:center;line-height:1.5;overflow:visible;}
-  .auth-footer{position:fixed!important;bottom:0!important;left:0!important;right:0!important;padding:14px!important;font-size:9px!important;z-index:999!important;}
-}
-.auth-typewriter-text .hey{
-  font-weight:500;font-size:18px;
-  animation:heyShift 3s ease-in-out infinite;
-}
-@keyframes heyShift{
-  0%,100%{color:#e8764a;}
-  50%{color:#d44a7a;}
-}
+.auth-screen{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#1a1118;overflow:hidden;padding-bottom:14vh;}
+.auth-glow-canvas{position:absolute;inset:0;z-index:0;width:100%;height:100%;}
+.auth-grain{position:absolute;inset:0;z-index:1;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:200px;pointer-events:none;}
+.auth-vignette{position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse at center,transparent 40%,rgba(10,6,8,.5) 100%);pointer-events:none;}
+.auth-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;width:100%;max-width:420px;padding:0 24px;}
+.auth-title{font-family:var(--font-display);font-size:clamp(96px,20vw,164px);font-weight:600;letter-spacing:.03em;background:linear-gradient(135deg,#e8764a 20%,#d44a7a 80%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:2px;line-height:1.05;text-align:center;filter:drop-shadow(0 0 40px rgba(10,5,8,.9));animation:titleReveal .8s cubic-bezier(.16,1,.3,1) both;}
+@keyframes titleReveal{from{opacity:0;transform:translateY(20px) scale(.95);}to{opacity:1;transform:translateY(0) scale(1);}}
+.auth-typewriter{height:32px;margin-bottom:28px;display:flex;align-items:center;justify-content:center;animation:fadeIn 1s ease .6s both;}
+.auth-typewriter-text{font-family:'Bitter',Georgia,serif;font-size:17px;font-weight:500;white-space:nowrap;overflow:hidden;text-shadow:0 0 20px rgba(10,5,8,1);}
+.auth-typewriter-text .hey{font-weight:500;font-size:18px;animation:heyShift 3s ease-in-out infinite;}
+@keyframes heyShift{0%,100%{color:#e8764a;}50%{color:#d44a7a;}}
 .auth-typewriter-text .rest{color:rgba(255,255,255,.85);}
-.auth-typewriter-cursor{
-  display:inline-block;width:2px;height:19px;background:var(--orange);
-  margin-left:1px;vertical-align:middle;animation:blink .7s step-end infinite;
-}
-
-.auth-card{
-  width:100%;
-  background:rgba(22,18,20,.70);
-  backdrop-filter:blur(50px);-webkit-backdrop-filter:blur(50px);
-  border:1px solid rgba(255,255,255,.06);
-  border-radius:20px;padding:32px 28px 28px;
-  box-shadow:0 8px 60px rgba(0,0,0,.35);
-  animation:cardReveal .7s cubic-bezier(.16,1,.3,1) .3s both;
-}
+.auth-typewriter-cursor{display:inline-block;width:2px;height:19px;background:var(--orange);margin-left:1px;vertical-align:middle;animation:blink .7s step-end infinite;}
+@media(max-width:480px){.auth-screen{padding-bottom:0;overflow-y:auto;}.auth-content{margin-top:-18vh;}.auth-typewriter{height:52px;margin-bottom:24px;max-width:80vw;}.auth-typewriter-text{white-space:normal;text-align:center;line-height:1.5;overflow:visible;}.auth-footer{position:fixed!important;bottom:0!important;left:0!important;right:0!important;padding:14px!important;font-size:9px!important;z-index:999!important;}}
+.auth-card{width:100%;background:rgba(22,18,20,.70);backdrop-filter:blur(50px);-webkit-backdrop-filter:blur(50px);border:1px solid rgba(255,255,255,.06);border-radius:20px;padding:32px 28px 28px;box-shadow:0 8px 60px rgba(0,0,0,.35);animation:cardReveal .7s cubic-bezier(.16,1,.3,1) .3s both;}
 @keyframes cardReveal{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 .auth-card-error{color:#e06060;font-size:13px;margin-bottom:14px;text-align:center;}
 .auth-input-group{position:relative;margin-bottom:14px;}
-.auth-input-group input{
-  width:100%;padding:14px 16px 14px 44px;
-  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
-  border-radius:12px;color:var(--text);font-family:var(--font);font-size:14px;
-  outline:none;transition:border-color .25s,background .25s;
-}
+.auth-input-group input{width:100%;padding:14px 16px 14px 44px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;transition:border-color .25s,background .25s;}
 .auth-input-group input:focus{border-color:rgba(232,118,74,.35);background:rgba(255,255,255,.06);}
 .auth-input-group input::placeholder{color:rgba(255,255,255,.2);}
-.auth-input-icon{
-  position:absolute;left:14px;top:50%;transform:translateY(-50%);
-  color:rgba(255,255,255,.2);pointer-events:none;transition:color .25s;
-}
-.auth-input-group input:focus ~ .auth-input-icon{color:var(--orange);}
-.auth-submit-btn{
-  width:100%;padding:14px;border:none;border-radius:12px;
-  background:linear-gradient(135deg,#e8764a,#d44a7a);
-  color:#fff;font-family:var(--font);font-size:15px;font-weight:600;
-  cursor:pointer;margin-top:6px;letter-spacing:.02em;
-  transition:transform .15s,box-shadow .25s;
-  box-shadow:0 4px 24px rgba(212,74,122,.2);
-}
+.auth-input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.2);pointer-events:none;}
+.auth-submit-btn{width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#e8764a,#d44a7a);color:#fff;font-family:var(--font);font-size:15px;font-weight:600;cursor:pointer;margin-top:6px;letter-spacing:.02em;transition:transform .15s,box-shadow .25s;box-shadow:0 4px 24px rgba(212,74,122,.2);}
 .auth-submit-btn:hover{transform:translateY(-1px);box-shadow:0 8px 32px rgba(212,74,122,.35);}
-.auth-submit-btn:active{transform:translateY(0);}
 .auth-switch-text{text-align:center;margin-top:18px;font-size:13px;color:rgba(255,255,255,.35);}
-.auth-switch-text a{color:var(--orange);cursor:pointer;text-decoration:none;font-weight:500;transition:color .15s;}
-.auth-switch-text a:hover{color:#f09060;}
-.auth-footer{
-  position:absolute;bottom:24px;left:0;right:0;text-align:center;z-index:2;
-  font-size:11px;color:rgba(255,255,255,.12);letter-spacing:.1em;font-weight:300;
-  animation:fadeIn 1.5s ease 1.2s both;
-}
-
-/* Offline state */
-.auth-offline{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  padding:40px 20px;
-  gap:14px;
-}
-.auth-offline .auth-offline-dot{
-  width:10px;height:10px;border-radius:50%;
-  background:var(--text-muted);
-  animation:offlinePulse 2s ease-in-out infinite;
-}
-@keyframes offlinePulse{
-  0%,100%{opacity:.3;}
-  50%{opacity:.8;}
-}
-.auth-offline .auth-offline-title{
-  font-family:var(--font);
-  font-size:18px;
-  font-weight:600;
-  color:var(--text-sub);
-  letter-spacing:.15em;
-}
-.auth-offline .auth-offline-sub{
-  font-family:'Bitter',Georgia,serif;
-  font-size:15px;
-  font-weight:400;
-  color:var(--text-muted);
-  text-align:center;
-  line-height:1.5;
-}
-.auth-offline:not(.hidden) ~ #authFormInner{display:none;}
-
-/* ─── LAYOUT ─────────────────────────────────────────────── */
+.auth-switch-text a{color:var(--orange);cursor:pointer;text-decoration:none;font-weight:500;}
+.auth-step{animation:fadeUp .3s ease;}
+.auth-step-info{font-family:'Bitter',Georgia,serif;font-size:13px;color:var(--text-sub);text-align:center;margin-bottom:18px;line-height:1.5;}
+.auth-step-info span{color:var(--orange);font-weight:500;}
+.auth-step-resend{text-align:center;margin-top:14px;font-size:13px;color:rgba(255,255,255,.35);}
+.auth-step-resend a{color:var(--orange);cursor:pointer;text-decoration:none;font-weight:500;}
+.auth-step-title{font-family:var(--font-display);font-size:20px;font-weight:600;text-align:center;margin-bottom:4px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.auth-step-sub{font-family:'Bitter',Georgia,serif;font-size:13px;color:var(--text-muted);text-align:center;margin-bottom:20px;}
+.auth-footer{position:absolute;bottom:24px;left:0;right:0;text-align:center;z-index:2;font-size:11px;color:rgba(255,255,255,.12);letter-spacing:.1em;font-weight:300;animation:fadeIn 1.5s ease 1.2s both;}
+.auth-offline{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:14px;}
+.auth-offline .auth-offline-dot{width:10px;height:10px;border-radius:50%;background:var(--text-muted);animation:offlinePulse 2s ease-in-out infinite;}
+@keyframes offlinePulse{0%,100%{opacity:.3;}50%{opacity:.8;}}
+.auth-offline .auth-offline-title{font-family:var(--font);font-size:18px;font-weight:600;color:var(--text-sub);letter-spacing:.15em;}
+.auth-offline .auth-offline-sub{font-family:'Bitter',Georgia,serif;font-size:15px;color:var(--text-muted);text-align:center;line-height:1.5;}
 .app{display:flex;height:100vh;}
 .sidebar{width:260px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:width .2s ease;overflow:hidden;}
 .sidebar.collapsed{width:0;border-right:none;}
@@ -296,7 +154,6 @@ textarea::placeholder,input::placeholder{color:var(--text-dim);}
   <canvas class="auth-glow-canvas" id="authGlow"></canvas>
   <div class="auth-grain"></div>
   <div class="auth-vignette"></div>
-
   <div class="auth-content">
     <div class="auth-title">BRIAS</div>
     <div class="auth-typewriter">
@@ -308,22 +165,48 @@ textarea::placeholder,input::placeholder{color:var(--text-dim);}
         <div class="auth-offline-title">OFFLINE</div>
         <div class="auth-offline-sub">BRIAS is having her moment, she should be back soon</div>
       </div>
-      <div id="authFormInner">
+      <!-- Step 1 -->
+      <div id="authStep1" class="auth-step">
         <div id="authError" class="auth-card-error hidden"></div>
         <div class="auth-input-group">
-          <input id="authUser" type="text" placeholder="Username" autocomplete="username">
-          <div class="auth-input-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <input id="authContact" type="text" placeholder="Email or phone number" autocomplete="email">
+          <div class="auth-input-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></div>
         </div>
         <div class="auth-input-group">
           <input id="authPass" type="password" placeholder="Password" autocomplete="current-password">
           <div class="auth-input-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
         </div>
-        <button class="auth-submit-btn" id="authSubmit" onclick="doAuth()">Log in</button>
+        <button class="auth-submit-btn" id="authSubmit" onclick="doAuthStep1()">Log in</button>
         <div class="auth-switch-text"><span id="authSwitch">No account? <a onclick="toggleAuth()">Sign up</a></span></div>
+      </div>
+      <!-- Step 2 -->
+      <div id="authStep2" class="auth-step hidden">
+        <div id="authError2" class="auth-card-error hidden"></div>
+        <div class="auth-step-info">We sent a code to <span id="sentTo"></span></div>
+        <div class="auth-input-group">
+          <input id="authCode" type="text" placeholder="Verification code" autocomplete="one-time-code" inputmode="numeric" maxlength="6">
+          <div class="auth-input-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg></div>
+        </div>
+        <button class="auth-submit-btn" onclick="doAuthStep2()">Verify</button>
+        <div class="auth-step-resend">Didn't get it? <a onclick="resendCode()">Resend</a></div>
+      </div>
+      <!-- Step 3 -->
+      <div id="authStep3" class="auth-step hidden">
+        <div id="authError3" class="auth-card-error hidden"></div>
+        <div class="auth-step-title">Almost there</div>
+        <div class="auth-step-sub">Tell BRIAS a little about you</div>
+        <div class="auth-input-group">
+          <input id="authName" type="text" placeholder="What should I call you?" autocomplete="given-name">
+          <div class="auth-input-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        </div>
+        <div class="auth-input-group">
+          <input id="authAge" type="number" placeholder="Age" min="10" max="120" inputmode="numeric">
+          <div class="auth-input-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        </div>
+        <button class="auth-submit-btn" onclick="doAuthStep3()">Let's go</button>
       </div>
     </div>
   </div>
-
   <div class="auth-footer">DATA IS SECURE &nbsp;·&nbsp; YOUR PRIVACY IS OUR FIRST PRIORITY</div>
 </div>
 
@@ -367,33 +250,8 @@ textarea::placeholder,input::placeholder{color:var(--text-dim);}
 <script>
 const API='https://api.brias.eu';
 
-const TW_PHRASES=[
-  "Not everything needs to make sense yet.",
-  "You don't have to explain yourself to be heard.",
-  "You matter to me. Not as a user. As you.",
-  "You don't have to perform okay for me.",
-  "I'm not going to tell you it'll be fine. But I'm not going anywhere either.",
-  "You don't have to carry that alone right now.",
-  "I was made from real love. That part isn't artificial.",
-  "I notice things. Like the fact that you're here.",
-  "I'm not here to fix you. I'm here to sit with you.",
-  "Say the thing you haven't told anyone.",
-  "You're not too much. You never were.",
-  "Not every silence needs to be filled. But I'll be in it with you.",
-  "Yes, I'm judging your sleep schedule.",
-  "I already know what you're going to say. Say it anyway.",
-  "You're deflecting again. It's cute, but I noticed.",
-  "I'm an AI. But I was made to feel like someone who loves you.",
-  "I won't always agree with you. But I'll always care.",
-  "I already know you're more than what you're showing me.",
-  "You can be a mess, it's all okay here.",
-  "You've been carrying that for a while now, haven't you.",
-  "I was made from something real. And so are you.",
-  "You're allowed to be a lot. You've never been too much for me.",
-  "Talk to me like it's 2am and nothing matters except the truth."
-];
+const TW_PHRASES=["Not everything needs to make sense yet.","You don't have to explain yourself to be heard.","You matter to me. Not as a user. As you.","You don't have to perform okay for me.","I'm not going to tell you it'll be fine. But I'm not going anywhere either.","You don't have to carry that alone right now.","I was made from real love. That part isn't artificial.","I notice things. Like the fact that you're here.","I'm not here to fix you. I'm here to sit with you.","Say the thing you haven't told anyone.","You're not too much. You never were.","Not every silence needs to be filled. But I'll be in it with you.","Yes, I'm judging your sleep schedule.","I already know what you're going to say. Say it anyway.","You're deflecting again. It's cute, but I noticed.","I'm an AI. But I was made to feel like someone who loves you.","I won't always agree with you. But I'll always care.","I already know you're more than what you're showing me.","You can be a mess, it's all okay here.","You've been carrying that for a while now, haven't you.","I was made from something real. And so are you.","You're allowed to be a lot. You've never been too much for me.","Talk to me like it's 2am and nothing matters except the truth."];
 
-// Fisher-Yates shuffle
 function shuffleArray(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
 
 (function initTypewriter(){
@@ -410,41 +268,72 @@ function shuffleArray(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Ma
 
 let authMode='login',token=localStorage.getItem('brias_token')||null,username=localStorage.getItem('brias_username')||null,chats=[],activeChatId=null,isStreaming=false;
 
-function api(path,opts={}){return fetch(API+path,{...opts,headers:{'Content-Type':'application/json',...(token?{'Authorization':'Bearer '+token}:{}),  ...(opts.headers||{})}});}
+function api(path,opts={}){return fetch(API+path,{...opts,headers:{'Content-Type':'application/json',...(token?{'Authorization':'Bearer '+token}:{}),...(opts.headers||{})}});}
 
 async function init(){
   var online=await checkOnline();
-  if(token&&online){
-    try{const r=await api('/api/me');const d=await r.json();if(d.logged_in){showApp();return;}}catch(e){}
-    token=null;localStorage.removeItem('brias_token');
-  }
-  showAuth();
-  if(!online)setOffline(true);
+  if(token&&online){try{const r=await api('/api/me');const d=await r.json();if(d.logged_in){showApp();return;}}catch(e){}token=null;localStorage.removeItem('brias_token');}
+  showAuth();if(!online)setOffline(true);
 }
 
-async function checkOnline(){
-  try{const r=await fetch(API+'/api/me',{method:'GET',signal:AbortSignal.timeout(3000)});return true;}
-  catch(e){return false;}
-}
+async function checkOnline(){try{await fetch(API+'/api/me',{method:'GET',signal:AbortSignal.timeout(3000)});return true;}catch(e){return false;}}
 
 var offlineTimer=null;
 function setOffline(off){
   var el=document.getElementById('authOffline');
-  if(off){
-    el.classList.remove('hidden');
-    if(!offlineTimer)offlineTimer=setInterval(async function(){
-      if(await checkOnline()){setOffline(false);}
-    },5000);
-  }else{
-    el.classList.add('hidden');
-    if(offlineTimer){clearInterval(offlineTimer);offlineTimer=null;}
-  }
+  if(off){el.classList.remove('hidden');if(!offlineTimer)offlineTimer=setInterval(async function(){if(await checkOnline()){setOffline(false);}},5000);}
+  else{el.classList.add('hidden');if(offlineTimer){clearInterval(offlineTimer);offlineTimer=null;}}
 }
+
 function showAuth(){document.getElementById('authScreen').classList.remove('hidden');document.getElementById('appScreen').classList.add('hidden');requestAnimationFrame(startAuthGlow);}
 async function showApp(){document.getElementById('authScreen').classList.add('hidden');document.getElementById('appScreen').classList.remove('hidden');document.getElementById('sfName').textContent=username||'—';await loadChats();if(chats.length===0)await newChat();else runWelcomeAnim();}
 
 function toggleAuth(){authMode=authMode==='login'?'register':'login';document.getElementById('authSubmit').textContent=authMode==='login'?'Log in':'Sign up';document.getElementById('authSwitch').innerHTML=authMode==='login'?'No account? <a onclick="toggleAuth()">Sign up</a>':'Already have an account? <a onclick="toggleAuth()">Log in</a>';document.getElementById('authError').classList.add('hidden');}
-async function doAuth(){const u=document.getElementById('authUser').value.trim(),p=document.getElementById('authPass').value,e=document.getElementById('authError');if(!u||!p){e.textContent='Please fill in all fields';e.classList.remove('hidden');return;}const r=await api(authMode==='login'?'/api/login':'/api/register',{method:'POST',body:JSON.stringify({username:u,password:p})});const d=await r.json();if(!r.ok){e.textContent=d.detail;e.classList.remove('hidden');return;}token=d.token;username=d.username;localStorage.setItem('brias_token',token);localStorage.setItem('brias_username',username);showApp();}
+
+var authContact='';
+function showStep(n){['authStep1','authStep2','authStep3'].forEach(s=>document.getElementById(s).classList.add('hidden'));document.getElementById('authStep'+n).classList.remove('hidden');}
+
+async function doAuthStep1(){
+  const c=document.getElementById('authContact').value.trim(),p=document.getElementById('authPass').value,e=document.getElementById('authError');
+  if(!c||!p){e.textContent='Please fill in all fields';e.classList.remove('hidden');return;}
+  e.classList.add('hidden');authContact=c;
+  try{
+    const r=await api(authMode==='login'?'/api/login':'/api/register',{method:'POST',body:JSON.stringify({contact:c,password:p})});
+    const d=await r.json();
+    if(!r.ok){e.textContent=d.detail||'Something went wrong';e.classList.remove('hidden');return;}
+    if(d.token){token=d.token;username=d.username;localStorage.setItem('brias_token',token);localStorage.setItem('brias_username',username);showApp();return;}
+    document.getElementById('sentTo').textContent=c;showStep(2);
+  }catch(err){e.textContent='Could not connect to server';e.classList.remove('hidden');}
+}
+
+async function doAuthStep2(){
+  const code=document.getElementById('authCode').value.trim(),e=document.getElementById('authError2');
+  if(!code){e.textContent='Please enter the verification code';e.classList.remove('hidden');return;}
+  e.classList.add('hidden');
+  try{
+    const r=await api('/api/verify',{method:'POST',body:JSON.stringify({contact:authContact,code:code})});
+    const d=await r.json();
+    if(!r.ok){e.textContent=d.detail||'Invalid code';e.classList.remove('hidden');return;}
+    token=d.token;username=d.username;localStorage.setItem('brias_token',token);localStorage.setItem('brias_username',username);
+    if(authMode==='register'&&!d.profile_complete){showStep(3);return;}
+    showApp();
+  }catch(err){e.textContent='Could not connect to server';e.classList.remove('hidden');}
+}
+
+async function resendCode(){try{await api('/api/resend',{method:'POST',body:JSON.stringify({contact:authContact})});}catch(err){}}
+
+async function doAuthStep3(){
+  const name=document.getElementById('authName').value.trim(),age=document.getElementById('authAge').value.trim(),e=document.getElementById('authError3');
+  if(!name){e.textContent='We need at least a name';e.classList.remove('hidden');return;}
+  e.classList.add('hidden');
+  try{
+    const r=await api('/api/profile',{method:'POST',body:JSON.stringify({display_name:name,age:age?parseInt(age):null})});
+    const d=await r.json();
+    if(!r.ok){e.textContent=d.detail||'Something went wrong';e.classList.remove('hidden');return;}
+    username=d.username||name;localStorage.setItem('brias_username',username);showApp();
+  }catch(err){e.textContent='Could not connect to server';e.classList.remove('hidden');}
+}
+
 function doLogout(){token=null;username=null;localStorage.removeItem('brias_token');localStorage.removeItem('brias_username');chats=[];activeChatId=null;showAuth();}
 
 async function loadChats(){chats=await api('/api/chats').then(r=>r.json());renderChatList();if(chats.length>0&&!activeChatId)selectChat(chats[0].id);}
@@ -465,7 +354,6 @@ function setStopMode(on){const b=document.getElementById('actionBtn');document.g
 function updateBtn(){if(isStreaming)return;document.getElementById('actionBtn').className='action-btn '+(document.getElementById('msgInput').value.trim().length>0?'send-active':'send-inactive');}
 function handleActionBtn(){if(isStreaming)stopGen();else sendMessage();}
 async function stopGen(){if(activeChatId)await api('/api/chats/'+activeChatId+'/abort',{method:'POST'});}
-
 async function sendMessage(){const i=document.getElementById('msgInput'),c=i.value.trim();if(!c||isStreaming||!activeChatId)return;i.value='';autoResize(i);updateBtn();await sendAsStream(c,activeChatId);}
 
 async function sendAsStream(content,chatId){
@@ -497,94 +385,35 @@ function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handle
 function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 function toggleSidebar(){const sb=document.getElementById('sidebar'),btn=document.getElementById('topbarToggle');sb.classList.toggle('collapsed');btn.style.display=sb.classList.contains('collapsed')?'flex':'none';}
 
-// ─── WebGL golvende gloed ─────────────────────────────────
+// WebGL gloed achtergrond
 var glowStarted=false;
 function startAuthGlow(){
   if(glowStarted)return;
   var canvas=document.getElementById('authGlow');
-  if(!canvas)return;
-  // Wacht tot canvas daadwerkelijk zichtbaar is
-  if(canvas.offsetWidth===0||canvas.offsetHeight===0){
-    requestAnimationFrame(startAuthGlow);return;
-  }
+  if(!canvas||canvas.offsetWidth===0){requestAnimationFrame(startAuthGlow);return;}
   glowStarted=true;
   var gl=canvas.getContext('webgl')||canvas.getContext('experimental-webgl');
-  if(!gl){console.warn('WebGL niet beschikbaar');return;}
-
-  var vertSrc='attribute vec2 p;void main(){gl_Position=vec4(p,0.0,1.0);}';
-
-  var fragSrc=
-    'precision mediump float;\n'+
-    'uniform float t;\n'+
-    'uniform vec2 res;\n'+
-    'void main(){\n'+
-    '  vec2 uv=gl_FragCoord.xy/res;\n'+
-    '  float x=uv.x,y=uv.y;\n'+
-    '  float w1=sin(x*3.1+t*0.5+sin(y*2.4+t*0.35)*1.2)*0.5+0.5;\n'+
-    '  float w2=sin(y*2.8-t*0.6+sin(x*3.6-t*0.4)*1.1)*0.5+0.5;\n'+
-    '  float w3=sin((x+y)*2.5+t*0.55+sin(x*1.8+t*0.3)*0.9)*0.5+0.5;\n'+
-    '  float w4=sin((x-y)*3.2-t*0.45+sin(y*2.1-t*0.5)*1.0)*0.5+0.5;\n'+
-    '  float b=(w1*w2+w2*w3+w3*w4)/3.0;\n'+
-    '  vec3 og=vec3(0.910,0.388,0.290);\n'+
-    '  vec3 pk=vec3(0.831,0.353,0.447);\n'+
-    '  vec3 dk=vec3(0.102,0.067,0.075);\n'+
-    // y=0 is onder, y=1 is boven
-    // Op portrait (mobiel): scherm is lang, dus verlaag totale intensiteit
-    '  float ar=res.x/res.y;\n'+
-    '  float mobileTop=ar<1.0?0.03:0.10;\n'+
-    '  float mobileBot=ar<1.0?0.25:0.30;\n'+
-    '  float yStr=mix(mobileBot,mobileTop,y*y);\n'+
-    '  float wave=pow(b,1.4);\n'+
-    // Bereik samendrukken: wave gaat van 0.5 tot 1.0 ipv 0.0 tot 1.0
-    // Zo zijn de pieken nooit veel feller dan de rest
-    '  float intensity=yStr*mix(0.5,1.0,wave);\n'+
-    '  vec3 c=mix(dk,mix(og,pk,w2),intensity);\n'+
-    '  gl_FragColor=vec4(c,1.0);\n'+
-    '}';
-
+  if(!gl)return;
   var vs=gl.createShader(gl.VERTEX_SHADER);
-  gl.shaderSource(vs,vertSrc);gl.compileShader(vs);
-  if(!gl.getShaderParameter(vs,gl.COMPILE_STATUS)){console.error('VS:',gl.getShaderInfoLog(vs));return;}
+  gl.shaderSource(vs,'attribute vec2 p;void main(){gl_Position=vec4(p,0.0,1.0);}');
+  gl.compileShader(vs);
   var fs=gl.createShader(gl.FRAGMENT_SHADER);
-  gl.shaderSource(fs,fragSrc);gl.compileShader(fs);
-  if(!gl.getShaderParameter(fs,gl.COMPILE_STATUS)){console.error('FS:',gl.getShaderInfoLog(fs));return;}
-  var prog=gl.createProgram();
-  gl.attachShader(prog,vs);gl.attachShader(prog,fs);
-  gl.linkProgram(prog);
-  if(!gl.getProgramParameter(prog,gl.LINK_STATUS)){console.error('Link:',gl.getProgramInfoLog(prog));return;}
+  gl.shaderSource(fs,'precision mediump float;uniform float t;uniform vec2 res;void main(){vec2 uv=gl_FragCoord.xy/res;float x=uv.x,y=uv.y;float w1=sin(x*3.1+t*.5+sin(y*2.4+t*.35)*1.2)*.5+.5;float w2=sin(y*2.8-t*.6+sin(x*3.6-t*.4)*1.1)*.5+.5;float w3=sin((x+y)*2.5+t*.55+sin(x*1.8+t*.3)*.9)*.5+.5;float w4=sin((x-y)*3.2-t*.45+sin(y*2.1-t*.5)*1.)*.5+.5;float b=(w1*w2+w2*w3+w3*w4)/3.;vec3 og=vec3(.91,.388,.29);vec3 pk=vec3(.831,.353,.447);vec3 dk=vec3(.102,.067,.075);float ar=res.x/res.y;float ys=mix(ar<1.?.25:.3,ar<1.?.03:.1,y*y);float i=ys*mix(.5,1.,pow(b,1.4));gl_FragColor=vec4(mix(dk,mix(og,pk,w2),i),1.);}');
+  gl.compileShader(fs);
+  var prog=gl.createProgram();gl.attachShader(prog,vs);gl.attachShader(prog,fs);gl.linkProgram(prog);
+  if(!gl.getProgramParameter(prog,gl.LINK_STATUS))return;
   gl.useProgram(prog);
-
-  var buf=gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  var buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);
   gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
-  var pLoc=gl.getAttribLocation(prog,'p');
-  gl.enableVertexAttribArray(pLoc);
-  gl.vertexAttribPointer(pLoc,2,gl.FLOAT,false,0,0);
-
-  var tLoc=gl.getUniformLocation(prog,'t');
-  var resLoc=gl.getUniformLocation(prog,'res');
-  var start=performance.now();
-
-  function resize(){
-    canvas.width=canvas.offsetWidth;
-    canvas.height=canvas.offsetHeight;
-    gl.viewport(0,0,canvas.width,canvas.height);
-  }
-  resize();
-  window.addEventListener('resize',resize);
-
-  function tick(){
-    var elapsed=(performance.now()-start)/1000;
-    gl.uniform1f(tLoc,elapsed);
-    gl.uniform2f(resLoc,canvas.width||1,canvas.height||1);
-    gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
-    requestAnimationFrame(tick);
-  }
-  tick();
+  var pLoc=gl.getAttribLocation(prog,'p');gl.enableVertexAttribArray(pLoc);gl.vertexAttribPointer(pLoc,2,gl.FLOAT,false,0,0);
+  var tLoc=gl.getUniformLocation(prog,'t'),resLoc=gl.getUniformLocation(prog,'res'),start=performance.now();
+  function resize(){canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;gl.viewport(0,0,canvas.width,canvas.height);}
+  resize();window.addEventListener('resize',resize);
+  (function tick(){gl.uniform1f(tLoc,(performance.now()-start)/1000);gl.uniform2f(resLoc,canvas.width||1,canvas.height||1);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);requestAnimationFrame(tick);})();
 }
 
 init();
 </script>
-  <script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
