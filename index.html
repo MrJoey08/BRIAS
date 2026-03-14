@@ -107,6 +107,13 @@ textarea::placeholder,input::placeholder{color:var(--text-dim);}
   white-space:nowrap;overflow:hidden;
   text-shadow:0 0 20px rgba(10,5,8,1),0 0 40px rgba(10,5,8,.9),0 0 80px rgba(10,5,8,.7);
 }
+@media(max-width:480px){
+  .auth-typewriter-text{font-size:13px;}
+  .auth-typewriter-text .hey{font-size:14px;}
+  .auth-screen{padding-bottom:18vh;}
+  .auth-title{margin-bottom:0;}
+  .auth-typewriter{margin-bottom:24px;}
+}
 .auth-typewriter-text .hey{
   font-weight:500;font-size:18px;
   animation:heyShift 3s ease-in-out infinite;
@@ -453,7 +460,11 @@ function startAuthGlow(){
     '  vec3 pk=vec3(0.831,0.353,0.447);\n'+
     '  vec3 dk=vec3(0.102,0.067,0.075);\n'+
     // y=0 is onder, y=1 is boven
-    '  float yStr=mix(0.30,0.10,y*y);\n'+
+    // Compenseer voor portrait schermen: normaliseer y op basis van aspect ratio
+    '  float ar=res.x/res.y;\n'+
+    '  float yNorm=mix(y,y*ar,step(ar,1.0));\n'+
+    '  yNorm=clamp(yNorm,0.0,1.0);\n'+
+    '  float yStr=mix(0.30,0.10,yNorm*yNorm);\n'+
     '  float wave=pow(b,1.4);\n'+
     // Bereik samendrukken: wave gaat van 0.5 tot 1.0 ipv 0.0 tot 1.0
     // Zo zijn de pieken nooit veel feller dan de rest
