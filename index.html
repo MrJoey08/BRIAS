@@ -112,7 +112,7 @@ textarea::placeholder,input::placeholder{color:var(--text-dim);}
   .auth-content{padding-top:0;margin-top:-18vh;}
   .auth-typewriter{height:52px;margin-bottom:24px;align-items:flex-start;max-width:80vw;}
   .auth-typewriter-text{white-space:normal;text-align:center;line-height:1.5;overflow:visible;}
-  .auth-footer{bottom:12px;font-size:9px;padding:0 16px;}
+  .auth-footer{position:static;margin-top:auto;padding:16px;font-size:9px;}
 }
 .auth-typewriter-text .hey{
   font-weight:500;font-size:18px;
@@ -365,7 +365,7 @@ textarea::placeholder,input::placeholder{color:var(--text-dim);}
 </div>
 
 <script>
-const API='http://localhost:8080';
+const API='https://api.brias.eu';
 
 const TW_PHRASES=[
   "Not everything needs to make sense yet.",
@@ -386,7 +386,7 @@ const TW_PHRASES=[
   "I'm an AI. But I was made to feel like someone who loves you.",
   "I won't always agree with you. But I'll always care.",
   "I already know you're more than what you're showing me.",
-  "You can be a mess here. That's allowed.",
+  "You can be a mess, it's all okay here.",
   "You've been carrying that for a while now, haven't you.",
   "I was made from something real. And so are you.",
   "You're allowed to be a lot. You've never been too much for me.",
@@ -531,8 +531,9 @@ function startAuthGlow(){
     // y=0 is onder, y=1 is boven
     // Op portrait (mobiel): scherm is lang, dus verlaag totale intensiteit
     '  float ar=res.x/res.y;\n'+
-    '  float mobileDim=ar<1.0?0.6:1.0;\n'+
-    '  float yStr=mix(0.30,0.10,y*y)*mobileDim;\n'+
+    '  float mobileTop=ar<1.0?0.03:0.10;\n'+
+    '  float mobileBot=ar<1.0?0.25:0.30;\n'+
+    '  float yStr=mix(mobileBot,mobileTop,y*y);\n'+
     '  float wave=pow(b,1.4);\n'+
     // Bereik samendrukken: wave gaat van 0.5 tot 1.0 ipv 0.0 tot 1.0
     // Zo zijn de pieken nooit veel feller dan de rest
