@@ -108,11 +108,11 @@ textarea::placeholder,input::placeholder{color:var(--text-dim);}
   text-shadow:0 0 20px rgba(10,5,8,1),0 0 40px rgba(10,5,8,.9),0 0 80px rgba(10,5,8,.7);
 }
 @media(max-width:480px){
-  .auth-screen{padding-bottom:10vh;}
+  .auth-screen{padding-bottom:0;overflow-y:auto;overflow-x:hidden;}
   .auth-content{padding-top:0;margin-top:-18vh;}
   .auth-typewriter{height:52px;margin-bottom:24px;align-items:flex-start;max-width:80vw;}
   .auth-typewriter-text{white-space:normal;text-align:center;line-height:1.5;overflow:visible;}
-  .auth-footer{position:static;margin-top:auto;padding:16px;font-size:9px;}
+  .auth-footer{position:static;margin-top:auto;padding:20px 16px;font-size:9px;}
 }
 .auth-typewriter-text .hey{
   font-weight:500;font-size:18px;
