@@ -710,6 +710,23 @@ function startAuthGlow(){
 }
 
 init();
+
+// ─── DEV: hidden offline bypass (Shift+Alt+O) ────────────────
+(function(){
+  var _fakeOffline=false;
+  var _origCheckOnline=checkOnline;
+  checkOnline=async function(){
+    if(_fakeOffline)return false;
+    return _origCheckOnline();
+  };
+  document.addEventListener('keydown',function(e){
+    if(e.shiftKey&&e.altKey&&e.key==='O'){
+      _fakeOffline=!_fakeOffline;
+      setOffline(_fakeOffline);
+      console.log('[DEV] offline mode:',_fakeOffline);
+    }
+  });
+})();
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
 </body>
