@@ -90,25 +90,32 @@ async function doAuthStep3() {
   } catch (err) { window.location.href = 'offline.html'; }
 }
 
-/* Init */
+/* ── Init ──
+   Page starts with visibility:hidden on #authScreen.
+   We check online FIRST. If offline → redirect to offline.html.
+   User never sees the login page flash. */
 (async function initAuth() {
   var token = localStorage.getItem('brias_token');
   var online = await checkOnline();
 
-  /* Server down → offline page */
-  if (!online) { window.location.href = 'offline.html'; return; }
+  /* Server down → straight to offline. Login page never becomes visible. */
+  if (!online) {
+    window.location.replace('offline.html');
+    return;
+  }
 
-  /* Already logged in → app */
+  /* Already logged in → straight to app. Login page never becomes visible. */
   if (token) {
     try {
       var r = await api('/api/me');
       var d = await r.json();
-      if (d.logged_in) { window.location.href = 'app.html'; return; }
+      if (d.logged_in) { window.location.replace('app.html'); return; }
     } catch (e) {}
     localStorage.removeItem('brias_token');
   }
 
-  /* All good — start effects */
+  /* Server online + not logged in → NOW reveal the login page */
+  document.getElementById('authScreen').style.visibility = 'visible';
   initGlow('authGlow');
   initTypewriter('twText');
 })();
