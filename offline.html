@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BRIAS — Offline</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;500&family=Noto+Serif+Display:wght@600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/variables.css">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font);
+      background: var(--bg-deep);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .offline-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      max-width: 380px;
+      animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .offline-logo {
+      font-family: var(--font-display);
+      font-size: 64px;
+      font-weight: 600;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+      filter: drop-shadow(0 0 40px rgba(10, 5, 8, 0.9));
+    }
+
+    .offline-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.3; transform: scale(0.9); }
+      50% { opacity: 0.8; transform: scale(1.1); }
+    }
+
+    .offline-title {
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-sub);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .offline-message {
+      font-family: 'Bitter', Georgia, serif;
+      font-size: 16px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .offline-retry {
+      margin-top: 12px;
+      padding: 12px 32px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-sub);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .offline-retry:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: var(--text);
+    }
+
+    .offline-footer {
+      position: absolute;
+      bottom: 24px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.1);
+      letter-spacing: 0.1em;
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="offline-logo">BRIAS</div>
+    <div class="offline-dot"></div>
+    <div class="offline-title">Offline</div>
+    <div class="offline-message">
+      BRIAS is having her moment.<br>
+      Check your connection and she should be right back.
+    </div>
+    <button class="offline-retry" onclick="window.location.reload()">Try again</button>
+  </div>
+  <div class="offline-footer">BRIAS · LOCALLY POWERED AI</div>
+</body>
+</html>

@@ -1,0 +1,84 @@
+/* ═══════════════════════════════════════════════
+   BRIAS Design System — variables.css
+   Core tokens, typography, color, spacing
+   ═══════════════════════════════════════════════ */
+
+:root {
+  /* ── Color Palette ── */
+  --bg:             #2a2a2a;
+  --bg-deep:        #1a1118;
+  --sidebar:        #232323;
+  --sidebar-hover:  #2c2c2c;
+  --sidebar-active: #343434;
+  --border:         #353535;
+  --surface:        #333;
+  --surface-raised: #3a3a3a;
+
+  /* Text hierarchy */
+  --text:           #e8e8e8;
+  --text-sub:       #9a9a9a;
+  --text-muted:     #636363;
+  --text-dim:       #4e4e4e;
+
+  /* Input */
+  --input-bg:       #252525;
+  --input-border:   #393939;
+  --input-focus:    #4a4a4a;
+
+  /* Brand */
+  --orange:         #e8764a;
+  --pink:           #d44a7a;
+  --grad:           linear-gradient(135deg, #e8764a, #d44a7a);
+  --orange-glow:    rgba(232, 118, 74, 0.15);
+  --pink-glow:      rgba(212, 74, 122, 0.15);
+
+  /* Semantic */
+  --error:          #e06060;
+  --success:        #5cb85c;
+
+  /* ── Typography ── */
+  --font:           'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display:   'Noto Serif Display', Georgia, serif;
+  --font-logo:      'Lora', Georgia, serif;
+  --font-body:      'Bitter', Georgia, serif;
+
+  /* Scale */
+  --text-xs:        11px;
+  --text-sm:        13px;
+  --text-base:      14px;
+  --text-md:        15px;
+  --text-lg:        17px;
+  --text-xl:        20px;
+  --text-2xl:       23px;
+  --text-hero:      clamp(96px, 20vw, 164px);
+
+  /* ── Spacing ── */
+  --space-xs:       4px;
+  --space-sm:       8px;
+  --space-md:       14px;
+  --space-lg:       20px;
+  --space-xl:       28px;
+  --space-2xl:      40px;
+
+  /* ── Radii ── */
+  --radius-sm:      5px;
+  --radius-md:      8px;
+  --radius-lg:      12px;
+  --radius-xl:      16px;
+  --radius-2xl:     20px;
+  --radius-pill:    50px;
+  --radius-full:    50%;
+
+  /* ── Shadows ── */
+  --shadow-card:    0 8px 60px rgba(0, 0, 0, 0.35);
+  --shadow-btn:     0 4px 24px rgba(212, 74, 122, 0.2);
+  --shadow-btn-hover: 0 8px 32px rgba(212, 74, 122, 0.35);
+  --shadow-glow:    0 0 40px rgba(10, 5, 8, 0.9);
+
+  /* ── Transitions ── */
+  --ease-out:       cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-bounce:    cubic-bezier(0.34, 1.4, 0.64, 1);
+  --dur-fast:       0.12s;
+  --dur-base:       0.2s;
+  --dur-slow:       0.5s;
+}
