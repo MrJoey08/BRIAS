@@ -19,21 +19,6 @@ async function checkOnline() {
   catch (e) { return false; }
 }
 
-var offlineTimer = null;
-function setOffline(off) {
-  var el = document.getElementById('authOffline');
-  var card = document.querySelector('.auth-card');
-  if (off) {
-    el.classList.remove('hidden');
-    if (card) card.classList.add('is-offline');
-    if (!offlineTimer) offlineTimer = setInterval(async function() { if (await checkOnline()) setOffline(false); }, 5000);
-  } else {
-    el.classList.add('hidden');
-    if (card) card.classList.remove('is-offline');
-    if (offlineTimer) { clearInterval(offlineTimer); offlineTimer = null; }
-  }
-}
-
 function showStep(n) {
   ['authStep1','authStep2','authStep3'].forEach(function(s) { document.getElementById(s).classList.add('hidden'); });
   document.getElementById('authStep' + n).classList.remove('hidden');
@@ -64,7 +49,9 @@ async function doAuthStep1() {
     if (d.token) { localStorage.setItem('brias_token', d.token); localStorage.setItem('brias_username', d.username); window.location.href = 'app.html'; return; }
     document.getElementById('sentTo').textContent = c;
     showStep(2);
-  } catch (err) { e.textContent = 'Could not connect to server'; e.classList.remove('hidden'); }
+  } catch (err) {
+    window.location.href = 'offline.html';
+  }
   finally { btn.classList.remove('is-loading'); }
 }
 
@@ -81,7 +68,7 @@ async function doAuthStep2() {
     localStorage.setItem('brias_username', d.username);
     if (authMode === 'register' && !d.profile_complete) { showStep(3); return; }
     window.location.href = 'app.html';
-  } catch (err) { e.textContent = 'Could not connect to server'; e.classList.remove('hidden'); }
+  } catch (err) { window.location.href = 'offline.html'; }
 }
 
 async function resendCode() {
@@ -100,14 +87,19 @@ async function doAuthStep3() {
     if (!r.ok) { e.textContent = d.detail || 'Something went wrong'; e.classList.remove('hidden'); return; }
     localStorage.setItem('brias_username', d.username || name);
     window.location.href = 'app.html';
-  } catch (err) { e.textContent = 'Could not connect to server'; e.classList.remove('hidden'); }
+  } catch (err) { window.location.href = 'offline.html'; }
 }
 
 /* Init */
 (async function initAuth() {
   var token = localStorage.getItem('brias_token');
   var online = await checkOnline();
-  if (token && online) {
+
+  /* Server down → offline page */
+  if (!online) { window.location.href = 'offline.html'; return; }
+
+  /* Already logged in → app */
+  if (token) {
     try {
       var r = await api('/api/me');
       var d = await r.json();
@@ -115,7 +107,8 @@ async function doAuthStep3() {
     } catch (e) {}
     localStorage.removeItem('brias_token');
   }
+
+  /* All good — start effects */
   initGlow('authGlow');
   initTypewriter('twText');
-  if (!online) setOffline(true);
 })();

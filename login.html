@@ -23,13 +23,7 @@
     </div>
 
     <div class="auth-card">
-      <div class="auth-offline hidden" id="authOffline">
-        <div class="auth-offline-dot"></div>
-        <div class="auth-offline-title">OFFLINE</div>
-        <div class="auth-offline-sub">BRIAS is having her moment, she should be back soon</div>
-      </div>
-
-      <!-- Step 1 -->
+      <!-- Step 1: Email + Password -->
       <div id="authStep1" class="auth-step">
         <div id="authError" class="auth-card-error hidden"></div>
         <div class="auth-input-group">
@@ -44,7 +38,7 @@
         <div class="auth-switch-text"><span id="authSwitch">No account? <a onclick="toggleAuth()">Sign up</a></span></div>
       </div>
 
-      <!-- Step 2 -->
+      <!-- Step 2: Verification -->
       <div id="authStep2" class="auth-step hidden">
         <div id="authError2" class="auth-card-error hidden"></div>
         <div class="auth-step-info">We sent a code to <span id="sentTo"></span></div>
@@ -56,7 +50,7 @@
         <div class="auth-step-resend">Didn't get it? <a onclick="resendCode()">Resend</a></div>
       </div>
 
-      <!-- Step 3 -->
+      <!-- Step 3: Profile setup -->
       <div id="authStep3" class="auth-step hidden">
         <div id="authError3" class="auth-card-error hidden"></div>
         <div class="auth-step-title">Almost there</div>

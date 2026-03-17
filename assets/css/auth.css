@@ -41,13 +41,7 @@
 
 .auth-footer{position:absolute;bottom:24px;left:0;right:0;text-align:center;z-index:2;font-size:11px;color:rgba(255,255,255,.12);letter-spacing:.1em;font-weight:300;animation:fadeIn 1.5s ease 1.2s both;}
 
-.auth-offline{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:14px;}
-.auth-offline .auth-offline-dot{width:10px;height:10px;border-radius:50%;background:var(--text-muted);animation:offlinePulse 2s ease-in-out infinite;}
-@keyframes offlinePulse{0%,100%{opacity:.3;}50%{opacity:.8;}}
-.auth-offline .auth-offline-title{font-family:var(--font);font-size:18px;font-weight:600;color:var(--text-sub);letter-spacing:.15em;}
-.auth-offline .auth-offline-sub{font-family:var(--font-body);font-size:15px;color:var(--text-muted);text-align:center;line-height:1.5;}
-.auth-card.is-offline .auth-step{display:none!important;}
-.auth-card.is-offline #authOffline{display:flex!important;}
+
 
 @media(max-width:480px){
   .auth-screen{padding-bottom:0;overflow-y:auto;}
