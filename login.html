@@ -1,9 +1,6 @@
-/* ═══════════════════════════════════════════════════════════
-   BRIAS — Typewriter Animation
-   Used on the auth/login page
-   ═══════════════════════════════════════════════════════════ */
+/* BRIAS — Typewriter Animation */
 
-const TW_PHRASES = [
+var TW_PHRASES = [
   "Not everything needs to make sense yet.",
   "You don't have to explain yourself to be heard.",
   "You matter to me. Not as a user. As you.",
@@ -30,54 +27,37 @@ const TW_PHRASES = [
 ];
 
 function shuffleArray(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
   }
   return arr;
 }
 
-/**
- * Start the typewriter effect on a given element
- * @param {string} elementId — ID of the <span> to type into
- */
 function initTypewriter(elementId) {
-  const el = document.getElementById(elementId);
+  var el = document.getElementById(elementId);
   if (!el) return;
-
-  let queue = [...TW_PHRASES];
+  var queue = TW_PHRASES.slice();
   shuffleArray(queue);
-  let qi = 0, ci = 0, del = false;
+  var qi = 0, ci = 0, del = false;
 
   function tick() {
-    const phrase = queue[qi];
-
+    var p = queue[qi];
     if (!del) {
-      el.textContent = phrase.slice(0, ci + 1);
+      el.textContent = p.slice(0, ci + 1);
       ci++;
-      if (ci >= phrase.length) {
-        setTimeout(() => { del = true; tick(); }, 2800);
-        return;
-      }
+      if (ci >= p.length) { setTimeout(function() { del = true; tick(); }, 2800); return; }
       setTimeout(tick, 38 + Math.random() * 35);
     } else {
-      el.textContent = phrase.slice(0, ci);
+      el.textContent = p.slice(0, ci);
       ci--;
       if (ci < 0) {
-        del = false;
-        ci = 0;
-        qi++;
-        if (qi >= queue.length) {
-          queue = [...TW_PHRASES];
-          shuffleArray(queue);
-          qi = 0;
-        }
-        setTimeout(tick, 500);
-        return;
+        del = false; ci = 0; qi++;
+        if (qi >= queue.length) { queue = TW_PHRASES.slice(); shuffleArray(queue); qi = 0; }
+        setTimeout(tick, 500); return;
       }
       setTimeout(tick, 18 + Math.random() * 15);
     }
   }
-
   setTimeout(tick, 1400);
 }
