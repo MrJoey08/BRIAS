@@ -1,18 +1,8 @@
-/* BRIAS — Chat App Logic */
+/* BRIAS — Chat App */
 
-var API = 'https://api.brias.eu';
 var token = localStorage.getItem('brias_token') || null;
 var username = localStorage.getItem('brias_username') || null;
 var chats = [], activeChatId = null, isStreaming = false;
-
-function api(path, opts) {
-  opts = opts || {};
-  var headers = { 'Content-Type': 'application/json' };
-  if (token) headers['Authorization'] = 'Bearer ' + token;
-  if (opts.headers) { for (var k in opts.headers) headers[k] = opts.headers[k]; }
-  opts.headers = headers;
-  return fetch(API + path, opts);
-}
 
 function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 function scrollBottom() { var c = document.getElementById('msgContainer'); setTimeout(function() { c.scrollTop = c.scrollHeight; }, 30); }
@@ -38,8 +28,7 @@ function updateBtn() {
 }
 
 function handleActionBtn() { if (isStreaming) stopGen(); else sendMessage(); }
-
-async function stopGen() { if (activeChatId) await api('/api/chats/' + activeChatId + '/abort', { method: 'POST' }); }
+async function stopGen() { if (activeChatId) await briasApi('/api/chats/' + activeChatId + '/abort', { method: 'POST' }); }
 
 async function sendMessage() {
   var i = document.getElementById('msgInput'), c = i.value.trim();
@@ -53,6 +42,7 @@ async function sendAsStream(content, chatId) {
   var welcome = document.getElementById('welcomeScreen'); if (welcome) welcome.remove();
   var inner = document.getElementById('msgInner');
   var isEdit = !!document.querySelector('[data-edit-content="' + content + '"]');
+
   if (!isEdit) {
     inner.insertAdjacentHTML('beforeend', '<div class="msg user" id="msg-pending"><div class="msg-inner"><div class="msg-avatar"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9a9a9a" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="msg-body"><div class="msg-bubble">' + esc(content) + '</div></div></div></div>');
     scrollBottom();
@@ -61,15 +51,17 @@ async function sendAsStream(content, chatId) {
   scrollBottom();
 
   try {
-    var resp = await api('/api/chats/' + chatId + '/messages/stream', { method: 'POST', body: JSON.stringify({ content: content }) });
+    var resp = await briasApi('/api/chats/' + chatId + '/messages/stream', { method: 'POST', body: JSON.stringify({ content: content }) });
     if (!resp.ok) throw new Error('Server error');
     var reader = resp.body.getReader(), dec = new TextDecoder();
     var buf = '', sb = null, st = '', gm = false;
+
     while (true) {
       var result = await reader.read();
       if (result.done) break;
       buf += dec.decode(result.value, { stream: true });
       var lines = buf.split('\n'); buf = lines.pop();
+
       for (var li = 0; li < lines.length; li++) {
         var line = lines[li];
         if (!line.startsWith('data: ')) continue;
@@ -117,7 +109,7 @@ async function sendAsStream(content, chatId) {
   }
 }
 
-/* Welcome animation BRAIS → BRIAS */
+/* BRAIS → BRIAS welcome animation */
 function runWelcomeAnim() {
   var logo = document.getElementById('welcomeLogo');
   if (!logo) return;
@@ -153,20 +145,24 @@ function runWelcomeAnim() {
 
 /* Chat CRUD */
 async function loadChats() {
-  chats = await api('/api/chats').then(function(r) { return r.json(); });
+  try {
+    chats = await briasApi('/api/chats').then(function(r) { return r.json(); });
+  } catch (e) { chats = []; }
   renderChatList();
   if (chats.length > 0 && !activeChatId) selectChat(chats[0].id);
 }
 
 async function newChat() {
-  var c = await api('/api/chats', { method: 'POST', body: JSON.stringify({ title: 'New chat' }) }).then(function(r) { return r.json(); });
-  chats.unshift({ id: c.id, title: c.title, created_at: new Date().toISOString(), updated_at: new Date().toISOString() });
-  renderChatList(); selectChat(c.id); runWelcomeAnim();
+  try {
+    var c = await briasApi('/api/chats', { method: 'POST', body: JSON.stringify({ title: 'New chat' }) }).then(function(r) { return r.json(); });
+    chats.unshift({ id: c.id, title: c.title, created_at: new Date().toISOString(), updated_at: new Date().toISOString() });
+    renderChatList(); selectChat(c.id); runWelcomeAnim();
+  } catch (e) { /* Server down mid-session — graceful fail */ }
 }
 
 async function deleteChat(id, ev) {
   ev.stopPropagation();
-  await api('/api/chats/' + id, { method: 'DELETE' });
+  await briasApi('/api/chats/' + id, { method: 'DELETE' });
   chats = chats.filter(function(c) { return c.id !== id; });
   if (activeChatId === id) { activeChatId = null; chats.length > 0 ? selectChat(chats[0].id) : newChat(); }
   renderChatList();
@@ -174,8 +170,10 @@ async function deleteChat(id, ev) {
 
 async function selectChat(id) {
   activeChatId = id; renderChatList();
-  var msgs = await api('/api/chats/' + id + '/messages').then(function(r) { return r.json(); });
-  renderMessages(msgs);
+  try {
+    var msgs = await briasApi('/api/chats/' + id + '/messages').then(function(r) { return r.json(); });
+    renderMessages(msgs);
+  } catch (e) { renderMessages([]); }
 }
 
 function renderChatList() {
@@ -229,7 +227,7 @@ async function confirmEdit(id) {
   var ea = document.getElementById('editarea-' + id), nc = ea.value.trim();
   if (!nc) return;
   document.getElementById('bubble-' + id).textContent = nc; cancelEdit(id);
-  var r = await api('/api/messages/' + id, { method: 'PATCH', body: JSON.stringify({ content: nc }) });
+  var r = await briasApi('/api/messages/' + id, { method: 'PATCH', body: JSON.stringify({ content: nc }) });
   if (!r.ok) { alert('Edit failed'); return; }
   var d = await r.json();
   var me = document.getElementById('msg-' + id);
@@ -245,13 +243,20 @@ function doLogout() {
   window.location.href = 'login.html';
 }
 
-/* Init */
+/* Init — app starts invisible, revealed after auth check */
 (async function initApp() {
-  if (!token) { window.location.href = 'login.html'; return; }
+  if (!token) { window.location.replace('login.html'); return; }
+
   try {
-    var r = await api('/api/me'); var d = await r.json();
-    if (!d.logged_in) { localStorage.removeItem('brias_token'); window.location.href = 'login.html'; return; }
-  } catch (e) { /* offline but has token, let them try */ }
+    var r = await briasApi('/api/me');
+    var d = await r.json();
+    if (!d.logged_in) { localStorage.removeItem('brias_token'); window.location.replace('login.html'); return; }
+  } catch (e) {
+    /* Server offline — but user has token. Show the app anyway, let API calls fail gracefully */
+  }
+
+  /* Reveal */
+  document.getElementById('appScreen').style.visibility = 'visible';
   document.getElementById('sfName').textContent = username || '—';
   await loadChats();
   if (chats.length === 0) await newChat(); else runWelcomeAnim();

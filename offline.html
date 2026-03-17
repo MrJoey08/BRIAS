@@ -1,14 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>BRIAS — Offline</title>
+<meta name="description" content="BRIAS is temporarily unavailable.">
 <meta name="theme-color" content="#1a1118">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="assets/css/base.css">
 <link rel="stylesheet" href="assets/css/offline.css">
 </head>
 <body>
+<noscript><div class="noscript-msg">BRIAS needs JavaScript to work.<br>Please enable it in your browser settings.</div></noscript>
 
 <div class="offline-screen">
   <canvas class="auth-glow-canvas" id="offlineGlow"></canvas>
@@ -26,25 +31,33 @@
   <div class="offline-footer">BRIAS &nbsp;&middot;&nbsp; MADE FROM SOMETHING REAL</div>
 </div>
 
+<script src="assets/js/config.js"></script>
 <script src="assets/js/glow.js"></script>
 <script>
-var API='https://api.brias.eu';
 initGlow('offlineGlow');
 
-var autoRetry=setInterval(checkAndRedirect,8000);
-async function checkAndRedirect(){
-  try{var r=await fetch(API+'/api/me',{method:'GET',signal:AbortSignal.timeout(3000)});if(r.ok){clearInterval(autoRetry);window.location.replace('index.html');}}
-  catch(e){}
+var autoRetry = setInterval(checkAndRedirect, 8000);
+
+async function checkAndRedirect() {
+  var online = await briasCheckOnline();
+  if (online) { clearInterval(autoRetry); window.location.replace('index.html'); }
 }
 
-async function retryConnection(){
-  var btn=document.getElementById('retryBtn');
-  btn.classList.add('is-checking');btn.textContent='Checking...';
-  try{var r=await fetch(API+'/api/me',{method:'GET',signal:AbortSignal.timeout(4000)});
-    if(r.ok){btn.textContent='Connected!';setTimeout(function(){window.location.replace('index.html');},400);return;}}
-  catch(e){}
-  btn.textContent='Still offline...';btn.classList.remove('is-checking');
-  setTimeout(function(){btn.textContent='Try again';},2000);
+async function retryConnection() {
+  var btn = document.getElementById('retryBtn');
+  btn.classList.add('is-checking');
+  btn.textContent = 'Checking...';
+
+  var online = await briasCheckOnline();
+  if (online) {
+    btn.textContent = 'Connected!';
+    setTimeout(function() { window.location.replace('index.html'); }, 400);
+    return;
+  }
+
+  btn.textContent = 'Still offline...';
+  btn.classList.remove('is-checking');
+  setTimeout(function() { btn.textContent = 'Try again'; }, 2000);
 }
 </script>
 </body>
