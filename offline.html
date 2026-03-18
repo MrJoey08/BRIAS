@@ -15,20 +15,17 @@
 <noscript><div class="noscript-msg">BRIAS needs JavaScript to work.<br>Please enable it in your browser settings.</div></noscript>
 
 <div class="offline-screen">
-  <canvas class="auth-glow-canvas" id="offlineGlow"></canvas>
-  <div class="auth-grain"></div>
-  <div class="auth-vignette"></div>
+  <canvas class="glow-canvas" id="offlineGlow"></canvas>
+  <div class="grain-overlay"></div>
+  <div class="vignette-overlay"></div>
 
   <div class="offline-content">
     <div class="offline-logo">BRIAS</div>
-    <div class="offline-divider"></div>
-    <div class="offline-message">
-      I'll be right back.<br>
-      Just give me a moment.
-    </div>
-    <div class="offline-retry">
-      <button class="offline-retry-btn" id="retryBtn" onclick="retryConnection()">Try again</button>
-      <div class="offline-status" id="statusText"></div>
+    <div class="offline-line"></div>
+    <div class="offline-text">I'll be right back.<br>Just give me a moment.</div>
+    <div class="offline-action">
+      <button class="offline-btn" id="retryBtn" onclick="retryConnection()">Try again</button>
+      <div class="offline-note" id="statusText"></div>
     </div>
   </div>
 </div>
@@ -38,36 +35,35 @@
 <script>
 initGlow('offlineGlow');
 
-/* Silent auto-retry every 8s */
 var autoRetry = setInterval(function() {
-  briasCheckOnline().then(function(online) {
-    if (online) {
+  briasCheckOnline().then(function(ok) {
+    if (ok) {
       clearInterval(autoRetry);
-      document.getElementById('statusText').textContent = 'reconnected';
-      document.getElementById('statusText').className = 'offline-status is-connected';
+      var s = document.getElementById('statusText');
+      s.textContent = 'reconnected';
+      s.className = 'offline-note ok';
       setTimeout(function() { window.location.replace('index.html'); }, 600);
     }
   });
 }, 8000);
 
-/* Manual retry */
 async function retryConnection() {
   var btn = document.getElementById('retryBtn');
-  var status = document.getElementById('statusText');
+  var s = document.getElementById('statusText');
   btn.classList.add('is-checking');
-  status.textContent = 'checking...';
+  s.textContent = 'checking...';
 
-  var online = await briasCheckOnline();
-  if (online) {
-    status.textContent = 'reconnected';
-    status.className = 'offline-status is-connected';
+  var ok = await briasCheckOnline();
+  if (ok) {
+    s.textContent = 'reconnected';
+    s.className = 'offline-note ok';
     setTimeout(function() { window.location.replace('index.html'); }, 600);
     return;
   }
 
-  status.textContent = 'still waiting';
+  s.textContent = 'still waiting';
   btn.classList.remove('is-checking');
-  setTimeout(function() { status.textContent = ''; }, 3000);
+  setTimeout(function() { s.textContent = ''; }, 3000);
 }
 </script>
 </body>

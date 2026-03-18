@@ -17,53 +17,22 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="assets/css/base.css">
 <style>
-.splash{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  height:100vh;
-  background:var(--auth-bg);
-  overflow:hidden;
-}
-.splash-logo{
-  font-family:var(--font-display);
-  font-size:clamp(80px,20vw,160px);
-  font-weight:600;
-  letter-spacing:.03em;
-  background:var(--grad);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  background-clip:text;
-  opacity:0;
-  animation:splashIn .7s var(--ease-smooth) .1s forwards;
-}
-@keyframes splashIn{
-  from{opacity:0;transform:scale(.96);}
-  to{opacity:1;transform:scale(1);}
-}
+.splash{display:flex;align-items:center;justify-content:center;height:100vh;background:var(--auth-bg);}
+.splash-logo{font-family:var(--font-display);font-size:clamp(80px,20vw,160px);font-weight:600;letter-spacing:.03em;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0;animation:splashIn .7s var(--ease-out) .1s forwards;}
+@keyframes splashIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
 </style>
 </head>
 <body>
 <noscript><div class="noscript-msg">BRIAS needs JavaScript to work.<br>Please enable it in your browser settings.</div></noscript>
-<div class="splash">
-  <div class="splash-logo">BRIAS</div>
-</div>
+<div class="splash"><div class="splash-logo">BRIAS</div></div>
 <script>
 (async function(){
   var API='https://api.brias.eu',token=localStorage.getItem('brias_token');
-
-  /* Always check if server is reachable first */
   var online=true;
   try{await fetch(API+'/api/me',{method:'HEAD',signal:AbortSignal.timeout(4000)});}
   catch(e){online=false;}
-
-  /* Server down → offline, regardless of token */
   if(!online){window.location.replace('offline.html');return;}
-
-  /* Server up, no token → login */
   if(!token){window.location.replace('login.html');return;}
-
-  /* Server up, has token → verify it */
   try{
     var r=await fetch(API+'/api/me',{headers:{'Authorization':'Bearer '+token}});
     var d=await r.json();

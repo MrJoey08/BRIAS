@@ -19,9 +19,9 @@
 <noscript><div class="noscript-msg">BRIAS needs JavaScript to work.<br>Please enable it in your browser settings.</div></noscript>
 
 <div id="authScreen" class="auth-screen" style="visibility:hidden;">
-  <canvas class="auth-glow-canvas" id="authGlow"></canvas>
-  <div class="auth-grain"></div>
-  <div class="auth-vignette"></div>
+  <canvas class="glow-canvas" id="authGlow"></canvas>
+  <div class="grain-overlay"></div>
+  <div class="vignette-overlay"></div>
 
   <div class="auth-content">
     <div class="auth-title">BRIAS</div>
@@ -30,7 +30,6 @@
     </div>
 
     <div class="auth-card">
-      <!-- Step 1: Credentials -->
       <div id="authStep1" class="auth-step">
         <div id="authError" class="auth-card-error hidden"></div>
         <div class="auth-input-group">
@@ -45,7 +44,6 @@
         <div class="auth-switch-text"><span id="authSwitch">No account? <a onclick="toggleAuth()">Sign up</a></span></div>
       </div>
 
-      <!-- Step 2: Verification -->
       <div id="authStep2" class="auth-step hidden">
         <div id="authError2" class="auth-card-error hidden"></div>
         <div class="auth-step-info">We sent a code to <span id="sentTo"></span></div>
@@ -57,7 +55,6 @@
         <div class="auth-step-resend">Didn't get it? <a onclick="resendCode()">Resend</a></div>
       </div>
 
-      <!-- Step 3: Profile -->
       <div id="authStep3" class="auth-step hidden">
         <div id="authError3" class="auth-card-error hidden"></div>
         <div class="auth-step-title">Almost there</div>
@@ -75,7 +72,7 @@
     </div>
   </div>
 
-  <div class="auth-footer">DATA IS SECURE &nbsp;&middot;&nbsp; YOUR PRIVACY IS OUR FIRST PRIORITY</div>
+  <div class="auth-footer">Data is secure &middot; Your privacy is our first priority</div>
 </div>
 
 <script src="assets/js/config.js"></script>
