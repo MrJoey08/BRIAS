@@ -1,21 +1,133 @@
-.offline-screen{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:var(--auth-bg);overflow:hidden;}
-.offline-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:20px;padding:0 24px;animation:fadeUp .6s var(--ease-smooth) both;}
+/* ═══════════════════════════════════════════════
+   BRIAS — Offline
+   She's just resting. She'll be back.
+   ═══════════════════════════════════════════════ */
 
-.offline-pulse{position:relative;width:64px;height:64px;display:flex;align-items:center;justify-content:center;}
-.offline-pulse::before,.offline-pulse::after{content:'';position:absolute;inset:0;border-radius:50%;border:1px solid rgba(232,118,74,.15);animation:pulseRing 3s ease-in-out infinite;}
-.offline-pulse::after{animation-delay:1.5s;}
-@keyframes pulseRing{0%{transform:scale(.8);opacity:.6;}50%{transform:scale(1.6);opacity:0;}100%{transform:scale(.8);opacity:0;}}
+.offline-screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: var(--auth-bg);
+  overflow: hidden;
+}
 
-.offline-dot{width:12px;height:12px;border-radius:50%;background:var(--grad);animation:offlineDotPulse 2s ease-in-out infinite;}
-@keyframes offlineDotPulse{0%,100%{opacity:.4;transform:scale(.9);}50%{opacity:1;transform:scale(1.1);}}
+.offline-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 32px;
+  max-width: 440px;
+  text-align: center;
+}
 
-.offline-title{font-family:var(--font-display);font-size:clamp(42px,10vw,64px);font-weight:600;letter-spacing:.03em;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:.3;}
-.offline-heading{font-family:var(--font);font-size:18px;font-weight:600;color:var(--text-sub);letter-spacing:.12em;text-transform:uppercase;}
-.offline-message{font-family:var(--font-body);font-size:15px;color:var(--text-muted);text-align:center;line-height:1.6;max-width:340px;}
+/* Logo — large, softly faded, like she's sleeping */
+.offline-logo {
+  font-family: var(--font-display);
+  font-size: clamp(80px, 20vw, 148px);
+  font-weight: 600;
+  letter-spacing: .03em;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.05;
+  opacity: 0;
+  animation: offlineLogo 1.2s var(--ease-smooth) .2s forwards;
+}
 
-.offline-retry-btn{margin-top:12px;padding:12px 32px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.03);color:var(--text-sub);font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;letter-spacing:.02em;}
-.offline-retry-btn:hover{border-color:rgba(232,118,74,.3);background:rgba(232,118,74,.06);color:var(--orange);}
-.offline-retry-btn:active{transform:scale(.97);}
-.offline-retry-btn.is-checking{pointer-events:none;opacity:.5;}
+@keyframes offlineLogo {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: .18; transform: translateY(0); }
+}
 
-.offline-footer{position:absolute;bottom:24px;left:0;right:0;text-align:center;z-index:2;font-size:11px;color:rgba(255,255,255,.08);letter-spacing:.1em;font-weight:300;}
+/* Divider — thin gradient line */
+.offline-divider {
+  width: 48px;
+  height: 1px;
+  background: var(--grad);
+  opacity: .25;
+  margin: 20px 0 24px;
+  animation: fadeIn .8s ease .6s both;
+}
+
+/* Message — warm, honest, human */
+.offline-message {
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: rgba(255,255,255,.45);
+  line-height: 1.7;
+  opacity: 0;
+  animation: offlineText .8s var(--ease-smooth) .7s forwards;
+}
+
+@keyframes offlineText {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Retry */
+.offline-retry {
+  margin-top: 32px;
+  opacity: 0;
+  animation: offlineText .8s var(--ease-smooth) 1s forwards;
+}
+
+.offline-retry-btn {
+  padding: 11px 28px;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 10px;
+  background: rgba(255,255,255,.025);
+  color: rgba(255,255,255,.4);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .25s;
+  letter-spacing: .01em;
+}
+
+.offline-retry-btn:hover {
+  border-color: rgba(232,118,74,.2);
+  color: rgba(255,255,255,.6);
+}
+
+.offline-retry-btn:active {
+  transform: scale(.97);
+}
+
+.offline-retry-btn.is-checking {
+  pointer-events: none;
+  opacity: .4;
+}
+
+/* Status text below button */
+.offline-status {
+  font-family: var(--font);
+  font-size: 11px;
+  color: rgba(255,255,255,.15);
+  margin-top: 12px;
+  height: 16px;
+  transition: color .3s;
+}
+
+.offline-status.is-connected {
+  color: rgba(232,118,74,.6);
+}
+
+/* Mobile */
+@media(max-width:480px) {
+  .offline-content {
+    padding: 0 24px;
+  }
+  .offline-logo {
+    font-size: clamp(64px, 22vw, 120px);
+  }
+  .offline-message {
+    font-size: 15px;
+  }
+}

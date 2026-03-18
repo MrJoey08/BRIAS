@@ -17,23 +17,36 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="assets/css/base.css">
 <style>
-.splash{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:var(--auth-bg);overflow:hidden;gap:4px;}
-.splash-logo{font-family:var(--font-display);font-size:clamp(72px,18vw,140px);font-weight:600;letter-spacing:.03em;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0;animation:splashIn .6s var(--ease-smooth) .1s forwards;}
-.splash-sub{font-family:var(--font-body);font-size:14px;color:var(--text-muted);opacity:0;animation:splashIn .6s var(--ease-smooth) .3s forwards;letter-spacing:.04em;}
-.splash-dots{display:flex;gap:6px;margin-top:28px;opacity:0;animation:splashIn .6s ease .5s forwards;}
-.splash-dots span{width:4px;height:4px;border-radius:50%;background:var(--text-dim);animation:dotPulse 1.2s ease-in-out infinite;}
-.splash-dots span:nth-child(2){animation-delay:.15s;}
-.splash-dots span:nth-child(3){animation-delay:.3s;}
-@keyframes splashIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-@keyframes dotPulse{0%,60%,100%{opacity:.3;}30%{opacity:1;}}
+.splash{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+  background:var(--auth-bg);
+  overflow:hidden;
+}
+.splash-logo{
+  font-family:var(--font-display);
+  font-size:clamp(80px,20vw,160px);
+  font-weight:600;
+  letter-spacing:.03em;
+  background:var(--grad);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  opacity:0;
+  animation:splashIn .7s var(--ease-smooth) .1s forwards;
+}
+@keyframes splashIn{
+  from{opacity:0;transform:scale(.96);}
+  to{opacity:1;transform:scale(1);}
+}
 </style>
 </head>
 <body>
 <noscript><div class="noscript-msg">BRIAS needs JavaScript to work.<br>Please enable it in your browser settings.</div></noscript>
 <div class="splash">
   <div class="splash-logo">BRIAS</div>
-  <div class="splash-sub">one moment...</div>
-  <div class="splash-dots"><span></span><span></span><span></span></div>
 </div>
 <script>
 (async function(){
