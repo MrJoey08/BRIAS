@@ -3,49 +3,89 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BRIAS — Offline</title>
-<meta name="theme-color" content="#1a1118">
-<link rel="stylesheet" href="assets/css/base.css">
-<link rel="stylesheet" href="assets/css/offline.css">
+<title>BRIAS · Be right back</title>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;500&family=Noto+Serif+Display:wght@600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --bg:#1a1118;--orange:#e8764a;--pink:#d44a7a;
+    --grad:linear-gradient(135deg,#e8764a,#d44a7a);
+    --font:'DM Sans',-apple-system,sans-serif;
+    --font-display:'Noto Serif Display',Georgia,serif;
+    --font-serif:'Bitter',Georgia,serif;
+    --text:rgba(255,255,255,.85);--text-sub:rgba(255,255,255,.35);
+  }
+  body{font-family:var(--font);background:var(--bg);height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;gap:0;}
+  canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;}
+  .grain{position:absolute;inset:0;z-index:1;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:200px;pointer-events:none;}
+  .vignette{position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse at center,transparent 40%,rgba(10,6,8,.6) 100%);pointer-events:none;}
+  .content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;gap:20px;padding:0 24px;max-width:400px;}
+  .logo{font-family:var(--font-display);font-size:72px;font-weight:600;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:logoIn .9s cubic-bezier(.16,1,.3,1) both;filter:drop-shadow(0 0 40px rgba(10,5,8,.9));}
+  @keyframes logoIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+  .status-dot{width:8px;height:8px;border-radius:50%;background:var(--orange);animation:pulse 2.2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:.3;transform:scale(.9);}50%{opacity:1;transform:scale(1.15);}}
+  .title{font-size:18px;font-weight:500;color:var(--text);letter-spacing:.06em;animation:fadeUp .6s ease .3s both;}
+  .sub{font-family:var(--font-serif);font-size:15px;color:var(--text-sub);line-height:1.6;animation:fadeUp .6s ease .5s both;}
+  .retry-btn{margin-top:8px;padding:11px 28px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.04);color:var(--text-sub);font-family:var(--font);font-size:13px;cursor:pointer;transition:all .2s;animation:fadeUp .6s ease .7s both;}
+  .retry-btn:hover{border-color:rgba(232,118,74,.3);color:var(--text);background:rgba(232,118,74,.06);}
+  .footer{position:absolute;bottom:24px;font-size:11px;color:rgba(255,255,255,.1);letter-spacing:.1em;z-index:2;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+</style>
 </head>
 <body>
-
-<div class="offline-screen">
-  <canvas class="auth-glow-canvas" id="offlineGlow"></canvas>
-  <div class="auth-grain"></div>
-  <div class="auth-vignette"></div>
-
-  <div class="offline-content">
-    <div class="offline-pulse"><div class="offline-dot"></div></div>
-    <div class="offline-title">BRIAS</div>
-    <div class="offline-heading">Offline</div>
-    <div class="offline-message">BRIAS is having her moment.<br>She should be back soon.</div>
-    <button class="offline-retry-btn" id="retryBtn" onclick="retryConnection()">Try again</button>
-  </div>
-
-  <div class="offline-footer">BRIAS &nbsp;&middot;&nbsp; MADE FROM SOMETHING REAL</div>
+<canvas id="glowCanvas"></canvas>
+<div class="grain"></div>
+<div class="vignette"></div>
+<div class="content">
+  <div class="logo">BRIAS</div>
+  <div class="status-dot"></div>
+  <div class="title">BE RIGHT BACK</div>
+  <div class="sub">BRIAS is having her moment.<br>She should be back soon.</div>
+  <button class="retry-btn" onclick="retry()">Try again</button>
 </div>
+<div class="footer">BRIAS · STATUS</div>
 
-<script src="assets/js/glow.js"></script>
 <script>
-var API='https://api.brias.eu';
-initGlow('offlineGlow');
+  const API = 'https://api.brias.eu';
 
-var autoRetry=setInterval(checkAndRedirect,8000);
-async function checkAndRedirect(){
-  try{var r=await fetch(API+'/api/me',{method:'GET',signal:AbortSignal.timeout(3000)});if(r.ok){clearInterval(autoRetry);window.location.replace('index.html');}}
-  catch(e){}
-}
+  // Start WebGL glow (same shader as login)
+  (function(){
+    const canvas = document.getElementById('glowCanvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (!gl) return;
+    const vs = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vs, 'attribute vec2 p;void main(){gl_Position=vec4(p,0.0,1.0);}');
+    gl.compileShader(vs);
+    const fs = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fs, 'precision mediump float;uniform float t;uniform vec2 res;void main(){vec2 uv=gl_FragCoord.xy/res;float x=uv.x,y=uv.y;float w1=sin(x*3.1+t*.5+sin(y*2.4+t*.35)*1.2)*.5+.5;float w2=sin(y*2.8-t*.6+sin(x*3.6-t*.4)*1.1)*.5+.5;float w3=sin((x+y)*2.5+t*.55+sin(x*1.8+t*.3)*.9)*.5+.5;float w4=sin((x-y)*3.2-t*.45+sin(y*2.1-t*.5)*1.)*.5+.5;float b=(w1*w2+w2*w3+w3*w4)/3.;vec3 og=vec3(.91,.388,.29);vec3 pk=vec3(.831,.353,.447);vec3 dk=vec3(.102,.067,.075);float ar=res.x/res.y;float ys=mix(ar<1.?.25:.3,ar<1.?.03:.1,y*y);float i=ys*mix(.5,1.,pow(b,1.4));gl_FragColor=vec4(mix(dk,mix(og,pk,w2),i),1.);}');
+    gl.compileShader(fs);
+    const prog = gl.createProgram();
+    gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
+    gl.useProgram(prog);
+    const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+    const pLoc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(pLoc); gl.vertexAttribPointer(pLoc, 2, gl.FLOAT, false, 0, 0);
+    const tLoc = gl.getUniformLocation(prog, 't'), resLoc = gl.getUniformLocation(prog, 'res'), start = performance.now();
+    function resize() { canvas.width = innerWidth; canvas.height = innerHeight; gl.viewport(0, 0, canvas.width, canvas.height); }
+    resize(); window.addEventListener('resize', resize);
+    (function tick() { gl.uniform1f(tLoc, (performance.now()-start)/1000); gl.uniform2f(resLoc, canvas.width||1, canvas.height||1); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); requestAnimationFrame(tick); })();
+  })();
 
-async function retryConnection(){
-  var btn=document.getElementById('retryBtn');
-  btn.classList.add('is-checking');btn.textContent='Checking...';
-  try{var r=await fetch(API+'/api/me',{method:'GET',signal:AbortSignal.timeout(4000)});
-    if(r.ok){btn.textContent='Connected!';setTimeout(function(){window.location.replace('index.html');},400);return;}}
-  catch(e){}
-  btn.textContent='Still offline...';btn.classList.remove('is-checking');
-  setTimeout(function(){btn.textContent='Try again';},2000);
-}
+  // Auto-retry every 5s
+  setInterval(async () => {
+    try {
+      await fetch(API + '/api/me', { signal: AbortSignal.timeout(3000) });
+      window.location.href = 'index.html';
+    } catch(e) {}
+  }, 5000);
+
+  async function retry() {
+    try {
+      await fetch(API + '/api/me', { signal: AbortSignal.timeout(3000) });
+      window.location.href = 'index.html';
+    } catch(e) {}
+  }
 </script>
 </body>
 </html>

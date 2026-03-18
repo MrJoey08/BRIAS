@@ -1,21 +1,145 @@
-.offline-screen{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:var(--auth-bg);overflow:hidden;}
-.offline-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:20px;padding:0 24px;animation:fadeUp .6s var(--ease-smooth) both;}
+// ===== BRIAS · Auth Logic =====
 
-.offline-pulse{position:relative;width:64px;height:64px;display:flex;align-items:center;justify-content:center;}
-.offline-pulse::before,.offline-pulse::after{content:'';position:absolute;inset:0;border-radius:50%;border:1px solid rgba(232,118,74,.15);animation:pulseRing 3s ease-in-out infinite;}
-.offline-pulse::after{animation-delay:1.5s;}
-@keyframes pulseRing{0%{transform:scale(.8);opacity:.6;}50%{transform:scale(1.6);opacity:0;}100%{transform:scale(.8);opacity:0;}}
+const API = 'https://api.brias.eu';
 
-.offline-dot{width:12px;height:12px;border-radius:50%;background:var(--grad);animation:offlineDotPulse 2s ease-in-out infinite;}
-@keyframes offlineDotPulse{0%,100%{opacity:.4;transform:scale(.9);}50%{opacity:1;transform:scale(1.1);}}
+let authMode = 'login';
+let authContact = '';
+let offlineTimer = null;
 
-.offline-title{font-family:var(--font-display);font-size:clamp(42px,10vw,64px);font-weight:600;letter-spacing:.03em;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:.3;}
-.offline-heading{font-family:var(--font);font-size:18px;font-weight:600;color:var(--text-sub);letter-spacing:.12em;text-transform:uppercase;}
-.offline-message{font-family:var(--font-body);font-size:15px;color:var(--text-muted);text-align:center;line-height:1.6;max-width:340px;}
+function api(path, opts = {}) {
+  const token = localStorage.getItem('brias_token');
+  return fetch(API + path, {
+    ...opts,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': 'Bearer ' + token } : {}),
+      ...(opts.headers || {})
+    }
+  });
+}
 
-.offline-retry-btn{margin-top:12px;padding:12px 32px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.03);color:var(--text-sub);font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;letter-spacing:.02em;}
-.offline-retry-btn:hover{border-color:rgba(232,118,74,.3);background:rgba(232,118,74,.06);color:var(--orange);}
-.offline-retry-btn:active{transform:scale(.97);}
-.offline-retry-btn.is-checking{pointer-events:none;opacity:.5;}
+async function checkOnline() {
+  try {
+    await fetch(API + '/api/me', { method: 'GET', signal: AbortSignal.timeout(3000) });
+    return true;
+  } catch(e) { return false; }
+}
 
-.offline-footer{position:absolute;bottom:24px;left:0;right:0;text-align:center;z-index:2;font-size:11px;color:rgba(255,255,255,.08);letter-spacing:.1em;font-weight:300;}
+function setOffline(off) {
+  const el = document.getElementById('authOffline');
+  const card = document.getElementById('authCard');
+  if (off) {
+    el.classList.remove('hidden');
+    if (card) card.classList.add('is-offline');
+    if (!offlineTimer) offlineTimer = setInterval(async () => {
+      if (await checkOnline()) setOffline(false);
+    }, 5000);
+  } else {
+    el.classList.add('hidden');
+    if (card) card.classList.remove('is-offline');
+    if (offlineTimer) { clearInterval(offlineTimer); offlineTimer = null; }
+  }
+}
+
+function showStep(n) {
+  ['authStep1', 'authStep2', 'authStep3'].forEach(s => document.getElementById(s)?.classList.add('hidden'));
+  document.getElementById('authStep' + n)?.classList.remove('hidden');
+}
+
+function toggleAuth() {
+  authMode = authMode === 'login' ? 'register' : 'login';
+  document.getElementById('authSubmit').textContent = authMode === 'login' ? 'Log in' : 'Sign up';
+  document.getElementById('authSwitch').innerHTML = authMode === 'login'
+    ? 'No account? <a onclick="toggleAuth()">Sign up</a>'
+    : 'Already have an account? <a onclick="toggleAuth()">Log in</a>';
+  document.getElementById('authError').classList.add('hidden');
+}
+
+async function doAuthStep1() {
+  const c = document.getElementById('authContact').value.trim();
+  const p = document.getElementById('authPass').value;
+  const e = document.getElementById('authError');
+  if (!c || !p) { e.textContent = 'Please fill in all fields'; e.classList.remove('hidden'); return; }
+  e.classList.add('hidden');
+  authContact = c;
+  try {
+    const r = await api(authMode === 'login' ? '/api/login' : '/api/register', {
+      method: 'POST', body: JSON.stringify({ contact: c, password: p })
+    });
+    const d = await r.json();
+    if (!r.ok) { e.textContent = d.detail || 'Something went wrong'; e.classList.remove('hidden'); return; }
+    if (d.token) {
+      localStorage.setItem('brias_token', d.token);
+      localStorage.setItem('brias_username', d.username);
+      window.location.href = 'app.html';
+      return;
+    }
+    document.getElementById('sentTo').textContent = c;
+    showStep(2);
+  } catch(err) {
+    e.textContent = 'Could not connect to server';
+    e.classList.remove('hidden');
+  }
+}
+
+async function doAuthStep2() {
+  const code = document.getElementById('authCode').value.trim();
+  const e = document.getElementById('authError2');
+  if (!code) { e.textContent = 'Please enter the verification code'; e.classList.remove('hidden'); return; }
+  e.classList.add('hidden');
+  try {
+    const r = await api('/api/verify', { method: 'POST', body: JSON.stringify({ contact: authContact, code }) });
+    const d = await r.json();
+    if (!r.ok) { e.textContent = d.detail || 'Invalid code'; e.classList.remove('hidden'); return; }
+    localStorage.setItem('brias_token', d.token);
+    localStorage.setItem('brias_username', d.username);
+    if (authMode === 'register' && !d.profile_complete) { showStep(3); return; }
+    window.location.href = 'app.html';
+  } catch(err) {
+    e.textContent = 'Could not connect to server';
+    e.classList.remove('hidden');
+  }
+}
+
+async function resendCode() {
+  try { await api('/api/resend', { method: 'POST', body: JSON.stringify({ contact: authContact }) }); } catch(e) {}
+}
+
+async function doAuthStep3() {
+  const name = document.getElementById('authName').value.trim();
+  const age = document.getElementById('authAge').value.trim();
+  const e = document.getElementById('authError3');
+  if (!name) { e.textContent = 'We need at least a name'; e.classList.remove('hidden'); return; }
+  e.classList.add('hidden');
+  try {
+    const r = await api('/api/profile', { method: 'POST', body: JSON.stringify({ display_name: name, age: age ? parseInt(age) : null }) });
+    const d = await r.json();
+    if (!r.ok) { e.textContent = d.detail || 'Something went wrong'; e.classList.remove('hidden'); return; }
+    localStorage.setItem('brias_username', d.username || name);
+    window.location.href = 'app.html';
+  } catch(err) {
+    e.textContent = 'Could not connect to server';
+    e.classList.remove('hidden');
+  }
+}
+
+// Init: check if already logged in, check if offline
+(async function init() {
+  const token = localStorage.getItem('brias_token');
+  const online = await checkOnline();
+
+  if (!online) {
+    setOffline(true);
+    return;
+  }
+
+  if (token) {
+    try {
+      const r = await api('/api/me');
+      const d = await r.json();
+      if (d.logged_in) { window.location.href = 'app.html'; return; }
+    } catch(e) {}
+    localStorage.removeItem('brias_token');
+    localStorage.removeItem('brias_username');
+  }
+})();
