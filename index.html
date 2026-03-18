@@ -38,9 +38,21 @@
 <script>
 (async function(){
   var API='https://api.brias.eu',token=localStorage.getItem('brias_token');
+
+  /* Always check if server is reachable first */
+  var online=true;
+  try{await fetch(API+'/api/me',{method:'HEAD',signal:AbortSignal.timeout(4000)});}
+  catch(e){online=false;}
+
+  /* Server down → offline, regardless of token */
+  if(!online){window.location.replace('offline.html');return;}
+
+  /* Server up, no token → login */
   if(!token){window.location.replace('login.html');return;}
+
+  /* Server up, has token → verify it */
   try{
-    var r=await fetch(API+'/api/me',{headers:{'Authorization':'Bearer '+token},signal:AbortSignal.timeout(4000)});
+    var r=await fetch(API+'/api/me',{headers:{'Authorization':'Bearer '+token}});
     var d=await r.json();
     if(d.logged_in){window.location.replace('app.html');}
     else{localStorage.removeItem('brias_token');window.location.replace('login.html');}
