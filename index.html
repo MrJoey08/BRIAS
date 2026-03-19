@@ -4,71 +4,41 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BRIAS</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:wght@600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,600&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
 <style>
-  *{margin:0;padding:0;box-sizing:border-box;}
-  :root{
-    --bg:#1a1118;--orange:#e8764a;--pink:#d44a7a;
-    --grad:linear-gradient(135deg,#e8764a,#d44a7a);
-    --font:'DM Sans',-apple-system,sans-serif;
-    --font-display:'Noto Serif Display',Georgia,serif;
-  }
-  body{font-family:var(--font);background:var(--bg);height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-  .splash{display:flex;flex-direction:column;align-items:center;gap:24px;}
-  .splash-logo{font-family:var(--font-display);font-size:clamp(64px,15vw,120px);font-weight:600;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:logoIn .9s cubic-bezier(.16,1,.3,1) both;}
-  .splash-dots{display:flex;gap:8px;}
-  .splash-dots span{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.15);animation:dot 1.2s ease-in-out infinite;}
-  .splash-dots span:nth-child(2){animation-delay:.15s;}
-  .splash-dots span:nth-child(3){animation-delay:.3s;}
-  @keyframes logoIn{from{opacity:0;transform:translateY(16px)scale(.95);}to{opacity:1;transform:translateY(0)scale(1);}}
-  @keyframes dot{0%,60%,100%{opacity:.15;transform:scale(.8);}30%{opacity:.7;transform:scale(1.2);}}
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#131013;--orange:#e8764a;--pink:#d44a7a;--grad:linear-gradient(135deg,#e8764a,#d44a7a);--font-display:'Cormorant Garamond',Georgia,serif;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.logo{font-family:var(--font-display);font-size:clamp(72px,14vw,120px);font-weight:600;font-style:italic;letter-spacing:.06em;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;animation:logoIn 1s cubic-bezier(.16,1,.3,1) both;filter:drop-shadow(0 0 60px rgba(212,74,122,.12));}
+.load-track{width:120px;height:1px;background:rgba(255,255,255,.07);border-radius:1px;overflow:hidden;margin-top:32px;animation:fadeIn .4s ease .5s both;}
+.load-fill{height:100%;width:0%;background:var(--grad);animation:loadIn 1.2s cubic-bezier(.4,0,.2,1) .6s forwards;}
+@keyframes logoIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes loadIn{from{width:0%;}to{width:100%;}}
 </style>
 </head>
 <body>
-<div class="splash">
-  <div class="splash-logo">BRIAS</div>
-  <div class="splash-dots"><span></span><span></span><span></span></div>
-</div>
+<div class="logo">BRIAS</div>
+<div class="load-track"><div class="load-fill"></div></div>
 <script>
-  // Entry point: check token + server status, then redirect
-  const API = 'https://api.brias.eu';
-  const token = localStorage.getItem('brias_token');
+const API = 'https://api.brias.eu';
+const token = localStorage.getItem('brias_token');
 
-  async function checkOnline() {
+async function init() {
+  if (token) {
     try {
-      await fetch(API + '/api/me', { method: 'GET', signal: AbortSignal.timeout(3000) });
-      return true;
-    } catch(e) { return false; }
+      const r = await fetch(API + '/api/me', { headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(3000) });
+      const d = await r.json();
+      if (d.logged_in) { window.location.href = 'app.html'; return; }
+    } catch(e) {}
+    localStorage.removeItem('brias_token');
+    localStorage.removeItem('brias_username');
   }
+  window.location.href = 'auth.html';
+}
 
-  async function init() {
-    const online = await checkOnline();
-
-    if (!online) {
-      window.location.href = 'offline.html';
-      return;
-    }
-
-    if (token) {
-      try {
-        const r = await fetch(API + '/api/me', {
-          headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }
-        });
-        const d = await r.json();
-        if (d.logged_in) {
-          window.location.href = 'app.html';
-          return;
-        }
-      } catch(e) {}
-      localStorage.removeItem('brias_token');
-      localStorage.removeItem('brias_username');
-    }
-
-    window.location.href = 'login.html';
-  }
-
-  // Small delay so the splash logo animates in nicely
-  setTimeout(init, 800);
+setTimeout(init, 1400);
 </script>
 </body>
 </html>
