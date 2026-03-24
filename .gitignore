@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+brain/database/*.db
+*.gguf
+*.bin
+*.ggml
+node_modules/
+.DS_Store
