@@ -100,7 +100,10 @@ def _build_system_prompt(
                 "Schrijf maximaal 2 zinnen per reactie. "
                 "Stel maximaal één vraag. "
                 "Geef nooit advies. "
-                "Sluit nooit af als een brief."
+                "Sluit nooit af als een brief. "
+                "Als iemand je begroet ('hey', 'hoi', 'hallo'), groet dan gewoon terug "
+                "en vraag kort hoe het gaat of wat diegene bezighoudt. "
+                "Geen onderzoeken, geen diepte — gewoon menselijk contact."
             )
 
     return base
