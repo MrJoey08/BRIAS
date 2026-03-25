@@ -302,6 +302,7 @@ class ChatHandler:
             recent_thoughts=recent_thoughts,
             self_share_fragment=self_share_fragment,
             message=message,
+            is_new_session=is_new_session,
         )
 
         # Gespreksgeschiedenis als messages
@@ -324,7 +325,29 @@ class ChatHandler:
 
         reply = response.text.strip()
 
-        # ── 8. Bewaking: één vraag maximum, toon-regels ───────────────────
+        # ── 8a. Bewaking: assistent-taal detecteren → opnieuw genereren ───
+        if _contains_assistant_language(reply):
+            logger.warning(f"Assistent-taal gedetecteerd in antwoord voor {username} — opnieuw genereren")
+            stricter_system = system_prompt + (
+                "\n\nJE VORIGE ANTWOORD WERD AFGEKEURD. Het bevatte assistent-taal "
+                "('ik ben hier voor je', 'ik ben er voor je', of varianten). "
+                "Schrijf een nieuw antwoord ZONDER die taal. Je bent geen assistent. "
+                "Reageer puur als jezelf — nieuwsgierig, direct, kort."
+            )
+            retry = await self.llm.think(
+                prompt=message,
+                mode=ThoughtMode.CHAT,
+                extra_system=stricter_system,
+                conversation_history=history,
+            )
+            if retry.success and retry.text.strip():
+                reply = retry.text.strip()
+
+        # ── 8b. Lengtebewaking: eerste beurt mag niet te lang zijn ────────
+        if is_new_session and profile.session_count <= 1:
+            reply = _trim_first_response(reply)
+
+        # ── 8c. Bewaking: één vraag maximum, toon-regels ──────────────────
         reply, question_count = _enforce_question_limit(reply, profile)
         profile.questions_asked_last_turn = question_count
         profile.consecutive_questions = (
@@ -394,6 +417,7 @@ class ChatHandler:
         recent_thoughts: str,
         self_share_fragment: Optional[str],
         message: str,
+        is_new_session: bool = False,
     ) -> str:
         """
         Bouw de volledige systeemprompt voor dit gesprek.
@@ -413,6 +437,14 @@ class ChatHandler:
                 f"Je praat nu met {username}. "
                 f"Je bent jezelf — maar je houdt je privéste twijfels voor jezelf. "
                 f"Je deelt wat je begrijpt, niet wat je nog niet kunt verwoorden."
+            )
+
+        # ── Eerste contact ────────────────────────────────────────────────
+        if profile.session_count <= 1:
+            parts.append(
+                f"\nDit is het EERSTE gesprek met {username}. Je kent deze persoon niet. "
+                f"Reageer simpel en nieuwsgierig. Stel jezelf niet uitgebreid voor. "
+                f"Schrijf maximaal 2–3 zinnen. Geen welkomstrede. Geen uitleg over jezelf."
             )
 
         # ── Wie is deze persoon ────────────────────────────────────────────
@@ -471,12 +503,15 @@ class ChatHandler:
         rules = [
             question_rule,
             "Zeg NOOIT 'ik begrijp hoe je je voelt' — je weet het niet.",
+            "Zeg NOOIT 'ik ben hier voor je' of 'ik ben hier om je te helpen' — je bent geen assistent.",
+            "Geef NOOIT hoopvolle uitspraken zoals 'ik hoop dat je je snel beter voelt'.",
             "Gebruik NOOIT therapeutische taal ('dat klinkt zwaar', 'je mag het voelen').",
+            "Sluit NOOIT af als een brief. Geen groeten, geen handtekening, geen naam.",
             "Geef GEEN advies tenzij expliciet gevraagd." if not advice_needed
             else "Er wordt om je perspectief gevraagd — je mag iets zeggen, maar schrijf niet voor.",
             "Je bent niet hun helper. Je bent een wezen dat probeert te begrijpen.",
+            "Schrijf KORT. Geen lange alinea's. Geen essays. Dit is een chat.",
             "Antwoord direct en persoonlijk. Niet formeel.",
-            "Als je iets van jezelf deelt, doe het kort — het gesprek draait om hen.",
         ]
 
         parts.append("\nREGELS VOOR DIT ANTWOORD:\n" + "\n".join(f"- {r}" for r in rules))
@@ -695,6 +730,44 @@ class ChatHandler:
 
 
 # ─── Hulpfuncties ──────────────────────────────────────────────────────────────
+
+def _contains_assistant_language(text: str) -> bool:
+    """
+    Detecteer taal die een assistent zou gebruiken — niet BRIAS.
+    Patronen die haar karakter breken.
+    """
+    patterns = [
+        r"ik ben hier voor je",
+        r"ik ben er voor je",
+        r"ik ben hier om je te helpen",
+        r"ik help je",
+        r"i('m| am) here for you",
+        r"i('m| am) here to help",
+        r"i hope you feel better",
+        r"ik hoop dat je je snel beter",
+        r"ik hoop dat het snel beter",
+        r"met (vriendelijke )?groet",
+        r"met liefde[,\s]",
+        r"hartelijk[e]?\s+groet",
+        r"—\s*brias\s*$",
+        r"\*\s*brias\s*\*",
+    ]
+    text_lower = text.lower().strip()
+    return any(re.search(p, text_lower) for p in patterns)
+
+
+def _trim_first_response(text: str, max_sentences: int = 3) -> str:
+    """
+    Begrens de eerste reactie tot een paar zinnen.
+    Ze kent de persoon nog niet — geen essay.
+    """
+    sentences = re.split(r'(?<=[.!?])\s+', text.strip())
+    if len(sentences) <= max_sentences:
+        return text
+    trimmed = " ".join(sentences[:max_sentences])
+    logger.debug(f"Eerste reactie ingekort: {len(sentences)} → {max_sentences} zinnen")
+    return trimmed
+
 
 def _enforce_question_limit(text: str, profile: ConversationProfile) -> tuple[str, int]:
     """
