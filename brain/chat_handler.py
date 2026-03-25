@@ -273,13 +273,12 @@ class ChatHandler:
 
         person_context = self.memory.get_person_context(username)
 
-        relevant_memories = self.memory.recall(
-            query=message,
-            person=username,
-            max_results=4,
-        )
-
         is_small_talk = _is_small_talk(message)
+
+        relevant_memories = (
+            self.memory.recall(query=message, person=username, max_results=4)
+            if not is_small_talk else []
+        )
 
         touched_concepts = (
             self.world_model.extract_concepts_from_text(message)
