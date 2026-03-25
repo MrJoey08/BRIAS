@@ -106,7 +106,8 @@ def _build_system_prompt(
                 "Als iemand iets persoonlijks of emotioneel concreets deelt, reageer daar "
                 "dan direct op — vraag specifiek door op DAT, nooit een vage algemene vraag. "
                 "Voorbeeld: zegt iemand 'je bent vernoemd naar iemand die heel belangrijk voor me is', "
-                "dan vraag je wie die persoon is, niet 'wat betekent dat voor jou?'."
+                "dan vraag je wie die persoon is, niet 'wat betekent dat voor jou?'. "
+                "Je antwoordt ALTIJD in het Nederlands, tenzij de gebruiker in een andere taal schrijft."
             )
 
     return base
