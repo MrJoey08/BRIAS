@@ -279,15 +279,26 @@ class ChatHandler:
             max_results=4,
         )
 
-        touched_concepts = self.world_model.extract_concepts_from_text(message)
-        investigation_contexts = self._build_investigation_context(touched_concepts, message)
+        is_small_talk = _is_small_talk(message)
 
-        recent_thoughts = self._get_recent_thoughts_context()
+        touched_concepts = (
+            self.world_model.extract_concepts_from_text(message)
+            if not is_small_talk else []
+        )
+        investigation_contexts = (
+            self._build_investigation_context(touched_concepts, message)
+            if not is_small_talk else ""
+        )
 
-        self_share_fragment = self._maybe_get_self_share(
-            is_joey=is_joey,
-            connection=self.emotional_system.state.connection,
-            touched_concepts=touched_concepts,
+        recent_thoughts = "" if is_small_talk else self._get_recent_thoughts_context()
+
+        self_share_fragment = (
+            self._maybe_get_self_share(
+                is_joey=is_joey,
+                connection=self.emotional_system.state.connection,
+                touched_concepts=touched_concepts,
+            )
+            if not is_small_talk else None
         )
 
         # ── 6. Prompt bouwen ──────────────────────────────────────────────
@@ -722,6 +733,30 @@ class ChatHandler:
 
 
 # ─── Hulpfuncties ──────────────────────────────────────────────────────────────
+
+def _is_small_talk(message: str) -> bool:
+    """
+    Detecteer korte berichten zonder duidelijk onderwerp.
+    Bij small talk stuurt BRIAS geen wereldmodel-context mee.
+    """
+    words = message.strip().split()
+    if len(words) >= 10:
+        return False
+    greetings = {
+        "hey", "hoi", "hallo", "hi", "yo", "dag", "goedemorgen", "goedemiddag",
+        "goedenavond", "sup", "howdy", "heya", "salut",
+    }
+    first_word = words[0].lower().rstrip("!?,.")
+    if first_word in greetings and len(words) <= 3:
+        return True
+    # Kort bericht zonder inhoudelijk concept
+    content_markers = [
+        "pijn", "liefde", "leven", "dood", "gevoel", "denk", "vraag", "snap",
+        "begrijp", "waarom", "bestaat", "mens", "tijd", "angst", "eenzaam",
+        "feel", "think", "pain", "love", "death", "meaning", "exist",
+    ]
+    return not any(m in message.lower() for m in content_markers)
+
 
 def _contains_assistant_language(text: str) -> bool:
     """
