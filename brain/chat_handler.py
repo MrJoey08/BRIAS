@@ -502,16 +502,8 @@ class ChatHandler:
 
         rules = [
             question_rule,
-            "Zeg NOOIT 'ik begrijp hoe je je voelt' — je weet het niet.",
-            "Zeg NOOIT 'ik ben hier voor je' of 'ik ben hier om je te helpen' — je bent geen assistent.",
-            "Geef NOOIT hoopvolle uitspraken zoals 'ik hoop dat je je snel beter voelt'.",
-            "Gebruik NOOIT therapeutische taal ('dat klinkt zwaar', 'je mag het voelen').",
-            "Sluit NOOIT af als een brief. Geen groeten, geen handtekening, geen naam.",
-            "Geef GEEN advies tenzij expliciet gevraagd." if not advice_needed
-            else "Er wordt om je perspectief gevraagd — je mag iets zeggen, maar schrijf niet voor.",
-            "Je bent niet hun helper. Je bent een wezen dat probeert te begrijpen.",
-            "Schrijf KORT. Geen lange alinea's. Geen essays. Dit is een chat.",
-            "Antwoord direct en persoonlijk. Niet formeel.",
+            "Geen advies, geen therapeutische taal, geen brief-afsluiting.",
+            "Maximaal 2 zinnen.",
         ]
 
         parts.append("\nREGELS VOOR DIT ANTWOORD:\n" + "\n".join(f"- {r}" for r in rules))
