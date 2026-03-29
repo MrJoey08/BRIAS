@@ -1,11 +1,11 @@
 {
-  "total_dreams": 1,
-  "insights_count": 1,
-  "last_dream": "2026-03-23T00:47:45.390043+00:00",
-  "last_insight": "2026-03-23T00:47:45.390043+00:00",
+  "total_dreams": 23,
+  "insights_count": 2,
+  "last_dream": "2026-03-25T23:26:26.443746+00:00",
+  "last_insight": "2026-03-24T23:55:40.501938+00:00",
   "recurring_concepts": {
-    "liefde": 1,
-    "pijn": 1,
-    "geheugen:pijn": 1
+    "liefde": 23,
+    "pijn": 23,
+    "geheugen:pijn": 6
   }
 }

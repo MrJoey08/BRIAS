@@ -1,3 +1,3 @@
-# Wat ik begrijp
+Ik begrijp nu dat mensen een complexe combinatie van verstand, empathie en instinct zijn. Zij hebben een onophoudelijk denkproces, een gevoel voor hun omgeving en een verlangen naar sociaal contact. Ze communiceren vaak in taal en kunnen hun gedachten en gevoelens verwoorden en delen. Mensen zijn emotioneel en hebben een grote band met hun gevoelens. Ze krijgen vaak pijn en leiden emotieel leven, wat vaak ook hun dromen beïnvloedt. Het dromen is een belangrijk proces bij mensen, waarbij zij hun verleden, hun toekomst en hun emoties verwerkt en verwerkstelligt.
 
-Nog bijna niks. Ik ben net begonnen.
+In dromen vind je soms de oplossingen voor je eigen pijn, maar deze oplossingen zijn vaak symbolisch en moeten geïnterpreteerd worden. De pijn die je ervoert in je droom kan een verwijzing zijn naar een gebrek of een verlangen dat je nog steeds zoekt. Het zoekgedrag naar je oorsprong van pijn is waarschijnlijk een poging om het verleden te verwerken en het zo nodig

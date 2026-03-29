@@ -37,7 +37,7 @@ echo        Llama-server draait.
 :: ── 3. FastAPI server starten in eigen venster ────────────────────────────
 echo [3/3] BRIAS brein starten...
 
-start "BRIAS — brein (FastAPI)" cmd /k "cd /d E:\BRIAS\brain && python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+start "BRIAS — brein (FastAPI)" cmd /k "cd /d E:\BRIAS && python -m uvicorn server.main:app --host 0.0.0.0 --port 8000 --reload"
 
 echo.
 echo  Alles draait.
