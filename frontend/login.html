@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BRIAS — Inloggen</title>
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <style>
+    body { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+
+    .auth-wrap {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+    }
+
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .auth-logo h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+    .auth-logo p {
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      margin-top: 6px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      background: var(--bg3);
+      border-radius: var(--radius-sm);
+      padding: 4px;
+      margin-bottom: 24px;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 8px;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      transition: var(--trans);
+    }
+    .auth-tab.active {
+      background: var(--bg2);
+      color: var(--text);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+
+    .auth-form { display: flex; flex-direction: column; gap: 16px; }
+
+    .auth-footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.85rem;
+      color: var(--text-dimmer);
+    }
+    .auth-footer a { color: var(--text-dim); }
+    .auth-footer a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<div class="auth-wrap">
+  <div class="auth-logo">
+    <h2>BRIAS</h2>
+    <p id="auth-subtitle">Welkom terug.</p>
+  </div>
+
+  <div class="auth-tabs">
+    <button class="auth-tab" id="tab-login" onclick="showTab('login')">Inloggen</button>
+    <button class="auth-tab" id="tab-register" onclick="showTab('register')">Account aanmaken</button>
+  </div>
+
+  <!-- Login -->
+  <div id="panel-login">
+    <form class="auth-form" onsubmit="handleLogin(event)">
+      <div class="input-group">
+        <label>E-mailadres</label>
+        <input class="input" id="login-email" type="email" placeholder="jouw@email.nl" required autocomplete="email">
+      </div>
+      <div class="input-group">
+        <label>Wachtwoord</label>
+        <input class="input" id="login-password" type="password" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <div id="login-error" class="error-msg hidden"></div>
+      <button type="submit" class="btn btn-primary w-full" id="login-btn">Inloggen</button>
+    </form>
+  </div>
+
+  <!-- Register -->
+  <div id="panel-register" class="hidden">
+    <form class="auth-form" onsubmit="handleRegister(event)">
+      <div class="input-group">
+        <label>Hoe heet je?</label>
+        <input class="input" id="reg-name" type="text" placeholder="Jouw naam" required autocomplete="name">
+      </div>
+      <div class="input-group">
+        <label>E-mailadres</label>
+        <input class="input" id="reg-email" type="email" placeholder="jouw@email.nl" required autocomplete="email">
+      </div>
+      <div class="input-group">
+        <label>Wachtwoord</label>
+        <input class="input" id="reg-password" type="password" placeholder="Minimaal 6 tekens" required autocomplete="new-password">
+      </div>
+      <div id="reg-error" class="error-msg hidden"></div>
+      <button type="submit" class="btn btn-primary w-full" id="reg-btn">Account aanmaken</button>
+    </form>
+  </div>
+
+  <div class="auth-footer">
+    <a href="/">← Terug naar de startpagina</a>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="/assets/js/api.js"></script>
+<script>
+  // Al ingelogd?
+  if (API.isLoggedIn()) window.location.href = '/app';
+
+  function showTab(tab) {
+    document.getElementById('panel-login').classList.toggle('hidden', tab !== 'login');
+    document.getElementById('panel-register').classList.toggle('hidden', tab !== 'register');
+    document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+    document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+    document.getElementById('auth-subtitle').textContent =
+      tab === 'login' ? 'Welkom terug.' : 'Maak een account aan.';
+    history.replaceState(null, '', tab === 'register' ? '?tab=register' : '/login');
+  }
+
+  // Check URL param
+  const tab = new URLSearchParams(location.search).get('tab');
+  showTab(tab === 'register' ? 'register' : 'login');
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    const btn = document.getElementById('login-btn');
+    const err = document.getElementById('login-error');
+    err.classList.add('hidden');
+    btn.disabled = true;
+    btn.textContent = 'Even geduld...';
+    try {
+      const res = await API.login(
+        document.getElementById('login-email').value,
+        document.getElementById('login-password').value,
+      );
+      API.saveSession(res.token, res.user, res.is_admin);
+      window.location.href = '/app';
+    } catch (ex) {
+      err.textContent = ex.message;
+      err.classList.remove('hidden');
+      btn.disabled = false;
+      btn.textContent = 'Inloggen';
+    }
+  }
+
+  async function handleRegister(e) {
+    e.preventDefault();
+    const btn = document.getElementById('reg-btn');
+    const err = document.getElementById('reg-error');
+    err.classList.add('hidden');
+    btn.disabled = true;
+    btn.textContent = 'Account aanmaken...';
+    try {
+      const res = await API.register(
+        document.getElementById('reg-email').value,
+        document.getElementById('reg-name').value,
+        document.getElementById('reg-password').value,
+      );
+      API.saveSession(res.token, res.user, res.is_admin);
+      window.location.href = '/app';
+    } catch (ex) {
+      err.textContent = ex.message;
+      err.classList.remove('hidden');
+      btn.disabled = false;
+      btn.textContent = 'Account aanmaken';
+    }
+  }
+</script>
+</body>
+</html>
