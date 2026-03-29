@@ -1,28 +1,20 @@
 {
-  "version": 2,
-  "name": "brias",
-  "buildCommand": null,
-  "outputDirectory": "frontend",
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "https://brias-backend.onrender.com/api/:path*"
-    },
-    {
-      "source": "/health",
-      "destination": "https://brias-backend.onrender.com/health"
-    },
-    { "source": "/login", "destination": "/login.html" },
-    { "source": "/app",   "destination": "/app.html"   },
-    { "source": "/",      "destination": "/index.html"  }
-  ],
   "headers": [
     {
-      "source": "/(.*)",
+      "source": "/assets/js/(.*).js",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options",        "value": "DENY"    }
+        { "key": "Content-Type", "value": "application/javascript; charset=utf-8" }
+      ]
+    },
+    {
+      "source": "/assets/css/(.*).css",
+      "headers": [
+        { "key": "Content-Type", "value": "text/css; charset=utf-8" }
       ]
     }
-  ]
+  ],
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" }
+  ],
+  "trailingSlash": false
 }

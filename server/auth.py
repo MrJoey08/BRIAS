@@ -1,11 +1,9 @@
 """
 BRIAS — Authenticatie.
 
-Simpel. Email + wachtwoord. Tokens opgeslagen in SQLite.
-Elke gebruiker heeft een uniek account_id dat BRIAS gebruikt
-om hen te herkennen.
-
-Admin: bailey.haks@gmail.com — heeft toegang tot het admin panel.
+contact = email of telefoonnummer (opgeslagen as-is)
+username = display name (ingesteld via /api/profile)
+Admin = bailey.haks@gmail.com
 """
 
 import hashlib
@@ -17,7 +15,7 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-ADMIN_EMAIL = "bailey.haks@gmail.com"
+ADMIN_CONTACT = "bailey.haks@gmail.com"
 DB_PATH = Path(__file__).parent.parent / "network_state" / "users.db"
 
 
@@ -32,18 +30,47 @@ def init_db() -> None:
     with _conn() as c:
         c.execute("""
             CREATE TABLE IF NOT EXISTS users (
-                id          TEXT PRIMARY KEY,
-                email       TEXT UNIQUE NOT NULL,
-                name        TEXT NOT NULL,
-                password    TEXT NOT NULL,
-                created_at  TEXT NOT NULL
+                id           TEXT PRIMARY KEY,
+                contact      TEXT UNIQUE NOT NULL,
+                password     TEXT NOT NULL,
+                username     TEXT,
+                age          INTEGER,
+                created_at   TEXT NOT NULL,
+                profile_done INTEGER DEFAULT 0
             )
         """)
         c.execute("""
             CREATE TABLE IF NOT EXISTS tokens (
-                token       TEXT PRIMARY KEY,
-                user_id     TEXT NOT NULL,
-                created_at  TEXT NOT NULL
+                token      TEXT PRIMARY KEY,
+                user_id    TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            )
+        """)
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS chats (
+                id         TEXT PRIMARY KEY,
+                user_id    TEXT NOT NULL,
+                title      TEXT NOT NULL DEFAULT 'New chat',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+        """)
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS messages (
+                id         TEXT PRIMARY KEY,
+                chat_id    TEXT NOT NULL,
+                role       TEXT NOT NULL,
+                content    TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            )
+        """)
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS memories (
+                id         TEXT PRIMARY KEY,
+                user_id    TEXT NOT NULL,
+                tier       TEXT NOT NULL,
+                content    TEXT NOT NULL,
+                created_at TEXT NOT NULL
             )
         """)
 
@@ -52,27 +79,27 @@ def _hash(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
 
-def register(email: str, name: str, password: str) -> dict | None:
-    """Registreer een nieuwe gebruiker. Geeft None terug als email al bestaat."""
+def register(contact: str, password: str) -> dict | None:
+    """Registreer. Geeft None terug als contact al bestaat."""
     uid = secrets.token_hex(16)
     now = datetime.now(timezone.utc).isoformat()
     try:
         with _conn() as c:
             c.execute(
-                "INSERT INTO users (id, email, name, password, created_at) VALUES (?,?,?,?,?)",
-                (uid, email.lower().strip(), name.strip(), _hash(password), now),
+                "INSERT INTO users (id, contact, password, created_at) VALUES (?,?,?,?)",
+                (uid, contact.strip(), _hash(password), now),
             )
-        return {"id": uid, "email": email.lower().strip(), "name": name.strip()}
+        return {"id": uid, "contact": contact.strip(), "username": None, "profile_done": False}
     except sqlite3.IntegrityError:
         return None
 
 
-def login(email: str, password: str) -> str | None:
-    """Login. Geeft een sessie-token terug, of None bij verkeerde gegevens."""
+def login(contact: str, password: str) -> tuple[str, dict] | None:
+    """Login. Geeft (token, user) terug of None."""
     with _conn() as c:
         row = c.execute(
-            "SELECT id FROM users WHERE email=? AND password=?",
-            (email.lower().strip(), _hash(password)),
+            "SELECT id, contact, username, profile_done FROM users WHERE contact=? AND password=?",
+            (contact.strip(), _hash(password)),
         ).fetchone()
         if not row:
             return None
@@ -82,20 +109,40 @@ def login(email: str, password: str) -> str | None:
             "INSERT INTO tokens (token, user_id, created_at) VALUES (?,?,?)",
             (token, row["id"], now),
         )
-        return token
+        return token, {
+            "id": row["id"],
+            "contact": row["contact"],
+            "username": row["username"],
+            "profile_done": bool(row["profile_done"]),
+        }
 
 
 def get_user_by_token(token: str) -> dict | None:
-    """Haal gebruiker op via token. Geeft None bij ongeldig token."""
     with _conn() as c:
         row = c.execute("""
-            SELECT u.id, u.email, u.name
+            SELECT u.id, u.contact, u.username, u.age, u.profile_done
             FROM tokens t JOIN users u ON t.user_id = u.id
             WHERE t.token = ?
         """, (token,)).fetchone()
         if not row:
             return None
-        return {"id": row["id"], "email": row["email"], "name": row["name"]}
+        return {
+            "id":           row["id"],
+            "contact":      row["contact"],
+            "username":     row["username"],
+            "age":          row["age"],
+            "profile_done": bool(row["profile_done"]),
+        }
+
+
+def update_profile(user_id: str, display_name: str, age: int | None) -> str:
+    """Sla naam + leeftijd op. Geeft de username terug."""
+    with _conn() as c:
+        c.execute(
+            "UPDATE users SET username=?, age=?, profile_done=1 WHERE id=?",
+            (display_name.strip(), age, user_id),
+        )
+    return display_name.strip()
 
 
 def logout(token: str) -> None:
@@ -104,13 +151,12 @@ def logout(token: str) -> None:
 
 
 def list_users() -> list[dict]:
-    """Alle gebruikers — alleen voor admin."""
     with _conn() as c:
         rows = c.execute(
-            "SELECT id, email, name, created_at FROM users ORDER BY created_at"
+            "SELECT id, contact, username, age, created_at, profile_done FROM users ORDER BY created_at"
         ).fetchall()
         return [dict(r) for r in rows]
 
 
-def is_admin(user: dict) -> bool:
-    return user["email"].lower() == ADMIN_EMAIL.lower()
+def is_admin(contact: str) -> bool:
+    return contact.lower().strip() == ADMIN_CONTACT.lower()
