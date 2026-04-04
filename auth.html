@@ -128,37 +128,6 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
   padding:48px 44px;
 }
 
-.offline-state{
-  display:none;
-  flex-direction:column;
-  align-items:center;
-  text-align:center;
-  gap:16px;
-  margin-bottom:32px;
-}
-.offline-state.visible{display:flex;}
-.offline-sweep{width:100%;height:1px;background:rgba(255,255,255,.06);overflow:hidden;position:relative;}
-.offline-sweep-fill{position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(232,118,74,.5),transparent);animation:sweep 2.4s ease-in-out infinite;}
-@keyframes sweep{0%{left:-100%;}100%{left:200%;}}
-.offline-title{font-family:var(--font-display);font-size:22px;font-weight:500;font-style:italic;color:var(--text-sub);}
-.offline-sub{font-family:var(--font-serif);font-size:14px;font-weight:300;color:var(--text-muted);line-height:1.65;}
-
-.tw-wrap{
-  margin-bottom:32px;
-  padding-bottom:28px;
-  border-bottom:1px solid var(--border);
-  min-height:52px;
-  display:flex;
-  align-items:flex-start;
-}
-.tw-text{
-  font-family:var(--font-serif);
-  font-size:14px;
-  font-weight:300;
-  font-style:italic;
-  color:var(--text-sub);
-  line-height:1.7;
-}
 .tw-cursor{
   display:inline-block;width:1.5px;height:13px;
   background:var(--orange);margin-left:2px;vertical-align:middle;
@@ -258,16 +227,6 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
 
     <div class="panel-right">
 
-      <div class="offline-state" id="offlineState">
-        <div class="offline-sweep"><div class="offline-sweep-fill"></div></div>
-        <div class="offline-title">Unavailable right now</div>
-        <div class="offline-sub">BRIAS is having her moment.<br>She should be back soon.</div>
-      </div>
-
-      <div class="tw-wrap" id="twWrap">
-        <div class="tw-text"><span id="twText2"></span><span class="tw-cursor"></span></div>
-      </div>
-
       <div id="step1" class="step">
         <div class="form-title" id="formTitle">Welcome back.</div>
         <div class="form-sub" id="formSub">Sign in to continue.</div>
@@ -317,7 +276,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
 
 <script>
 const API = 'https://api.brias.eu';
-let mode = 'login', contact = '', offlineTimer = null;
+let mode = 'login', contact = '';
 
 function api(path, opts = {}) {
   const t = localStorage.getItem('brias_token');
@@ -363,23 +322,6 @@ function startTypewriter(elId) {
 }
 
 startTypewriter('twText');
-document.getElementById('twWrap').style.display = 'none';
-
-// ── Offline ──
-async function checkOnline() { try { await fetch(API+'/api/me', { method:'GET', signal:AbortSignal.timeout(3000) }); return true; } catch { return false; } }
-function setOffline(off) {
-  const os = document.getElementById('offlineState');
-  const steps = document.querySelectorAll('.step');
-  if (off) {
-    os.classList.add('visible');
-    steps.forEach(s => s.classList.add('hidden'));
-    if (!offlineTimer) offlineTimer = setInterval(async () => { if (await checkOnline()) setOffline(false); }, 5000);
-  } else {
-    os.classList.remove('visible');
-    document.getElementById('step1').classList.remove('hidden');
-    if (offlineTimer) { clearInterval(offlineTimer); offlineTimer = null; }
-  }
-}
 
 // ── Auth ──
 function showStep(n) {
@@ -444,8 +386,6 @@ async function doStep3() {
 
 (async function() {
   const token = localStorage.getItem('brias_token');
-  const online = await checkOnline();
-  if (!online) { setOffline(true); return; }
   if (token) {
     try { const r = await api('/api/me'); const d = await r.json(); if (d.logged_in) { window.location.href = 'app.html'; return; } } catch {}
     localStorage.removeItem('brias_token'); localStorage.removeItem('brias_username');
