@@ -6,7 +6,7 @@ username = display name (ingesteld via /api/profile)
 Admin = bailey.haks@gmail.com
 """
 
-import hashlib
+import bcrypt
 import logging
 import secrets
 import sqlite3
@@ -76,7 +76,10 @@ def init_db() -> None:
 
 
 def _hash(password: str) -> str:
-    return hashlib.sha256(password.encode()).hexdigest()
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+
+def _verify(password: str, hashed: str) -> bool:
+    return bcrypt.checkpw(password.encode(), hashed.encode())
 
 
 def register(contact: str, password: str) -> dict | None:
@@ -98,10 +101,10 @@ def login(contact: str, password: str) -> tuple[str, dict] | None:
     """Login. Geeft (token, user) terug of None."""
     with _conn() as c:
         row = c.execute(
-            "SELECT id, contact, username, profile_done FROM users WHERE contact=? AND password=?",
-            (contact.strip(), _hash(password)),
+            "SELECT id, contact, password, username, profile_done FROM users WHERE contact=?",
+            (contact.strip(),),
         ).fetchone()
-        if not row:
+        if not row or not _verify(password, row["password"]):
             return None
         token = secrets.token_hex(32)
         now = datetime.now(timezone.utc).isoformat()
