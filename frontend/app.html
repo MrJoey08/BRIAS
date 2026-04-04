@@ -46,6 +46,16 @@
     .activity-item { display: flex; align-items: center; gap: 6px; }
     .activity-val  { color: var(--text-dim); font-variant-numeric: tabular-nums; }
 
+    /* ── Chat wrap ───────────────────────────────────────────────────────── */
+    #chat-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      min-height: 0;
+    }
+
     /* ── Chat ────────────────────────────────────────────────────────────── */
     #chat-messages {
       flex: 1;
@@ -54,6 +64,62 @@
       display: flex;
       flex-direction: column;
       gap: 20px;
+    }
+
+    /* ── Offline overlay ─────────────────────────────────────────────────── */
+    #offline-overlay {
+      position: absolute;
+      inset: 0;
+      background: var(--bg);
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      padding: 40px;
+      text-align: center;
+    }
+    #offline-overlay.hidden { display: none !important; }
+
+    .offline-symbol {
+      font-size: 2.2rem;
+      opacity: 0.25;
+      animation: offlinePulse 3.5s ease-in-out infinite;
+      user-select: none;
+    }
+    @keyframes offlinePulse {
+      0%, 100% { opacity: 0.15; }
+      50%       { opacity: 0.4; }
+    }
+
+    .offline-typewriter-wrap {
+      display: flex;
+      align-items: center;
+      font-size: 1rem;
+      color: var(--text-dim);
+      min-height: 1.6em;
+    }
+    .offline-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1.05em;
+      background: var(--accent);
+      margin-left: 3px;
+      vertical-align: text-bottom;
+      flex-shrink: 0;
+      animation: cursorBlink 1s step-end infinite;
+    }
+    @keyframes cursorBlink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    .offline-sub {
+      font-size: 0.82rem;
+      color: var(--text-dimmer);
+      max-width: 280px;
+      line-height: 1.6;
     }
 
     .msg {
@@ -246,26 +312,41 @@
   </div>
 </div>
 
-<!-- Berichten -->
-<div id="chat-messages">
-  <div id="empty-state">
-    <div class="big">✦</div>
-    <p>BRIAS is er. Ze denkt al de hele dag.<br>Zeg iets.</p>
-  </div>
-</div>
+<!-- Chat wrap (berichten + invoer + offline overlay) -->
+<div id="chat-wrap">
 
-<!-- Invoer -->
-<div class="input-area">
-  <div class="input-row">
-    <textarea
-      id="msg-input"
-      rows="1"
-      placeholder="Schrijf iets..."
-      onkeydown="handleKey(event)"
-      oninput="autoResize(this)"
-    ></textarea>
-    <button id="send-btn" onclick="sendMessage()" title="Verstuur">↑</button>
+  <!-- Berichten -->
+  <div id="chat-messages">
+    <div id="empty-state">
+      <div class="big">✦</div>
+      <p>BRIAS is er. Ze denkt al de hele dag.<br>Zeg iets.</p>
+    </div>
   </div>
+
+  <!-- Invoer -->
+  <div class="input-area">
+    <div class="input-row">
+      <textarea
+        id="msg-input"
+        rows="1"
+        placeholder="Schrijf iets..."
+        onkeydown="handleKey(event)"
+        oninput="autoResize(this)"
+      ></textarea>
+      <button id="send-btn" onclick="sendMessage()" title="Verstuur">↑</button>
+    </div>
+  </div>
+
+  <!-- Offline overlay -->
+  <div id="offline-overlay" class="hidden">
+    <div class="offline-symbol">◌</div>
+    <div class="offline-typewriter-wrap">
+      <span id="tw-text"></span>
+      <span class="offline-cursor"></span>
+    </div>
+    <div class="offline-sub" id="offline-sub">BRIAS is tijdelijk niet bereikbaar.</div>
+  </div>
+
 </div>
 
 <!-- Instellingen modal -->
@@ -600,6 +681,73 @@
       toast(ex.message, 'error');
     }
   }
+
+  // ── Offline detectie & typewriter ───────────────────────────────────────
+  const OFFLINE_LINES = [
+    'BRIAS is er even niet.',
+    'Ze denkt ergens anders.',
+    'Kom straks terug.',
+  ];
+
+  function startOfflineTypewriter() {
+    const el = document.getElementById('tw-text');
+    let lineIdx = 0;
+    let charIdx = 0;
+    let deleting = false;
+    let pauseTicks = 0;
+
+    function tick() {
+      const line = OFFLINE_LINES[lineIdx];
+
+      if (!deleting && charIdx < line.length) {
+        el.textContent = line.slice(0, ++charIdx);
+        setTimeout(tick, 55 + Math.random() * 35);
+      } else if (!deleting && pauseTicks < 36) {
+        pauseTicks++;
+        setTimeout(tick, 55);
+      } else if (!deleting) {
+        deleting = true;
+        pauseTicks = 0;
+        setTimeout(tick, 35);
+      } else if (deleting && charIdx > 0) {
+        el.textContent = line.slice(0, --charIdx);
+        setTimeout(tick, 28);
+      } else {
+        deleting = false;
+        lineIdx = (lineIdx + 1) % OFFLINE_LINES.length;
+        charIdx = 0;
+        setTimeout(tick, 380);
+      }
+    }
+
+    tick();
+  }
+
+  function showOffline(customMessage) {
+    document.getElementById('offline-overlay').classList.remove('hidden');
+    document.getElementById('msg-input').disabled = true;
+    document.getElementById('send-btn').disabled = true;
+    if (customMessage) {
+      document.getElementById('offline-sub').textContent = customMessage;
+    }
+    document.getElementById('header-sub').innerHTML =
+      '<span class="dot dot-red" style="margin-right:4px;vertical-align:middle;"></span>offline';
+    startOfflineTypewriter();
+  }
+
+  async function checkOnlineStatus() {
+    try {
+      const s = await API.statePublic();
+      if (s.brias_active === false) {
+        const msg = s.maintenance_message || 'BRIAS is tijdelijk niet beschikbaar.';
+        showOffline(msg);
+      }
+    } catch {
+      showOffline('BRIAS is tijdelijk niet bereikbaar.');
+    }
+  }
+
+  checkOnlineStatus();
 </script>
 </body>
 </html>
