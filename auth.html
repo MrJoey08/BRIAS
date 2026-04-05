@@ -142,7 +142,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
   align-items:center;
   text-align:center;
   gap:16px;
-  padding:12px 0 28px;
+  margin-bottom:32px;
 }
 .offline-state.visible{display:flex;}
 .offline-sweep{width:100%;height:1px;background:rgba(255,255,255,.06);overflow:hidden;position:relative;}
@@ -150,7 +150,23 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
 @keyframes sweep{0%{left:-100%;}100%{left:200%;}}
 .offline-title{font-family:var(--font-display);font-size:22px;font-weight:500;font-style:italic;color:var(--text-sub);}
 .offline-sub{font-family:var(--font-serif);font-size:14px;font-weight:300;color:var(--text-muted);line-height:1.65;}
-.offline-tw-text{font-family:var(--font-serif);font-size:13px;font-weight:300;font-style:italic;color:rgba(228,224,227,.28);line-height:1.7;}
+
+.tw-wrap{
+  margin-bottom:32px;
+  padding-bottom:28px;
+  border-bottom:1px solid var(--border);
+  min-height:52px;
+  display:flex;
+  align-items:flex-start;
+}
+.tw-text{
+  font-family:var(--font-serif);
+  font-size:14px;
+  font-weight:300;
+  font-style:italic;
+  color:var(--text-sub);
+  line-height:1.7;
+}
 
 .form-title{font-family:var(--font-display);font-size:24px;font-weight:500;font-style:italic;color:var(--text);margin-bottom:5px;letter-spacing:.01em;}
 .form-sub{font-size:13px;font-weight:300;color:var(--text-muted);margin-bottom:28px;}
@@ -247,8 +263,11 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
       <div class="offline-state" id="offlineState">
         <div class="offline-sweep"><div class="offline-sweep-fill"></div></div>
         <div class="offline-title">Unavailable right now</div>
-        <div class="offline-sub">BRIAS is having her moment.<br>She'll be back soon.</div>
-        <div class="offline-tw-text"><span id="offlineTwText"></span><span class="tw-cursor"></span></div>
+        <div class="offline-sub">BRIAS is having her moment.<br>She should be back soon.</div>
+      </div>
+
+      <div class="tw-wrap" id="twWrap">
+        <div class="tw-text"><span id="twText2"></span><span class="tw-cursor"></span></div>
       </div>
 
       <div id="step1" class="step">
@@ -322,17 +341,17 @@ function startOfflineTw() {
 
 function showOfflineState(on) {
   document.getElementById('offlineState').classList.toggle('visible', on);
+  const tw = document.getElementById('twWrap');
+  if (tw) tw.style.display = on ? 'none' : '';
   ['step1','step2','step3'].forEach(s => {
     const el = document.getElementById(s);
     if (el) el.style.display = on ? 'none' : '';
   });
   if (on) {
-    startOfflineTw();
     if (!offlinePollTimer) offlinePollTimer = setInterval(async () => {
       if (await checkOnline()) {
         clearInterval(offlinePollTimer); offlinePollTimer = null;
-        if (offlineTwTimer) { clearTimeout(offlineTwTimer); offlineTwTimer = null; }
-        showOfflineState(false);
+        location.reload();
       }
     }, 5000);
   }
@@ -451,8 +470,9 @@ async function doStep3() {
   const online = await checkOnline();
   if (!online) { showOfflineState(true); return; }
 
-  // Server is bereikbaar — toon het formulier
+  // Server is bereikbaar — toon formulier + typewriter
   document.getElementById('step1').style.display = '';
+  startTypewriter('twText2');
 
   const token = localStorage.getItem('brias_token');
   if (token) {
