@@ -752,7 +752,7 @@ function startOfflineTypewriter() {
   offlineTwTimer = setTimeout(tick, 800);
 }
 
-async function checkOnline() { try { const r = await fetch(API+'/api/me', { method:'GET', signal:AbortSignal.timeout(3000) }); return r.status === 200 || r.status === 401; } catch { return false; } }
+async function checkOnline() { try { const r = await fetch(API+'/api/me', { method:'GET', signal:AbortSignal.timeout(3000) }); const d = await r.json(); return typeof d.logged_in === 'boolean'; } catch { return false; } }
 
 function showOffline() {
   const welcome = document.getElementById('welcomeScreen'); if (welcome) welcome.style.display = 'none';

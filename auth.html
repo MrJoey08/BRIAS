@@ -324,8 +324,9 @@ let mode = 'login', contact = '', offlinePollTimer = null, offlineTwTimer = null
 async function checkOnline() {
   try {
     const r = await fetch(API + '/api/me', { method:'GET', signal:AbortSignal.timeout(3000) });
-    // Alleen 200 of 401 betekent dat ONZE server echt draait
-    return r.status === 200 || r.status === 401;
+    const d = await r.json();
+    // Onze server geeft altijd { logged_in: bool } terug — geen proxy of CDN doet dat
+    return typeof d.logged_in === 'boolean';
   } catch { return false; }
 }
 
