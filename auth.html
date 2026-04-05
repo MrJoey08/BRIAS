@@ -322,8 +322,12 @@ const API = 'https://api.brias.eu';
 let mode = 'login', contact = '', offlinePollTimer = null, offlineTwTimer = null;
 
 async function checkOnline() {
-  try { await fetch(API + '/api/me', { method:'GET', signal:AbortSignal.timeout(3000) }); return true; }
-  catch { return false; }
+  try {
+    const r = await fetch(API + '/api/me', { method:'GET', signal:AbortSignal.timeout(3000) });
+    // 200 of 401 = server draait (401 = niet ingelogd, dat is normaal)
+    // 5xx of geen response = server is down
+    return r.status < 500;
+  } catch { return false; }
 }
 
 function startOfflineTw() {
