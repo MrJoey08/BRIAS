@@ -270,7 +270,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
         <div class="tw-text"><span id="twText2"></span><span class="tw-cursor"></span></div>
       </div>
 
-      <div id="step1" class="step">
+      <div id="step1" class="step" style="display:none">
         <div class="form-title" id="formTitle">Welcome back.</div>
         <div class="form-sub" id="formSub">Sign in to continue.</div>
         <div class="form-err" id="err1"></div>
@@ -468,9 +468,6 @@ async function doStep3() {
 }
 
 (async function() {
-  // Verberg het formulier meteen — pas tonen als server bereikbaar is
-  document.getElementById('step1').style.display = 'none';
-
   const online = await checkOnline();
   if (!online) { showOfflineState(true); return; }
 
