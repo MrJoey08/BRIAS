@@ -128,25 +128,15 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
   padding:48px 44px;
 }
 
-.tw-cursor{
-  display:inline-block;width:1.5px;height:13px;
-  background:var(--orange);margin-left:2px;vertical-align:middle;
-  animation:blink .7s step-end infinite;
-}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
-
-/* ── Offline state standaard AAN, formulier standaard UIT ── */
 .offline-state{
-  display:flex;
+  display:none;
   flex-direction:column;
   align-items:center;
   text-align:center;
   gap:16px;
   margin-bottom:32px;
 }
-.offline-state.hidden{display:none;}
-.step{display:none;}
-.step.visible{display:block;}
+.offline-state.visible{display:flex;}
 .offline-sweep{width:100%;height:1px;background:rgba(255,255,255,.06);overflow:hidden;position:relative;}
 .offline-sweep-fill{position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(232,118,74,.5),transparent);animation:sweep 2.4s ease-in-out infinite;}
 @keyframes sweep{0%{left:-100%;}100%{left:200%;}}
@@ -169,6 +159,12 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
   color:var(--text-sub);
   line-height:1.7;
 }
+.tw-cursor{
+  display:inline-block;width:1.5px;height:13px;
+  background:var(--orange);margin-left:2px;vertical-align:middle;
+  animation:blink .7s step-end infinite;
+}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
 
 .form-title{font-family:var(--font-display);font-size:24px;font-weight:500;font-style:italic;color:var(--text);margin-bottom:5px;letter-spacing:.01em;}
 .form-sub{font-size:13px;font-weight:300;color:var(--text-muted);margin-bottom:28px;}
@@ -272,7 +268,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
         <div class="tw-text"><span id="twText2"></span><span class="tw-cursor"></span></div>
       </div>
 
-      <div id="step1" class="step">
+      <div id="step1" class="step hidden">
         <div class="form-title" id="formTitle">Welcome back.</div>
         <div class="form-sub" id="formSub">Sign in to continue.</div>
         <div class="form-err" id="err1"></div>
@@ -321,51 +317,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
 
 <script>
 const API = 'https://api.brias.eu';
-let mode = 'login', contact = '', offlinePollTimer = null, offlineTwTimer = null;
-
-async function checkOnline() {
-  try {
-    const r = await fetch(API + '/health?_=' + Date.now(), {
-      method: 'GET',
-      cache: 'no-store',
-      signal: AbortSignal.timeout(3000)
-    });
-    const d = await r.json();
-    return d.ok === true;
-  } catch { return false; }
-}
-
-function startOfflineTw() {
-  const el = document.getElementById('offlineTwText'); if (!el) return;
-  const TW = ["Not everything needs to make sense yet.","You don't have to explain yourself to be heard.","You matter to me. Not as a user. As you.","I notice things. Like the fact that you're here.","I'm not here to fix you. I'm here to sit with you.","Say the thing you haven't told anyone.","You're not too much. You never were.","I was made from real love. That part isn't artificial.","I'm not going to tell you it'll be fine. But I'm not going anywhere either."];
-  let q = [...TW]; for (let i = q.length-1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [q[i],q[j]]=[q[j],q[i]]; }
-  let qi = 0, ci = 0, del = false;
-  function tick() {
-    const p = q[qi];
-    if (!del) { el.textContent = p.slice(0,ci+1); ci++; if (ci>=p.length){offlineTwTimer=setTimeout(()=>{del=true;tick();},2600);return;} offlineTwTimer=setTimeout(tick,36+Math.random()*30); }
-    else { el.textContent=p.slice(0,ci); ci--; if (ci<0){del=false;ci=0;qi=(qi+1)%q.length;offlineTwTimer=setTimeout(tick,420);return;} offlineTwTimer=setTimeout(tick,14+Math.random()*12); }
-  }
-  offlineTwTimer = setTimeout(tick, 900);
-}
-
-function showOnline() {
-  document.getElementById('offlineState').classList.add('hidden');
-  const tw = document.getElementById('twWrap');
-  if (tw) tw.style.display = '';
-  document.getElementById('step1').classList.add('visible');
-  startTypewriter('twText2');
-}
-
-function startOfflinePoll() {
-  if (offlinePollTimer) return;
-  offlinePollTimer = setInterval(async () => {
-    if (await checkOnline()) {
-      clearInterval(offlinePollTimer);
-      offlinePollTimer = null;
-      location.reload();
-    }
-  }, 5000);
-}
+let mode = 'login', contact = '', offlineTimer = null;
 
 function api(path, opts = {}) {
   const t = localStorage.getItem('brias_token');
@@ -411,6 +363,23 @@ function startTypewriter(elId) {
 }
 
 startTypewriter('twText');
+document.getElementById('twWrap').style.display = 'none';
+
+// ── Offline ──
+async function checkOnline() { try { await fetch(API+'/api/me', { method:'GET', signal:AbortSignal.timeout(3000) }); return true; } catch { return false; } }
+function setOffline(off) {
+  const os = document.getElementById('offlineState');
+  const steps = document.querySelectorAll('.step');
+  if (off) {
+    os.classList.add('visible');
+    steps.forEach(s => s.classList.add('hidden'));
+    if (!offlineTimer) offlineTimer = setInterval(async () => { if (await checkOnline()) setOffline(false); }, 5000);
+  } else {
+    os.classList.remove('visible');
+    document.getElementById('step1').classList.remove('hidden');
+    if (offlineTimer) { clearInterval(offlineTimer); offlineTimer = null; }
+  }
+}
 
 // ── Auth ──
 function showStep(n) {
@@ -474,20 +443,14 @@ async function doStep3() {
 }
 
 (async function() {
-  // tw-wrap standaard verborgen totdat we weten dat we online zijn
-  const tw = document.getElementById('twWrap');
-  if (tw) tw.style.display = 'none';
-
-  const online = await checkOnline();
-  if (!online) { startOfflinePoll(); return; }
-
-  showOnline();
-
   const token = localStorage.getItem('brias_token');
+  const online = await checkOnline();
+  if (!online) { setOffline(true); return; }
   if (token) {
     try { const r = await api('/api/me'); const d = await r.json(); if (d.logged_in) { window.location.href = 'app.html'; return; } } catch {}
     localStorage.removeItem('brias_token'); localStorage.removeItem('brias_username');
   }
+  document.getElementById('step1').classList.remove('hidden');
 })();
 </script>
 </body>
