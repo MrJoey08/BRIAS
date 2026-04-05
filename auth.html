@@ -445,8 +445,14 @@ async function doStep3() {
 }
 
 (async function() {
+  // Verberg het formulier meteen — pas tonen als server bereikbaar is
+  document.getElementById('step1').style.display = 'none';
+
   const online = await checkOnline();
   if (!online) { showOfflineState(true); return; }
+
+  // Server is bereikbaar — toon het formulier
+  document.getElementById('step1').style.display = '';
 
   const token = localStorage.getItem('brias_token');
   if (token) {
