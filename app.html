@@ -418,6 +418,7 @@ const API = 'https://api.brias.eu';
 let token = localStorage.getItem('brias_token');
 let username = localStorage.getItem('brias_username');
 let chats = [], activeChatId = null, isStreaming = false;
+let meData = null; // cached /api/me response
 
 function api(path, opts = {}) {
   return fetch(API + path, { ...opts, headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': 'Bearer ' + token } : {}), ...(opts.headers || {}) } });
@@ -425,9 +426,8 @@ function api(path, opts = {}) {
 
 async function init() {
   if (!token) { window.location.href = 'auth.html'; return; }
-  let meData;
   try { const r = await api('/api/me'); meData = await r.json(); if (!meData.logged_in) { doLogout(); return; } } catch(e) { window.location.href = 'auth.html'; return; }
-  const name = meData.username || username || '—';
+  const name = meData.display_name || meData.username || username || '—';
   document.getElementById('sfName').textContent = name;
   document.getElementById('sfInitial').textContent = name.charAt(0).toUpperCase();
   if (meData.is_admin) document.getElementById('tab-btn-admin').style.display = 'block';
@@ -648,7 +648,9 @@ async function loadMind() {
 
 // ── Settings ──
 function openSettings() {
-  document.getElementById('settingsName').textContent = username || '—';
+  const name = meData?.display_name || meData?.username || username || '—';
+  document.getElementById('settingsName').textContent = name;
+  document.getElementById('settingsAge').textContent = meData?.age ?? '—';
   document.getElementById('settingsOverlay').classList.remove('hidden');
   loadMemories();
 }

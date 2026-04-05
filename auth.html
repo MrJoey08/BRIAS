@@ -231,7 +231,19 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
   .field input{font-size:16px;padding:14px 16px 14px 44px;border-radius:16px;}
   .submit-btn{padding:15px;font-size:15px;border-radius:16px;}
 }
+.divider{display:flex;align-items:center;gap:10px;margin:18px 0 12px;}
+.divider-line{flex:1;height:1px;background:rgba(255,255,255,.07);}
+.divider-text{font-size:12px;font-weight:300;color:var(--text-muted);}
+.google-btn{
+  width:100%;padding:13px 16px;border:1px solid rgba(255,255,255,.1);border-radius:14px;
+  background:rgba(255,255,255,.04);color:var(--text);font-family:var(--font);font-size:14px;font-weight:300;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:background .18s,border-color .18s;
+}
+.google-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);}
+.google-btn svg{flex-shrink:0;}
 </style>
+<script src="https://accounts.google.com/gsi/client" async></script>
 </head>
 <body>
 
@@ -281,6 +293,15 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
           <span class="field-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
         </div>
         <button class="submit-btn" id="submitBtn" onclick="doStep1()">Continue</button>
+        <div class="divider" id="googleDivider" style="display:none;">
+          <div class="divider-line"></div>
+          <span class="divider-text">or</span>
+          <div class="divider-line"></div>
+        </div>
+        <button class="google-btn" id="googleBtn" onclick="triggerGoogle()" style="display:none;">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+          Continue with Google
+        </button>
         <div class="switch-text" id="switchText">New here? <a onclick="toggleMode()">Create account</a></div>
       </div>
 
@@ -317,7 +338,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
 
 <script>
 const API = 'https://api.brias.eu';
-let mode = 'login', contact = '', offlineTimer = null;
+let mode = 'login', contact = '', offlineTimer = null, googleClientId = '';
 
 function api(path, opts = {}) {
   const t = localStorage.getItem('brias_token');
@@ -408,7 +429,12 @@ async function doStep1() {
     const r = await api(mode === 'login' ? '/api/login' : '/api/register', { method:'POST', body:JSON.stringify({contact:c,password:p}) });
     const d = await r.json();
     if (!r.ok) { showErr(1, d.detail || 'Something went wrong'); return; }
-    if (d.token) { localStorage.setItem('brias_token',d.token); localStorage.setItem('brias_username',d.username); window.location.href='app.html'; return; }
+    if (d.token) {
+      localStorage.setItem('brias_token', d.token);
+      localStorage.setItem('brias_username', d.username);
+      if (mode === 'register' && !d.profile_complete) { showStep(3); return; }
+      window.location.href = 'app.html'; return;
+    }
     document.getElementById('sentTo').textContent = c; showStep(2);
   } catch { showErr(1, 'Could not reach the server'); }
 }
@@ -442,6 +468,37 @@ async function doStep3() {
   } catch { showErr(3, 'Could not reach the server'); }
 }
 
+// ── Google OAuth ──
+async function initGoogle() {
+  try {
+    const r = await api('/api/auth/google/config');
+    const d = await r.json();
+    if (!d.client_id) return;
+    googleClientId = d.client_id;
+    google.accounts.id.initialize({ client_id: googleClientId, callback: handleGoogleAuth });
+    document.getElementById('googleDivider').style.display = 'flex';
+    document.getElementById('googleBtn').style.display = 'flex';
+  } catch {}
+}
+
+function triggerGoogle() {
+  if (!googleClientId) return;
+  google.accounts.id.prompt();
+}
+
+async function handleGoogleAuth(response) {
+  clearErr(1);
+  try {
+    const r = await api('/api/auth/google', { method: 'POST', body: JSON.stringify({ credential: response.credential }) });
+    const d = await r.json();
+    if (!r.ok) { showErr(1, d.detail || 'Google sign-in failed'); return; }
+    localStorage.setItem('brias_token', d.token);
+    localStorage.setItem('brias_username', d.username);
+    if (!d.profile_complete) { showStep(3); return; }
+    window.location.href = 'app.html';
+  } catch { showErr(1, 'Google sign-in failed. Please try again.'); }
+}
+
 (async function() {
   const token = localStorage.getItem('brias_token');
   const online = await checkOnline();
@@ -451,6 +508,7 @@ async function doStep3() {
     localStorage.removeItem('brias_token'); localStorage.removeItem('brias_username');
   }
   document.getElementById('step1').classList.remove('hidden');
+  initGoogle();
 })();
 </script>
 </body>
