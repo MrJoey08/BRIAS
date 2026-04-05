@@ -324,9 +324,8 @@ let mode = 'login', contact = '', offlinePollTimer = null, offlineTwTimer = null
 async function checkOnline() {
   try {
     const r = await fetch(API + '/api/me', { method:'GET', signal:AbortSignal.timeout(3000) });
-    // 200 of 401 = server draait (401 = niet ingelogd, dat is normaal)
-    // 5xx of geen response = server is down
-    return r.status < 500;
+    // Alleen 200 of 401 betekent dat ONZE server echt draait
+    return r.status === 200 || r.status === 401;
   } catch { return false; }
 }
 
