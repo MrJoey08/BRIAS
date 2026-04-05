@@ -325,10 +325,13 @@ let mode = 'login', contact = '', offlinePollTimer = null, offlineTwTimer = null
 
 async function checkOnline() {
   try {
-    const r = await fetch(API + '/api/me', { method:'GET', signal:AbortSignal.timeout(3000) });
+    const r = await fetch(API + '/health?_=' + Date.now(), {
+      method: 'GET',
+      cache: 'no-store',
+      signal: AbortSignal.timeout(3000)
+    });
     const d = await r.json();
-    // Onze server geeft altijd { logged_in: bool } terug — geen proxy of CDN doet dat
-    return typeof d.logged_in === 'boolean';
+    return d.ok === true;
   } catch { return false; }
 }
 
