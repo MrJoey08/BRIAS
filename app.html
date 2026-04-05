@@ -426,7 +426,7 @@ function api(path, opts = {}) {
 async function init() {
   if (!token) { window.location.href = 'auth.html'; return; }
   let meData;
-  try { const r = await api('/api/me'); meData = await r.json(); if (!meData.logged_in) { doLogout(); return; } } catch(e) { showOffline(); return; }
+  try { const r = await api('/api/me'); meData = await r.json(); if (!meData.logged_in) { doLogout(); return; } } catch(e) { window.location.href = 'auth.html'; return; }
   const name = meData.username || username || '—';
   document.getElementById('sfName').textContent = name;
   document.getElementById('sfInitial').textContent = name.charAt(0).toUpperCase();
