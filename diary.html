@@ -429,6 +429,9 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:no
 </div>
 
 <script>
+// ── Auth check ──
+if (!localStorage.getItem('brias_token')) { window.location.href = 'auth.html'; }
+
 // ── State ──
 const TODAY = new Date(); TODAY.setHours(0,0,0,0);
 let viewDate  = new Date(TODAY);
@@ -447,7 +450,7 @@ function isToday(d){ return ds(d)===ds(TODAY) }
 function isFuture(d){ const c=new Date(d);c.setHours(0,0,0,0);return c>TODAY }
 function esc(s){ const d=document.createElement('div');d.textContent=s;return d.innerHTML }
 function getUsername(){ return localStorage.getItem('brias_username')||'You' }
-function skey(w,d){ return `brias_diary_${w}_${d}` }
+function skey(w,d){ const u=localStorage.getItem('brias_username')||'anon'; return `brias_diary_${u}_${w}_${d}` }
 function getEntry(w,d){ return localStorage.getItem(skey(w,ds(d)))||'' }
 function setEntry(w,d,v){ if(v.trim()) localStorage.setItem(skey(w,ds(d)),v.trim()); else localStorage.removeItem(skey(w,ds(d))) }
 function hasEntry(d){ return !!(localStorage.getItem(skey('user',ds(d)))||localStorage.getItem(skey('brias',ds(d)))) }
