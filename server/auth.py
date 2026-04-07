@@ -145,6 +145,43 @@ def update_profile(user_id: str, display_name: str, age: int | None) -> str:
     return display_name.strip()
 
 
+def register_google(google_id: str, email: str, display_name: str) -> tuple[str, dict]:
+    """Register a new Google user, or log in an existing one with the same email."""
+    now = datetime.now(timezone.utc).isoformat()
+    email = email.strip()
+    with _conn() as c:
+        row = c.execute(
+            "SELECT id, contact, username, age, profile_done FROM users WHERE contact=?",
+            (email,)
+        ).fetchone()
+        if row:
+            # Existing user — just create a new session token
+            user_id = row["id"]
+            username = row["username"]
+            profile_done = bool(row["profile_done"])
+        else:
+            # New Google user — register with a placeholder password
+            uid = secrets.token_hex(16)
+            c.execute(
+                "INSERT INTO users (id, contact, password, username, created_at, profile_done) VALUES (?,?,?,?,?,1)",
+                (uid, email, f"google:{google_id}", display_name.strip(), now),
+            )
+            user_id = uid
+            username = display_name.strip()
+            profile_done = True
+        token = secrets.token_hex(32)
+        c.execute(
+            "INSERT INTO tokens (token, user_id, created_at) VALUES (?,?,?)",
+            (token, user_id, now),
+        )
+    return token, {
+        "id": user_id,
+        "contact": email,
+        "username": username,
+        "profile_done": profile_done,
+    }
+
+
 def logout(token: str) -> None:
     with _conn() as c:
         c.execute("DELETE FROM tokens WHERE token=?", (token,))

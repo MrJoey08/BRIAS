@@ -116,10 +116,63 @@ async def me(authorization: str | None = Header(default=None)):
     except HTTPException:
         return {"logged_in": False}
     return {
-        "logged_in": True,
-        "username":  user["username"] or user["contact"],
-        "is_admin":  auth.is_admin(user["contact"]),
+        "logged_in":    True,
+        "username":     user["username"] or user["contact"],
+        "display_name": user["username"],          # null if profile not set yet
+        "email":        user["contact"],
+        "age":          user.get("age"),
+        "is_admin":     auth.is_admin(user["contact"]),
         "profile_done": user["profile_done"],
+    }
+
+
+@app.get("/api/auth/google/config")
+async def google_config():
+    """Return the Google OAuth client ID so the frontend can initialise Sign-In."""
+    import os
+    client_id = os.environ.get("GOOGLE_CLIENT_ID", "")
+    return {"client_id": client_id or None}
+
+
+@app.post("/api/auth/google")
+async def google_auth_endpoint(request: Request):
+    """Verify a Google ID token and return a BRIAS session token."""
+    import os
+    body = await request.json()
+    credential = body.get("credential")
+    if not credential:
+        raise HTTPException(400, "No credential provided")
+
+    client_id = os.environ.get("GOOGLE_CLIENT_ID", "")
+    if not client_id:
+        raise HTTPException(500, "Google OAuth not configured — set GOOGLE_CLIENT_ID")
+
+    try:
+        from google.oauth2 import id_token
+        from google.auth.transport import requests as google_requests
+        idinfo = id_token.verify_oauth2_token(credential, google_requests.Request(), client_id)
+    except ImportError:
+        raise HTTPException(500, "google-auth package not installed")
+    except Exception as exc:
+        raise HTTPException(401, f"Invalid Google token: {exc}")
+
+    google_id   = idinfo["sub"]
+    email       = idinfo["email"]
+    display_name = idinfo.get("name") or idinfo.get("given_name") or email.split("@")[0]
+
+    cfg = admin_config.load()
+    # For new users (not already in DB) check if registration is open
+    with _db() as c:
+        existing = c.execute("SELECT id FROM users WHERE contact=?", (email,)).fetchone()
+    if not existing and not cfg["allow_new_users"]:
+        raise HTTPException(403, "Registration is currently closed")
+
+    token, user = auth.register_google(google_id, email, display_name)
+    return {
+        "token":            token,
+        "username":         user["username"] or user["contact"],
+        "display_name":     user["username"],
+        "profile_complete": user["profile_done"],
     }
 
 
