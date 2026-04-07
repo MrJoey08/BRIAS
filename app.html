@@ -202,14 +202,17 @@ textarea::placeholder{color:rgba(228,224,227,.18);}
 .mind-question{padding:10px 14px;background:rgba(232,118,74,.05);border:1px solid rgba(232,118,74,.1);border-radius:10px;margin-bottom:5px;font-size:12px;font-weight:300;color:var(--text-sub);font-style:italic;}
 
 /* ── Offline screen (in chat area) ── */
-.offline-screen{display:none;flex-direction:column;align-items:center;justify-content:center;position:absolute;inset:0;gap:16px;text-align:center;padding:20px;}
+.offline-screen{display:none;flex-direction:column;align-items:center;justify-content:center;position:absolute;inset:0;padding:40px 24px;}
 .offline-screen.visible{display:flex;}
-.offline-sweep{width:260px;height:1px;background:rgba(255,255,255,.06);overflow:hidden;position:relative;}
+.offline-inner{width:100%;max-width:400px;}
+.offline-state-block{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;margin-bottom:32px;}
+.offline-sweep{width:100%;height:1px;background:rgba(255,255,255,.06);overflow:hidden;position:relative;}
 .offline-sweep-fill{position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(232,118,74,.5),transparent);animation:offlineSweep 2.4s ease-in-out infinite;}
 @keyframes offlineSweep{0%{left:-100%;}100%{left:200%;}}
 .offline-title{font-family:var(--font-display);font-size:22px;font-weight:500;font-style:italic;color:var(--text-sub);}
 .offline-sub{font-family:var(--font-serif);font-size:14px;font-weight:300;color:var(--text-muted);line-height:1.65;}
-.offline-tw{font-family:var(--font-serif);font-size:14px;font-weight:300;font-style:italic;color:var(--text-sub);line-height:1.7;min-height:22px;margin-top:4px;}
+.offline-tw-wrap{padding-bottom:28px;border-bottom:1px solid var(--border);min-height:52px;display:flex;align-items:flex-start;}
+.offline-tw-text{font-family:var(--font-serif);font-size:14px;font-weight:300;font-style:italic;color:var(--text-sub);line-height:1.7;}
 .tw-cursor{display:inline-block;width:1.5px;height:13px;background:var(--orange);margin-left:2px;vertical-align:middle;animation:blink .7s step-end infinite;}
 </style>
 </head>
@@ -259,10 +262,16 @@ textarea::placeholder{color:rgba(228,224,227,.18);}
     </div>
     <div class="messages" id="msgContainer">
       <div class="offline-screen" id="offlineScreen">
-        <div class="offline-sweep"><div class="offline-sweep-fill"></div></div>
-        <div class="offline-title">Unavailable right now</div>
-        <div class="offline-sub">BRIAS is having her moment.<br>She should be back soon.</div>
-        <div class="offline-tw"><span id="offlineTwText"></span><span class="tw-cursor"></span></div>
+        <div class="offline-inner">
+          <div class="offline-state-block">
+            <div class="offline-sweep"><div class="offline-sweep-fill"></div></div>
+            <div class="offline-title">Unavailable right now</div>
+            <div class="offline-sub">BRIAS is having her moment.<br>She should be back soon.</div>
+          </div>
+          <div class="offline-tw-wrap">
+            <div class="offline-tw-text"><span id="offlineTwText"></span><span class="tw-cursor"></span></div>
+          </div>
+        </div>
       </div>
       <div class="messages-inner" id="msgInner">
         <div class="welcome" id="welcomeScreen">
