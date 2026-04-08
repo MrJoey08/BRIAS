@@ -111,22 +111,37 @@ textarea::placeholder{color:rgba(228,224,227,.18);}
 .page-btn:hover svg{opacity:.7;}
 
 @media(max-width:680px){
-  .sidebar{display:none;}
+  /* Sidebar → slide-in drawer */
+  .sidebar{position:fixed;left:-280px;top:0;bottom:0;height:100%;width:260px;z-index:50;border-radius:0 24px 24px 0;transition:left .3s cubic-bezier(.4,0,.2,1);box-shadow:4px 0 32px rgba(0,0,0,.5);}
+  .sidebar.mobile-open{left:0;}
+  .sidebar-backdrop{position:fixed;inset:0;z-index:49;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);display:none;}
+  .sidebar-backdrop.visible{display:block;}
+  /* Topbar */
   .topbar{height:52px;}
-  .input-area{padding:10px 14px 96px;}
+  #topbarToggle{display:flex!important;}
+  /* Input area */
+  .input-area{padding:10px 14px 22px;}
   .input-box{border-radius:18px;padding:10px 12px;}
   .messages{padding:20px 14px;}
   .msg-inner{max-width:88%;}
   .page-switch{display:none;}
-  /* Bottom nav */
-  .bottom-nav{display:flex;position:fixed;bottom:16px;left:20px;right:20px;z-index:30;height:62px;background:rgba(22,16,20,.88);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid rgba(255,255,255,.08);border-radius:22px;align-items:center;justify-content:space-around;padding:0 12px;box-shadow:0 8px 32px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06);}
-  .bottom-btn{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;padding:8px 0;border:none;background:transparent;cursor:pointer;font-family:var(--font);font-size:10px;font-weight:400;letter-spacing:.05em;color:rgba(228,224,227,.18);transition:color .15s;}
-  .bottom-btn span{color:inherit;}
-  .bottom-btn svg{width:20px;height:20px;stroke:rgba(212,74,122,.25);transition:stroke .15s;}
-  .bottom-btn.active span{color:var(--orange);}
-  .bottom-btn.active svg{stroke:var(--pink);}
+  /* Nav pill — subtle gradient handle at bottom */
+  .nav-pill{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);z-index:30;width:72px;height:4px;border-radius:4px;background:var(--grad);opacity:.28;cursor:pointer;transition:opacity .2s;display:block;}
+  .nav-pill:hover,.nav-pill:active{opacity:.55;}
+  /* Nav sheet */
+  .nav-sheet-backdrop{position:fixed;inset:0;z-index:39;display:none;}
+  .nav-sheet-backdrop.visible{display:block;}
+  .nav-sheet{position:fixed;left:0;right:0;bottom:-240px;z-index:40;background:rgba(17,13,15,.97);backdrop-filter:blur(36px);-webkit-backdrop-filter:blur(36px);border-top:1px solid rgba(255,255,255,.07);border-radius:28px 28px 0 0;padding:14px 20px 44px;transition:bottom .28s cubic-bezier(.4,0,.2,1);box-shadow:0 -8px 40px rgba(0,0,0,.6);}
+  .nav-sheet.open{bottom:0;}
+  .nav-sheet-handle{width:36px;height:3px;border-radius:3px;background:rgba(255,255,255,.14);margin:0 auto 22px;}
+  .nav-sheet-row{display:flex;align-items:center;gap:14px;width:100%;padding:15px 18px;border:none;border-radius:16px;background:transparent;cursor:pointer;font-family:var(--font);font-size:15px;font-weight:300;color:var(--text-sub);transition:background .15s,color .15s;margin-bottom:6px;text-align:left;}
+  .nav-sheet-row:hover,.nav-sheet-row:active{background:rgba(255,255,255,.05);color:var(--text);}
+  .nav-sheet-row.current{color:var(--text);}
+  .nav-sheet-row.current svg{stroke:var(--orange);}
 }
-@media(min-width:681px){.bottom-nav{display:none;}}
+@media(min-width:681px){
+  .bottom-nav,.nav-pill,.nav-sheet,.nav-sheet-backdrop,.sidebar-backdrop{display:none!important;}
+}
 .mem-item{display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:12px;margin-bottom:6px;}
 .mem-item-text{flex:1;font-size:13px;font-weight:300;color:var(--text-sub);line-height:1.4;}
 .mem-del-btn{width:22px;height:22px;border-radius:6px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-dim);transition:background .1s,color .1s;flex-shrink:0;}
@@ -283,15 +298,25 @@ textarea::placeholder{color:rgba(228,224,227,.18);}
     </div>
   </div>
 
-<!-- Mobile bottom nav -->
-<div class="bottom-nav">
-  <button class="bottom-btn active">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-    <span>Chat</span>
+<!-- Mobile sidebar backdrop -->
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
+
+<!-- Mobile nav pill (tap to open nav sheet) -->
+<div class="nav-pill" id="navPill" onclick="openNavSheet()"></div>
+
+<!-- Mobile nav sheet backdrop -->
+<div class="nav-sheet-backdrop" id="navSheetBackdrop" onclick="closeNavSheet()"></div>
+
+<!-- Mobile nav sheet -->
+<div class="nav-sheet" id="navSheet">
+  <div class="nav-sheet-handle"></div>
+  <button class="nav-sheet-row current" onclick="closeNavSheet()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    Chat
   </button>
-  <button class="bottom-btn" onclick="window.location.href='diary.html'">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-    <span>Journal</span>
+  <button class="nav-sheet-row" onclick="closeNavSheet();window.location.href='diary.html'">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    Journal
   </button>
 </div>
 
@@ -511,6 +536,7 @@ async function deleteChat(id, e) {
 
 async function selectChat(id) {
   activeChatId = id; renderChatList();
+  if (window.innerWidth <= 680) closeMobileSidebar();
   const msgs = await api('/api/chats/' + id + '/messages').then(r => r.json());
   renderMessages(msgs);
 }
@@ -718,9 +744,26 @@ function autoResize(el) { el.style.height = '24px'; el.style.height = Math.min(e
 function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleActionBtn(); } }
 function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 function toggleSidebar() {
+  if (window.innerWidth <= 680) { openMobileSidebar(); return; }
   const sb = document.getElementById('sidebar'), btn = document.getElementById('topbarToggle');
   sb.classList.toggle('collapsed');
   btn.style.display = sb.classList.contains('collapsed') ? 'flex' : 'none';
+}
+function openMobileSidebar() {
+  document.getElementById('sidebar').classList.add('mobile-open');
+  document.getElementById('sidebarBackdrop').classList.add('visible');
+}
+function closeMobileSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebarBackdrop').classList.remove('visible');
+}
+function openNavSheet() {
+  document.getElementById('navSheet').classList.add('open');
+  document.getElementById('navSheetBackdrop').classList.add('visible');
+}
+function closeNavSheet() {
+  document.getElementById('navSheet').classList.remove('open');
+  document.getElementById('navSheetBackdrop').classList.remove('visible');
 }
 
 // ── Admin ──
