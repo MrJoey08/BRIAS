@@ -485,8 +485,10 @@ async function init() {
   document.getElementById('sfName').textContent = name;
   document.getElementById('sfInitial').textContent = name.charAt(0).toUpperCase();
   if (meData.is_admin) document.getElementById('tab-btn-admin').style.display = 'block';
+  if (!await checkOnline()) { showOffline(); return; }
   await loadChats();
   if (chats.length === 0) await newChat();
+  offlinePollTimer = setInterval(async () => { if (!await checkOnline()) { clearInterval(offlinePollTimer); offlinePollTimer = null; showOffline(); } }, 15000);
 }
 
 function doLogout() {
