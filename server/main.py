@@ -562,4 +562,5 @@ async def app_page():
 
 @app.get("/health")
 async def health():
-    return {"ok": True}
+    cfg = admin_config.load()
+    return {"ok": bool(cfg.get("brias_active", True))}
