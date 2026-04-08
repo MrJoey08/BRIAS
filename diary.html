@@ -430,7 +430,16 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:no
 
 <script>
 // ── Auth check ──
-if (!localStorage.getItem('brias_token')) { window.location.href = 'auth.html'; }
+const API = 'https://api.brias.eu';
+(async function() {
+  const token = localStorage.getItem('brias_token');
+  if (!token) { window.location.href = 'auth.html'; return; }
+  try {
+    const r = await fetch(API + '/api/me', { headers: { 'Authorization': 'Bearer ' + token }, signal: AbortSignal.timeout(3000) });
+    const d = await r.json();
+    if (!d.logged_in) { localStorage.removeItem('brias_token'); localStorage.removeItem('brias_username'); window.location.href = 'auth.html'; }
+  } catch { window.location.href = 'auth.html'; }
+})();
 
 // ── State ──
 const TODAY = new Date(); TODAY.setHours(0,0,0,0);
