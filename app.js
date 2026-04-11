@@ -17,75 +17,22 @@ function api(path, opts = {}) {
   });
 }
 
-// ── Connection monitor ───────────────────────────────────
-let _connLost = false;
-let _connTimer = null;
-let _connDelay = 2000;
-
-function _showReconnectBanner(show) {
-  let b = document.getElementById('rcBanner');
-  if (show && !b) {
-    b = document.createElement('div');
-    b.id = 'rcBanner';
-    b.className = 'reconnect-banner';
-    b.innerHTML = '<span class="reconnect-pulse"></span>Verbinding verbroken\u200a\u2014\u200aopnieuw verbinden...';
-    document.body.prepend(b);
-  } else if (!show && b) {
-    b.classList.add('reconnect-banner--out');
-    setTimeout(() => b?.remove(), 400);
-  }
-}
-
-function onConnectionLost() {
-  if (_connLost) return;
-  _connLost = true;
-  _connDelay = 2000;
-  _showReconnectBanner(true);
-  _scheduleReconnect();
-}
-
-function _scheduleReconnect() {
-  clearTimeout(_connTimer);
-  _connTimer = setTimeout(async () => {
-    try {
-      const r = await fetch(API + '/health', { signal: AbortSignal.timeout(5000) });
-      if (r.ok) {
-        _connLost = false;
-        _connDelay = 2000;
-        _showReconnectBanner(false);
-        try { await loadChats(); } catch {}
-        return;
-      }
-    } catch {}
-    // Nog steeds offline — exponential backoff (max 30s)
-    _connDelay = Math.min(_connDelay * 2, 30000);
-    _scheduleReconnect();
-  }, _connDelay);
-}
-
 // ── Auth guard ──────────────────────────────────────────
 async function init() {
   if (!token) { window.location.href = 'login.html'; return; }
   try {
-    const r = await api('/api/me', { signal: AbortSignal.timeout(8000) });
+    const r = await api('/api/me');
     const d = await r.json();
     if (!d.logged_in) { doLogout(); return; }
   } catch(e) {
-    onConnectionLost();
+    // Server unreachable — show offline overlay or redirect
+    window.location.href = 'offline.html';
     return;
   }
   document.getElementById('sfName').textContent = username || '—';
-  try {
-    await loadChats();
-  } catch {
-    onConnectionLost();
-    return;
-  }
-  if (chats.length === 0) {
-    try { await newChat(); } catch { onConnectionLost(); }
-  } else {
-    runWelcomeAnim();
-  }
+  await loadChats();
+  if (chats.length === 0) await newChat();
+  else runWelcomeAnim();
 }
 
 function doLogout() {
@@ -314,15 +261,9 @@ async function sendAsStream(content, chatId) {
         }
       }
     }
-  } catch(e) {
+  } catch {
     document.getElementById('typingMsg')?.remove();
-    if (e instanceof TypeError) {
-      // Netwerk error (tunnel/server weg)
-      onConnectionLost();
-      inner.insertAdjacentHTML('beforeend', msgHtml('err-' + Date.now(), 'assistant', 'Verbinding verbroken — BRIAS komt terug 💙'));
-    } else {
-      inner.insertAdjacentHTML('beforeend', msgHtml('err-' + Date.now(), 'assistant', 'something went wrong... please try again 💙'));
-    }
+    inner.insertAdjacentHTML('beforeend', msgHtml('err-' + Date.now(), 'assistant', 'something went wrong... please try again 💙'));
     scrollBottom();
   } finally {
     isStreaming = false; setStopMode(false); scrollBottom();
