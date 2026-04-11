@@ -97,12 +97,23 @@ if errorlevel 1 (
     timeout /t 12 /nobreak >nul
 )
 
-:: Check cloudflared via tasklist
+:: Check cloudflared: eerst process, dan echte tunnelverbinding
 if not "!CLOUDFLARED!"=="" (
     tasklist /fi "imagename eq cloudflared.exe" 2>nul | find /i "cloudflared.exe" >nul
     if errorlevel 1 (
-        echo [%TIME%] Cloudflare tunnel offline — herstart...
+        echo [%TIME%] Cloudflare tunnel gestopt — herstart...
         call :fn_start_tunnel
+        timeout /t 8 /nobreak >nul
+    ) else (
+        :: Proces draait — maar is de tunnel-verbinding ook echt actief?
+        :: cloudflared geeft /ready = 200 als de tunnel verbonden is, 503 als niet
+        curl -s --max-time 4 -o nul -w "%%{http_code}" http://localhost:2000/ready 2>nul | findstr /r "^200$" >nul
+        if errorlevel 1 (
+            echo [%TIME%] Tunnel verbinding verbroken ^(proces leeft maar verbinding is weg^) — herstart...
+            taskkill /f /im cloudflared.exe >nul 2>&1
+            timeout /t 2 /nobreak >nul
+            call :fn_start_tunnel
+        )
     )
 )
 
