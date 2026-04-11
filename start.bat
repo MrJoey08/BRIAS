@@ -28,9 +28,10 @@ set "TUNNEL_NAME=brias"
 
 :: cloudflared.exe — automatisch zoeken op bekende plekken
 set "CLOUDFLARED="
-if exist "!BRIAS_DIR!\cloudflared.exe"  set "CLOUDFLARED=!BRIAS_DIR!\cloudflared.exe"
-if "!CLOUDFLARED!"=="" if exist "C:\cloudflared.exe"       set "CLOUDFLARED=C:\cloudflared.exe"
-if "!CLOUDFLARED!"=="" if exist "C:\BRIAS\cloudflared.exe" set "CLOUDFLARED=C:\BRIAS\cloudflared.exe"
+if exist "!BRIAS_DIR!\cloudflared.exe"                              set "CLOUDFLARED=!BRIAS_DIR!\cloudflared.exe"
+if "!CLOUDFLARED!"=="" if exist "C:\Program Files (x86)\cloudflared\cloudflared.exe" set "CLOUDFLARED=C:\Program Files (x86)\cloudflared\cloudflared.exe"
+if "!CLOUDFLARED!"=="" if exist "C:\cloudflared.exe"                set "CLOUDFLARED=C:\cloudflared.exe"
+if "!CLOUDFLARED!"=="" if exist "C:\BRIAS\cloudflared.exe"          set "CLOUDFLARED=C:\BRIAS\cloudflared.exe"
 
 :: ─────────────────────────────────────────────────────────────────────────────
 :: OPSTARTEN
