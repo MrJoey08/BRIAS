@@ -4,7 +4,8 @@ const API = 'https://api.brias.eu';
 
 let authMode = 'login';
 let authContact = '';
-let offlineTimer = null;
+let _authRetryTimer = null;
+let _authRetryDelay = 3000;
 
 function api(path, opts = {}) {
   const token = localStorage.getItem('brias_token');
@@ -31,14 +32,29 @@ function setOffline(off) {
   if (off) {
     el.classList.remove('hidden');
     if (card) card.classList.add('is-offline');
-    if (!offlineTimer) offlineTimer = setInterval(async () => {
-      if (await checkOnline()) setOffline(false);
-    }, 5000);
+    if (!_authRetryTimer) {
+      _authRetryDelay = 3000;
+      _scheduleAuthRetry();
+    }
   } else {
     el.classList.add('hidden');
     if (card) card.classList.remove('is-offline');
-    if (offlineTimer) { clearInterval(offlineTimer); offlineTimer = null; }
+    _authRetryDelay = 3000;
+    if (_authRetryTimer) { clearTimeout(_authRetryTimer); _authRetryTimer = null; }
   }
+}
+
+function _scheduleAuthRetry() {
+  _authRetryTimer = setTimeout(async () => {
+    _authRetryTimer = null;
+    if (await checkOnline()) {
+      setOffline(false);
+    } else {
+      // Exponential backoff: 3s → 6s → 12s → 24s → max 30s
+      _authRetryDelay = Math.min(_authRetryDelay * 2, 30000);
+      _scheduleAuthRetry();
+    }
+  }, _authRetryDelay);
 }
 
 function showStep(n) {
