@@ -155,5 +155,7 @@ if "!CLOUDFLARED!"=="" (
     echo        Zet cloudflared.exe in !BRIAS_DIR! om de tunnel automatisch te bewaken.
     exit /b
 )
-start "BRIAS — tunnel" "!CLOUDFLARED!" tunnel run !TUNNEL_NAME!
+:: --protocol http2 = TCP in plaats van QUIC/UDP
+:: Stabieler op thuisnetwerken waar UDP gelimiteerd of geblokkeerd wordt
+start "BRIAS — tunnel" "!CLOUDFLARED!" tunnel run --protocol http2 !TUNNEL_NAME!
 exit /b
