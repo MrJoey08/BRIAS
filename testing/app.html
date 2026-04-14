@@ -135,8 +135,8 @@ textarea::placeholder{color:rgba(228,224,227,.18);}
 .settings-tabs{display:flex;gap:6px;padding:14px 24px;flex-shrink:0;border-bottom:1px solid var(--border);}
 .stab{flex:1;padding:9px 8px;border-radius:22px;font-size:12px;font-weight:400;color:var(--text-dim);transition:color .2s,background .2s;white-space:nowrap;text-align:center;background:rgba(255,255,255,.04);}
 .stab:hover{color:var(--text-sub);background:rgba(255,255,255,.06);}
-/* active: gradient background pill, crisp white text */
-.stab.active{background:var(--grad);color:#fff;font-weight:500;letter-spacing:.01em;}
+/* active: gradient background pill, warm off-white text */
+.stab.active{background:var(--grad);color:rgba(255,248,244,.9);font-weight:500;letter-spacing:.01em;}
 
 .settings-content{flex:1;overflow-y:auto;display:flex;justify-content:center;padding:28px 20px;}
 .settings-body{width:100%;max-width:560px;}
@@ -149,17 +149,31 @@ textarea::placeholder{color:rgba(228,224,227,.18);}
 .s-row-sub{font-size:11.5px;color:rgba(228,224,227,.38);margin-top:2px;line-height:1.4;}
 .s-row-val{font-size:13px;color:rgba(228,224,227,.5);flex-shrink:0;}
 
-/* Settings buttons — readable, modern pill style */
+/* Settings buttons — warm grey, fits the palette */
 .s-btn{
-  padding:8px 18px;border-radius:20px;font-size:13px;font-weight:400;
-  color:rgba(228,224,227,.82);background:rgba(255,255,255,.08);
+  padding:7px 15px;border-radius:10px;font-size:12.5px;font-weight:400;
+  color:rgba(228,224,227,.55);
+  background:rgba(255,255,255,.055);
   border:1px solid rgba(255,255,255,.07);
-  transition:background .18s,border-color .18s,color .18s;white-space:nowrap;flex-shrink:0;
+  transition:background .18s,color .18s,border-color .18s;
+  white-space:nowrap;flex-shrink:0;
   letter-spacing:.01em;
 }
-.s-btn:hover{background:rgba(255,255,255,.13);color:#e4e0e3;border-color:rgba(255,255,255,.13);}
-.s-btn.danger{color:rgba(240,100,100,.85);background:rgba(220,60,60,.07);border-color:rgba(220,60,60,.12);}
-.s-btn.danger:hover{background:rgba(220,60,60,.14);border-color:rgba(220,60,60,.22);}
+.s-btn:hover{
+  background:rgba(255,255,255,.09);
+  color:rgba(228,224,227,.75);
+  border-color:rgba(255,255,255,.11);
+}
+.s-btn.danger{
+  color:rgba(220,90,90,.65);
+  background:transparent;
+  border-color:rgba(220,90,90,.15);
+}
+.s-btn.danger:hover{
+  background:rgba(220,70,70,.07);
+  color:rgba(220,90,90,.85);
+  border-color:rgba(220,90,90,.25);
+}
 
 /* toggle:
    OFF = white knob, dim track
@@ -188,56 +202,54 @@ textarea::placeholder{color:rgba(228,224,227,.18);}
 
 .about-logo{font-family:var(--font-display);font-size:42px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:block;}
 
-/* ── Desktop layout (≥768px): persistent sidebar ── */
+/* ── Desktop (≥768px): focused chat layout, no persistent sidebar ── */
 @media (min-width: 768px) {
-  /* bump up global text visibility on desktop */
+
+  /* lift text readability across the board */
   :root {
-    --text-sub: rgba(228,224,227,.68);
-    --text-muted: rgba(228,224,227,.44);
-    --text-dim: rgba(228,224,227,.3);
+    --text-sub:   rgba(228,224,227,.62);
+    --text-muted: rgba(228,224,227,.40);
+    --text-dim:   rgba(228,224,227,.26);
   }
 
-  /* sidebar always visible — fixed on left */
-  .drawer-backdrop { display: none !important; }
-  .drawer {
-    pointer-events: all !important;
-  }
-  .drawer-panel {
-    position: fixed;
-    top: 0; left: 0; bottom: 0;
-    transform: none !important;
-    border-right: 1px solid var(--border);
-    border-radius: 0;
-    width: 240px;
-  }
+  /* wider, centered content column */
+  .messages { padding: 48px 40px; }
+  .messages-inner { max-width: 680px; }
+  .input-area { padding: 16px 40px 32px; }
+  .input-box { max-width: 680px; }
+  .input-footer { max-width: 680px; }
 
-  /* push app content to the right of sidebar */
-  .app { margin-left: 240px; }
-
-  /* hide hamburger on desktop */
-  .menu-btn { display: none; }
-
-  /* wider message area */
-  .messages-inner { max-width: 780px; }
-  .input-box { max-width: 780px; }
-  .input-footer { max-width: 780px; }
+  /* topbar — give menu btn more breathing room */
+  .topbar { height: 60px; }
+  .topbar-logo { font-size: 24px; }
+  .menu-btn { left: 24px; }
 
   /* welcome screen */
-  .welcome-logo { font-size: 72px; }
-  .welcome-sub { font-size: 17px; }
+  .welcome-logo { font-size: 76px; }
+  .welcome-sub { font-size: 16px; letter-spacing: .02em; }
 
-  /* chat text more readable */
-  .msg-bubble { font-size: 15px; line-height: 1.75; }
+  /* chat messages */
+  .msg-bubble { font-size: 15px; line-height: 1.78; }
+  .msg { margin-bottom: 14px; }
 
-  /* settings */
-  .settings-body { max-width: 620px; }
-  .stab { font-size: 13px; padding: 10px 12px; }
+  /* input */
+  .input-box textarea { font-size: 15px; line-height: 26px; }
 
-  /* nav labels more visible */
-  .nav-name { color: rgba(228,224,227,.68); font-size: 13.5px; }
-  .nav-sub { color: rgba(228,224,227,.32); font-size: 11.5px; }
-  .footer-name { color: rgba(228,224,227,.68); font-size: 13.5px; }
-  .footer-handle { color: rgba(228,224,227,.34); }
+  /* settings overlay — centered, narrower, more refined */
+  .settings-header { padding: 0 36px; height: 60px; }
+  .settings-title  { font-size: 24px; }
+  .settings-tabs   { padding: 16px 32px; gap: 8px; }
+  .stab { font-size: 13px; padding: 10px 16px; letter-spacing: .01em; }
+  .settings-content { padding: 36px 32px; }
+  .settings-body { max-width: 600px; }
+  .s-section-title { font-size: 10.5px; letter-spacing: .11em; }
+  .s-row { padding: 15px 18px; border-radius: 16px; }
+  .s-row-label { font-size: 14px; }
+  .s-row-sub { font-size: 12px; }
+
+  /* nav labels in drawer (still used as overlay on desktop) */
+  .nav-name { font-size: 13.5px; }
+  .nav-sub  { font-size: 11.5px; }
 }
 </style>
 </head>
