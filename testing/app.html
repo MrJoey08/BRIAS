@@ -131,12 +131,31 @@ textarea::placeholder{color:rgba(228,224,227,.18);}
 .settings-close-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:background .15s;}
 .settings-close-btn:hover{background:rgba(255,255,255,.1);}
 
-/* tabs — full width, no scroll, pill style with gradient active */
-.settings-tabs{display:flex;gap:6px;padding:14px 24px;flex-shrink:0;border-bottom:1px solid var(--border);}
-.stab{flex:1;padding:9px 8px;border-radius:22px;font-size:12px;font-weight:400;color:var(--text-dim);transition:color .2s,background .2s;white-space:nowrap;text-align:center;background:rgba(255,255,255,.04);}
-.stab:hover{color:var(--text-sub);background:rgba(255,255,255,.06);}
-/* active: gradient background pill, warm off-white text */
-.stab.active{background:var(--grad);color:rgba(255,248,244,.9);font-weight:500;letter-spacing:.01em;}
+/* tabs — clean underline indicator, no pills */
+.settings-tabs{display:flex;gap:0;padding:0 24px;flex-shrink:0;border-bottom:1px solid var(--border);}
+.stab{
+  flex:1;padding:14px 8px 13px;
+  border-radius:0;font-size:12px;font-weight:400;
+  color:var(--text-muted);
+  transition:color .2s;
+  white-space:nowrap;text-align:center;
+  background:transparent;
+  position:relative;
+}
+.stab::after{
+  content:'';position:absolute;bottom:-1px;left:50%;right:50%;
+  height:1.5px;background:var(--grad);
+  border-radius:2px 2px 0 0;
+  transition:left .25s cubic-bezier(.4,0,.2,1), right .25s cubic-bezier(.4,0,.2,1);
+}
+.stab:hover{color:rgba(228,224,227,.55);}
+/* active: subtle gradient text, underline indicator */
+.stab.active{
+  background:var(--grad);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  font-weight:500;
+}
+.stab.active::after{left:16%;right:16%;}
 
 .settings-content{flex:1;overflow-y:auto;display:flex;justify-content:center;padding:28px 20px;}
 .settings-body{width:100%;max-width:560px;}
@@ -238,8 +257,8 @@ textarea::placeholder{color:rgba(228,224,227,.18);}
   /* settings overlay — centered, narrower, more refined */
   .settings-header { padding: 0 36px; height: 60px; }
   .settings-title  { font-size: 24px; }
-  .settings-tabs   { padding: 16px 32px; gap: 8px; }
-  .stab { font-size: 13px; padding: 10px 16px; letter-spacing: .01em; }
+  .settings-tabs   { padding: 0 32px; gap: 0; }
+  .stab { font-size: 13px; padding: 16px 12px 14px; letter-spacing: .01em; }
   .settings-content { padding: 36px 32px; }
   .settings-body { max-width: 600px; }
   .s-section-title { font-size: 10.5px; letter-spacing: .11em; }
