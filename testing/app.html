@@ -44,6 +44,48 @@ body.light{
 body.light .settings-overlay{background:rgba(235,224,214,.92);}
 body.light .drawer-panel{background:var(--sidebar);}
 body.light ::-webkit-scrollbar-thumb{background:rgba(80,40,20,.12);}
+/* light mode — fix all hardcoded dark rgba colors */
+body.light .msg.user .msg-bubble{background:rgba(80,40,20,.07);border-color:rgba(80,40,20,.1);}
+body.light .msg.assistant .msg-bubble{border-color:rgba(80,40,20,.1);}
+body.light .nav-item:hover{background:rgba(80,40,20,.06);}
+body.light .nav-item.active{background:linear-gradient(135deg,rgba(232,118,74,.12),rgba(212,74,122,.1));}
+body.light .nav-item:not(.active) .nav-icon{background:rgba(80,40,20,.06);}
+body.light .nav-icon svg{stroke:rgba(46,31,24,.35)!important;}
+body.light .nav-item.active .nav-icon svg{stroke:url(#ng1)!important;}
+body.light .soon-badge{background:rgba(80,40,20,.07);color:var(--text-dim);-webkit-text-fill-color:var(--text-dim);}
+body.light .drawer-divider{background:rgba(80,40,20,.08);}
+body.light .drawer-settings-btn{background:rgba(80,40,20,.06);}
+body.light .drawer-settings-btn:hover{background:rgba(80,40,20,.1);}
+body.light .drawer-settings-btn svg{stroke:rgba(46,31,24,.4);}
+body.light .drawer-backdrop{background:rgba(46,31,24,.5);}
+body.light .s-row{background:rgba(80,40,20,.05);}
+body.light .s-btn{color:var(--text-sub);background:rgba(80,40,20,.07);border-color:rgba(80,40,20,.1);}
+body.light .s-btn:hover{background:rgba(80,40,20,.12);color:var(--text);}
+body.light .s-btn.danger{color:rgba(180,50,50,.8);border-color:rgba(180,50,50,.2);}
+body.light .s-btn.danger:hover{background:rgba(180,50,50,.08);}
+body.light .toggle{background:rgba(80,40,20,.15);}
+body.light .toggle.on{background:var(--grad);}
+body.light .toggle::after{background:#fff;}
+body.light .toggle.on::after{background:#e8d8cc;}
+body.light .settings-close-btn{background:rgba(80,40,20,.07);}
+body.light .settings-close-btn svg{stroke:rgba(46,31,24,.5);}
+body.light .settings-close-btn:hover{background:rgba(80,40,20,.12);}
+body.light .stab{color:var(--text-muted);}
+body.light .stab:hover{color:var(--text-sub);}
+body.light .s-section-title{color:rgba(46,31,24,.38);}
+body.light .send-btn.inactive{background:rgba(80,40,20,.08);}
+body.light .stop-btn{border-color:rgba(80,40,20,.2);}
+body.light .stop-sq{background:rgba(46,31,24,.4);}
+body.light textarea{color:var(--text);}
+body.light textarea::placeholder{color:rgba(46,31,24,.25);}
+body.light .msg-act-btn{color:var(--text-dim);}
+body.light .msg-act-btn:hover{background:var(--surface);color:var(--text-sub);}
+body.light .nav-name{color:var(--text-sub);}
+body.light .footer-name{color:var(--text-sub);}
+body.light .footer-handle{color:var(--text-dim);}
+body.light .topbar{border-bottom-color:rgba(80,40,20,.1);}
+body.light .settings-header{border-bottom-color:rgba(80,40,20,.1);}
+body.light .settings-tabs{border-bottom-color:rgba(80,40,20,.1);}
 html,body{height:100%;overflow:hidden;}
 body{font-family:var(--font);background:var(--bg);color:var(--text);}
 ::-webkit-scrollbar{width:4px;}
@@ -243,9 +285,45 @@ body.light .theme-toggle{background:rgba(80,40,20,.06);}
 .theme-opt.active{background:var(--grad);color:#fff;font-weight:500;}
 body.light .theme-opt:not(.active){color:var(--text-sub);}
 
-font-family:var(--font-display);font-size:42px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:block;}
+.about-logo{font-family:var(--font-display);font-size:42px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:block;}
+.about-text{font-family:var(--font-serif);font-size:14px;font-weight:300;font-style:italic;color:var(--text-sub);line-height:1.75;margin-top:16px;}
 
-/* ── Desktop (≥768px): focused chat layout, no persistent sidebar ── */
+/* ── Mobile (≤480px) ── */
+@media (max-width: 480px) {
+  .messages { padding: 16px 12px; }
+  .messages-inner { max-width: 100%; }
+  .msg-inner { max-width: 88%; }
+  .input-area { padding: 8px 12px 20px; }
+  .input-box { padding: 10px 10px 10px 14px; border-radius: 18px; }
+  .input-box textarea { font-size: 14px; }
+  .input-footer { font-size: 10px; margin-top: 6px; }
+  .welcome-logo { font-size: 44px; }
+  .welcome-sub { font-size: 13px; }
+  .topbar { height: 52px; }
+  .topbar-logo { font-size: 20px; }
+  .menu-btn { left: 12px; }
+  /* settings — compact on mobile */
+  .settings-header { padding: 0 16px; height: 52px; }
+  .settings-title { font-size: 19px; }
+  .settings-tabs { padding: 0 8px; }
+  .stab { font-size: 10px; padding: 12px 4px 11px; }
+  .settings-content { padding: 16px 12px; }
+  .settings-body { max-width: 100%; }
+  .s-row { padding: 11px 12px; border-radius: 12px; gap: 10px; }
+  .s-row-label { font-size: 13px; }
+  .s-row-sub { font-size: 10.5px; }
+  .s-btn { padding: 6px 12px; font-size: 12px; }
+  .s-section-title { font-size: 9.5px; }
+  .drawer-panel { width: min(260px, 82%); }
+  .nav-item { padding: 10px 10px; }
+  .nav-icon { width: 30px; height: 30px; border-radius: 9px; }
+  .nav-name { font-size: 12.5px; }
+  .drawer-top { padding: 24px 16px 14px; }
+  .drawer-logo { font-size: 26px; }
+  .drawer-footer { padding: 8px 12px 20px; }
+}
+
+/* ── Desktop (≥768px) ── */
 @media (min-width: 768px) {
 
   /* lift text readability across the board */
@@ -446,7 +524,11 @@ const tabs = [
       <div class="s-row"><div class="s-row-left"><div class="s-row-label">Sign out</div></div><button class="s-btn" onclick="doLogout()">Sign out</button></div>
       <div class="s-row"><div class="s-row-left"><div class="s-row-label">Delete account</div></div><button class="s-btn danger">Delete</button></div>
     </div>`,
-  ()=>``,
+  ()=>`
+    <div class="s-section">
+      <div class="s-section-title">Your plan</div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Plan</div><div class="s-row-sub">Free</div></div></div>
+    </div>`,
   ()=>`
     <div class="s-section">
       <div class="s-section-title">Device</div>
