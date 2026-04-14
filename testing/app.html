@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BRIAS</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+button{outline:none!important;border:none;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent;-webkit-appearance:none;}
+:root{
+  --bg:#121012;--surface:#1a171a;
+  --border:rgba(255,255,255,.06);
+  --text:rgba(228,223,227,.9);--sub:rgba(228,223,227,.44);
+  --muted:rgba(228,223,227,.26);--dim:rgba(228,223,227,.13);
+  --orange:#e8764a;--pink:#d44a7a;
+  --grad:linear-gradient(135deg,#e8764a,#d44a7a);
+  --grad-soft:linear-gradient(135deg,rgba(232,118,74,.12),rgba(212,74,122,.1));
+  --font:'DM Sans',-apple-system,sans-serif;
+  --serif:'Lora',Georgia,serif;
+}
+html,body{height:100%;overflow:hidden;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);}
+
+/* noise overlay */
+.noise{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:200px;}
+
+/* scrollbar */
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:3px;}
+
+/* ── App shell ── */
+.app{position:relative;z-index:1;display:flex;flex-direction:column;height:100vh;}
+
+/* ── Topbar ── */
+.topbar{height:56px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;border-bottom:1px solid var(--border);}
+.logo-top{font-family:var(--serif);font-size:22px;font-weight:500;font-style:italic;letter-spacing:.02em;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+/* ── Menu button ── */
+.menu-btn{position:absolute;left:16px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;}
+.lns{display:flex;flex-direction:column;gap:4px;align-items:center;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
+.ln{display:block;width:26px;height:5px;border-radius:100px;background:var(--grad);flex-shrink:0;
+  transition:transform .52s cubic-bezier(.22,1.35,.5,1),opacity .38s ease;}
+.menu-btn.open .ln:nth-child(1){transform:translateY(9px) rotate(45deg);}
+.menu-btn.open .ln:nth-child(2){opacity:0;transform:scaleX(0);}
+.menu-btn.open .ln:nth-child(3){transform:translateY(-9px) rotate(-45deg);}
+
+/* ── Messages ── */
+.messages{flex:1;overflow-y:auto;padding:24px 20px;}
+.messages-inner{max-width:680px;margin:0 auto;}
+
+/* welcome */
+.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;}
+.welcome-logo{font-family:var(--serif);font-size:52px;font-weight:500;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.02em;filter:drop-shadow(0 0 40px rgba(212,74,122,.15));}
+.welcome-sub{font-family:var(--serif);font-size:15px;font-weight:400;font-style:italic;color:var(--muted);}
+
+/* messages */
+.msg{display:flex;margin-bottom:10px;}
+.msg.user{justify-content:flex-end;}
+.msg-inner{display:flex;gap:9px;max-width:72%;align-items:flex-end;}
+.msg.user .msg-inner{flex-direction:row-reverse;}
+.msg-av{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.msg.assistant .msg-av{background:var(--grad);}
+.msg.user .msg-av{background:rgba(255,255,255,.06);}
+.msg-av span{font-family:var(--serif);font-size:11px;color:#fff;font-style:italic;}
+.msg-bubble{padding:11px 16px;font-family:var(--serif);font-size:14px;font-weight:400;line-height:1.7;word-break:break-word;}
+.msg.assistant .msg-bubble{background:rgba(255,255,255,.05);border-radius:20px 20px 20px 5px;}
+.msg.user .msg-bubble{background:rgba(212,74,122,.12);border-radius:20px 20px 5px 20px;}
+
+/* typing */
+.typing-dots{display:flex;gap:5px;align-items:center;padding:2px 0;}
+.typing-dots span{width:5px;height:5px;border-radius:50%;background:var(--muted);}
+.typing-dots span:nth-child(1){animation:bDot 1.4s ease-in-out 0s infinite;}
+.typing-dots span:nth-child(2){animation:bDot 1.4s ease-in-out .16s infinite;}
+.typing-dots span:nth-child(3){animation:bDot 1.4s ease-in-out .32s infinite;}
+@keyframes bDot{0%,60%,100%{opacity:.2;transform:scale(.8);}30%{opacity:.8;transform:scale(1.15);}}
+
+/* cursor */
+.cursor{display:inline-block;width:1.5px;height:13px;background:var(--orange);margin-left:2px;vertical-align:middle;animation:blink .7s step-end infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── Input ── */
+.input-area{padding:10px 20px 20px;flex-shrink:0;}
+.input-box{display:flex;align-items:flex-end;gap:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:11px 11px 11px 16px;max-width:680px;margin:0 auto;transition:border-color .2s;}
+.input-box:focus-within{border-color:rgba(232,118,74,.28);}
+.input-box textarea{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:var(--serif);font-size:14px;font-weight:400;line-height:24px;resize:none;height:24px;max-height:140px;align-self:center;}
+.input-box textarea::placeholder{color:var(--dim);}
+.send-btn{width:34px;height:34px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 14px rgba(212,74,122,.28);transition:all .18s;}
+.send-btn:hover{box-shadow:0 4px 20px rgba(212,74,122,.45);transform:scale(1.05);}
+.send-btn.inactive{opacity:.28;cursor:default;transform:none;box-shadow:none;}
+.stop-btn{width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .15s;}
+.stop-btn:hover{border-color:rgba(255,255,255,.35);}
+.stop-sq{width:10px;height:10px;border-radius:2px;background:rgba(255,255,255,.4);}
+.input-footer{text-align:center;font-size:11px;color:var(--dim);margin-top:8px;max-width:680px;margin:8px auto 0;font-weight:300;letter-spacing:.02em;}
+
+/* ── Drawer ── */
+.drawer{position:fixed;inset:0;z-index:40;pointer-events:none;}
+.drawer-backdrop{position:absolute;inset:0;background:rgba(8,6,8,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);opacity:0;transition:opacity .38s ease;}
+.drawer-panel{position:absolute;top:0;left:0;bottom:0;width:min(300px,80%);background:#151215;border-radius:0 32px 32px 0;transform:translateX(-100%);transition:transform .42s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column;overflow:hidden;border-right:1px solid rgba(255,255,255,.05);}
+.drawer.open{pointer-events:all;}
+.drawer.open .drawer-backdrop{opacity:1;}
+.drawer.open .drawer-panel{transform:translateX(0);}
+
+.drawer-top{padding:32px 20px 18px;flex-shrink:0;}
+.drawer-logo{font-family:var(--serif);font-size:30px;font-weight:500;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+.drawer-nav{flex:1;padding:0 12px;display:flex;flex-direction:column;gap:3px;overflow-y:auto;}
+.nav-section-label{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim);padding:4px 12px 6px;font-weight:500;}
+
+.nav-item{display:flex;align-items:center;gap:12px;padding:12px 12px;border-radius:18px;transition:background .15s;width:100%;text-align:left;}
+.nav-item:hover{background:rgba(255,255,255,.04);}
+.nav-item.active{background:var(--grad-soft);}
+.nav-icon{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;}
+.nav-item:not(.active) .nav-icon{background:rgba(255,255,255,.04);}
+.nav-item.active .nav-icon{background:linear-gradient(135deg,rgba(232,118,74,.22),rgba(212,74,122,.2));}
+.nav-texts{flex:1;min-width:0;}
+.nav-name{font-size:13px;font-weight:400;color:rgba(228,223,227,.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nav-item.active .nav-name{font-weight:500;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.nav-sub{font-size:11px;color:var(--dim);margin-top:2px;}
+.soon-badge{font-size:9px;padding:2px 7px;border-radius:20px;background:rgba(255,255,255,.05);color:var(--dim);letter-spacing:.03em;margin-left:5px;vertical-align:middle;-webkit-text-fill-color:var(--dim);}
+
+.drawer-divider{height:1px;background:rgba(255,255,255,.05);margin:10px 12px 12px;}
+
+.drawer-footer{padding:12px 16px 24px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.footer-av{width:34px;height:34px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.footer-av span{font-family:var(--serif);font-size:13px;color:#fff;font-style:italic;font-weight:500;}
+.footer-info{flex:1;min-width:0;}
+.footer-name{font-size:13px;font-weight:500;color:rgba(228,223,227,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.footer-handle{font-size:11px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.drawer-settings-btn{width:32px;height:32px;border-radius:11px;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .18s;}
+.drawer-settings-btn:hover{background:rgba(255,255,255,.08);}
+
+/* ── Settings overlay ── */
+.settings-overlay{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;background:rgba(8,6,8,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);opacity:0;pointer-events:none;transition:opacity .3s ease;}
+.settings-overlay.open{opacity:1;pointer-events:all;}
+
+.settings-header{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;flex-shrink:0;border-bottom:1px solid var(--border);}
+.settings-title{font-family:var(--serif);font-size:22px;font-weight:500;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.settings-close-btn{width:32px;height:32px;border-radius:11px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:background .15s;}
+.settings-close-btn:hover{background:rgba(255,255,255,.1);}
+
+.settings-tabs{display:flex;gap:6px;padding:14px 18px;flex-shrink:0;overflow-x:auto;border-bottom:1px solid var(--border);}
+.settings-tabs::-webkit-scrollbar{display:none;}
+.stab{padding:8px 18px;border-radius:20px;font-size:12px;font-weight:400;color:rgba(228,223,227,.28);transition:all .22s;white-space:nowrap;background:rgba(255,255,255,.04);}
+.stab:hover{color:rgba(228,223,227,.5);background:rgba(255,255,255,.07);}
+.stab.active{background:var(--grad);color:#fff;font-weight:500;box-shadow:0 3px 16px rgba(212,74,122,.3);}
+
+.settings-body{flex:1;overflow-y:auto;padding:20px;max-width:640px;width:100%;margin:0 auto;}
+.settings-body::-webkit-scrollbar{width:3px;}
+
+.s-section{margin-bottom:22px;}
+.s-section-title{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:rgba(228,223,227,.18);margin-bottom:10px;font-weight:500;}
+
+.s-row{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;background:rgba(255,255,255,.03);border-radius:16px;margin-bottom:5px;gap:12px;}
+.s-row-left{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;}
+.s-row-label{font-size:13px;color:rgba(228,223,227,.6);}
+.s-row-sub{font-size:11px;color:var(--dim);}
+.s-row-val{font-size:12px;color:rgba(228,223,227,.22);}
+
+/* buttons — 3 distinct styles */
+.s-btn-primary{padding:8px 18px;border-radius:20px;font-size:12px;font-weight:500;color:#fff;background:var(--grad);box-shadow:0 3px 14px rgba(212,74,122,.28);transition:all .2s;white-space:nowrap;}
+.s-btn-primary:hover{box-shadow:0 4px 20px rgba(212,74,122,.45);transform:translateY(-1px);}
+
+.s-btn-ghost{padding:8px 18px;border-radius:20px;font-size:12px;font-weight:400;color:rgba(232,118,74,.85);background:rgba(232,118,74,.08);box-shadow:inset 0 0 0 1px rgba(232,118,74,.22);transition:all .2s;white-space:nowrap;}
+.s-btn-ghost:hover{background:rgba(232,118,74,.14);box-shadow:inset 0 0 0 1px rgba(232,118,74,.4);}
+
+.s-btn-neutral{padding:8px 18px;border-radius:20px;font-size:12px;font-weight:400;color:rgba(228,223,227,.42);background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);transition:all .2s;white-space:nowrap;}
+.s-btn-neutral:hover{background:rgba(255,255,255,.08);color:rgba(228,223,227,.65);}
+
+.s-btn-danger{padding:8px 18px;border-radius:20px;font-size:12px;font-weight:400;color:rgba(220,80,80,.75);background:rgba(220,80,80,.07);box-shadow:inset 0 0 0 1px rgba(220,80,80,.18);transition:all .2s;white-space:nowrap;}
+.s-btn-danger:hover{background:rgba(220,80,80,.13);box-shadow:inset 0 0 0 1px rgba(220,80,80,.32);color:rgba(220,80,80,.95);}
+
+/* toggle */
+.toggle{width:42px;height:24px;border-radius:12px;background:rgba(255,255,255,.08);position:relative;transition:background .28s;flex-shrink:0;}
+.toggle.on{background:var(--grad);box-shadow:0 2px 10px rgba(212,74,122,.25);}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .26s cubic-bezier(.34,1.4,.6,1);box-shadow:0 1px 4px rgba(0,0,0,.25);}
+.toggle.on::after{left:21px;}
+
+.about-logo{font-family:var(--serif);font-size:40px;font-weight:500;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:block;margin-bottom:20px;}
+
+/* hidden */
+.hidden{display:none!important;}
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+
+<div class="app">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <button class="menu-btn" id="menuBtn" onclick="toggleDrawer()">
+      <div class="lns">
+        <span class="ln"></span>
+        <span class="ln"></span>
+        <span class="ln"></span>
+      </div>
+    </button>
+    <div class="logo-top">BRIAS</div>
+  </div>
+
+  <!-- Messages -->
+  <div class="messages" id="msgContainer">
+    <div class="messages-inner" id="msgInner">
+      <div class="welcome" id="welcomeScreen">
+        <div class="welcome-logo">BRIAS</div>
+        <div class="welcome-sub">Wat speelt er?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="input-area">
+    <div class="input-box">
+      <textarea id="msgInput" rows="1" placeholder="Vertel me iets..." oninput="autoResize(this);updateBtn();" onkeydown="handleKey(event)"></textarea>
+      <button class="send-btn inactive" id="actionBtn" onclick="handleActionBtn()">
+        <svg id="iconSend" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+        <div id="iconStop" class="stop-sq" style="display:none;"></div>
+      </button>
+    </div>
+    <div class="input-footer">BRIAS is geen vervanging voor professionele hulp. Ze is AI en kan fouten maken.</div>
+  </div>
+
+</div>
+
+<!-- Drawer -->
+<div class="drawer" id="drawer">
+  <div class="drawer-backdrop" onclick="closeDrawer()"></div>
+  <div class="drawer-panel">
+    <div class="drawer-top">
+      <div class="drawer-logo">BRIAS</div>
+    </div>
+
+    <div class="drawer-nav">
+      <div class="nav-section-label">Spaces</div>
+
+      <button class="nav-item active" onclick="closeDrawer()">
+        <div class="nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
+            <defs><linearGradient id="ng1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e8764a"/><stop offset="100%" stop-color="#d44a7a"/></linearGradient></defs>
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="url(#ng1)"/>
+          </svg>
+        </div>
+        <div class="nav-texts">
+          <div class="nav-name">Chat</div>
+          <div class="nav-sub">Jouw gesprek met BRIAS</div>
+        </div>
+      </button>
+
+      <button class="nav-item" onclick="window.location.href='diary.html'">
+        <div class="nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,223,227,.25)" stroke-width="1.8" stroke-linecap="round">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+          </svg>
+        </div>
+        <div class="nav-texts">
+          <div class="nav-name">Journal</div>
+          <div class="nav-sub">Jullie schrijven hier samen</div>
+        </div>
+      </button>
+
+      <button class="nav-item">
+        <div class="nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,223,227,.25)" stroke-width="1.8" stroke-linecap="round">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <div class="nav-texts">
+          <div class="nav-name">Agenda <span class="soon-badge">binnenkort</span></div>
+          <div class="nav-sub">Mentale stappen bijhouden</div>
+        </div>
+      </button>
+
+      <button class="nav-item">
+        <div class="nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,223,227,.25)" stroke-width="1.8" stroke-linecap="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 8v4l3 3"/>
+          </svg>
+        </div>
+        <div class="nav-texts">
+          <div class="nav-name">Mindspace <span class="soon-badge">binnenkort</span></div>
+          <div class="nav-sub">Dump het hier, sort later</div>
+        </div>
+      </button>
+    </div>
+
+    <div class="drawer-divider"></div>
+
+    <div class="drawer-footer">
+      <div class="footer-av"><span id="drawerInitial">—</span></div>
+      <div class="footer-info">
+        <div class="footer-name" id="drawerName">—</div>
+        <div class="footer-handle" id="drawerHandle">—</div>
+      </div>
+      <button class="drawer-settings-btn" onclick="openSettings();closeDrawer();" title="Settings">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(228,223,227,.35)" stroke-width="1.5" stroke-linecap="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings overlay -->
+<div class="settings-overlay" id="settingsOverlay">
+  <div class="settings-header">
+    <div class="settings-title">Settings</div>
+    <button class="settings-close-btn" onclick="closeSettings()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(228,223,227,.5)" stroke-width="2.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+  <div class="settings-tabs" id="settingsTabs">
+    <button class="stab active" onclick="switchSettingsTab(0)">Account</button>
+    <button class="stab" onclick="switchSettingsTab(1)">Subscription</button>
+    <button class="stab" onclick="switchSettingsTab(2)">Permissions</button>
+    <button class="stab" onclick="switchSettingsTab(3)">About</button>
+  </div>
+  <div class="settings-body" id="settingsBody"></div>
+</div>
+
+<script>
+const API = 'https://api.brias.eu';
+let token = localStorage.getItem('brias_token');
+let username = localStorage.getItem('brias_username');
+let activeChatId = null;
+let isStreaming = false;
+let meData = null;
+
+function api(path, opts={}) {
+  return fetch(API + path, {
+    ...opts,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? {'Authorization':'Bearer '+token} : {}),
+      ...(opts.headers || {})
+    }
+  });
+}
+
+// ── Init ──
+async function init() {
+  if (!token) { window.location.href = 'auth.html'; return; }
+  try {
+    const r = await api('/api/me');
+    meData = await r.json();
+    if (!meData.logged_in) { doLogout(); return; }
+  } catch(e) { window.location.href = 'auth.html'; return; }
+
+  const name = meData.display_name || meData.username || username || '—';
+  document.getElementById('drawerName').textContent = name;
+  document.getElementById('drawerHandle').textContent = meData.username || '—';
+  document.getElementById('drawerInitial').textContent = name.charAt(0).toUpperCase();
+
+  // load or create chat
+  const chats = await api('/api/chats').then(r=>r.json());
+  if (chats.length > 0) {
+    activeChatId = chats[0].id;
+    const msgs = await api('/api/chats/'+activeChatId+'/messages').then(r=>r.json());
+    if (msgs.length > 0) renderMessages(msgs);
+  } else {
+    const c = await api('/api/chats',{method:'POST',body:JSON.stringify({title:'Chat'})}).then(r=>r.json());
+    activeChatId = c.id;
+  }
+}
+
+function doLogout() {
+  token=null; username=null;
+  localStorage.removeItem('brias_token');
+  localStorage.removeItem('brias_username');
+  window.location.href = 'auth.html';
+}
+
+// ── Drawer ──
+function toggleDrawer() {
+  const d = document.getElementById('drawer');
+  const b = document.getElementById('menuBtn');
+  const isOpen = d.classList.contains('open');
+  if (isOpen) { closeDrawer(); } else { d.classList.add('open'); b.classList.add('open'); }
+}
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('menuBtn').classList.remove('open');
+}
+
+// ── Settings ──
+const settingsTabs = [
+  // 0 Account
+  () => `
+    <div class="s-section">
+      <div class="s-section-title">Profiel</div>
+      <div class="s-row">
+        <div class="s-row-left"><div class="s-row-label">Naam</div></div>
+        <button class="s-btn-neutral" id="sName">${esc(meData?.display_name||meData?.username||'—')}</button>
+      </div>
+      <div class="s-row">
+        <div class="s-row-left"><div class="s-row-label">E-mail</div></div>
+        <div class="s-row-val">${esc(meData?.email||'—')}</div>
+      </div>
+    </div>
+    <div class="s-section">
+      <div class="s-section-title">Beheer</div>
+      <div class="s-row">
+        <div class="s-row-left"><div class="s-row-label">Wachtwoord</div></div>
+        <button class="s-btn-ghost">Wijzigen</button>
+      </div>
+      <div class="s-row">
+        <div class="s-row-left"><div class="s-row-label">Uitloggen</div></div>
+        <button class="s-btn-neutral" onclick="doLogout()">Uitloggen</button>
+      </div>
+      <div class="s-row">
+        <div class="s-row-left"><div class="s-row-label">Account verwijderen</div></div>
+        <button class="s-btn-danger">Verwijderen</button>
+      </div>
+    </div>`,
+
+  // 1 Subscription — leeg, Joey vult zelf in
+  () => ``,
+
+  // 2 Permissions
+  () => `
+    <div class="s-section">
+      <div class="s-section-title">Apparaat</div>
+      <div class="s-row">
+        <div class="s-row-left"><div class="s-row-label">Notificaties</div><div class="s-row-sub">Laat BRIAS bij je inchecken</div></div>
+        <button class="toggle" onclick="this.classList.toggle('on')"></button>
+      </div>
+      <div class="s-row">
+        <div class="s-row-left"><div class="s-row-label">Microfoon</div><div class="s-row-sub">Voor spraakberichten</div></div>
+        <button class="toggle" onclick="this.classList.toggle('on')"></button>
+      </div>
+    </div>
+    <div class="s-section">
+      <div class="s-section-title">Data</div>
+      <div class="s-row">
+        <div class="s-row-left"><div class="s-row-label">Gesprekken opslaan</div><div class="s-row-sub">Bewaar je chatgeschiedenis</div></div>
+        <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+      </div>
+      <div class="s-row">
+        <div class="s-row-left"><div class="s-row-label">Journal opslaan</div><div class="s-row-sub">Lokaal op jouw apparaat</div></div>
+        <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+      </div>
+    </div>`,
+
+  // 3 About — alleen logo, Joey vult zelf in
+  () => `<span class="about-logo">BRIAS</span>`
+];
+
+function openSettings() {
+  document.getElementById('settingsOverlay').classList.add('open');
+  switchSettingsTab(0);
+}
+function closeSettings() {
+  document.getElementById('settingsOverlay').classList.remove('open');
+}
+function switchSettingsTab(i) {
+  document.querySelectorAll('.stab').forEach((t,j) => t.classList.toggle('active', j===i));
+  document.getElementById('settingsBody').innerHTML = settingsTabs[i]();
+}
+
+// ── Messages ──
+function renderMessages(msgs) {
+  const inner = document.getElementById('msgInner');
+  if (!msgs.length) {
+    inner.innerHTML = `<div class="welcome" id="welcomeScreen"><div class="welcome-logo">BRIAS</div><div class="welcome-sub">Wat speelt er?</div></div>`;
+    return;
+  }
+  inner.innerHTML = msgs.map(m => msgHtml(m.id, m.role, m.content)).join('');
+  scrollBottom();
+}
+
+function msgHtml(id, role, content) {
+  const isUser = role === 'user';
+  const av = isUser
+    ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(228,223,227,.3)" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`
+    : `<span>B</span>`;
+  return `<div class="msg ${isUser?'user':'assistant'}" id="msg-${id}">
+    <div class="msg-inner">
+      <div class="msg-av">${av}</div>
+      <div class="msg-bubble">${esc(content)}</div>
+    </div>
+  </div>`;
+}
+
+// ── Sending ──
+function updateBtn() {
+  if (isStreaming) return;
+  const has = document.getElementById('msgInput').value.trim().length > 0;
+  document.getElementById('actionBtn').className = 'send-btn' + (has ? '' : ' inactive');
+}
+
+function setStopMode(on) {
+  document.getElementById('iconSend').style.display = on ? 'none' : 'block';
+  document.getElementById('iconStop').style.display = on ? 'block' : 'none';
+  if (on) {
+    const b = document.getElementById('actionBtn');
+    b.className = 'stop-btn';
+    b.innerHTML = '<div class="stop-sq"></div>';
+  }
+}
+
+function handleActionBtn() {
+  if (isStreaming) stopGen(); else sendMessage();
+}
+
+async function stopGen() {
+  if (activeChatId) await api('/api/chats/'+activeChatId+'/abort',{method:'POST'});
+}
+
+async function sendMessage() {
+  const i = document.getElementById('msgInput'), c = i.value.trim();
+  if (!c || isStreaming || !activeChatId) return;
+  i.value = ''; autoResize(i); updateBtn();
+  await sendAsStream(c, activeChatId);
+}
+
+async function sendAsStream(content, chatId) {
+  isStreaming = true; setStopMode(true);
+  const welcome = document.getElementById('welcomeScreen');
+  if (welcome) welcome.remove();
+  const inner = document.getElementById('msgInner');
+
+  inner.insertAdjacentHTML('beforeend',
+    `<div class="msg user" id="msg-pending"><div class="msg-inner"><div class="msg-av"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(228,223,227,.3)" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="msg-bubble">${esc(content)}</div></div></div>`);
+  scrollBottom();
+
+  inner.insertAdjacentHTML('beforeend',
+    `<div class="msg assistant" id="typingMsg"><div class="msg-inner"><div class="msg-av"><span>B</span></div><div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div></div></div>`);
+  scrollBottom();
+
+  try {
+    const resp = await api('/api/chats/'+chatId+'/messages/stream',{method:'POST',body:JSON.stringify({content})});
+    if (!resp.ok) throw new Error('Server error');
+    const reader = resp.body.getReader(), dec = new TextDecoder();
+    let buf='', sb=null, st='', gm=false;
+
+    while(true) {
+      const {value,done} = await reader.read();
+      if (done) break;
+      buf += dec.decode(value,{stream:true});
+      const lines = buf.split('\n'); buf = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        let msg; try { msg=JSON.parse(line.slice(6)); } catch { continue; }
+        if (msg.type==='meta') {
+          gm=true;
+          document.getElementById('msg-pending')?.remove();
+          document.getElementById('typingMsg')?.remove();
+          inner.insertAdjacentHTML('beforeend',
+            `<div class="msg assistant" id="streamMsg"><div class="msg-inner"><div class="msg-av"><span>B</span></div><div class="msg-bubble" id="streamBubble"><span class="cursor"></span></div></div></div>`);
+          sb=document.getElementById('streamBubble'); scrollBottom();
+        } else if (msg.type==='token') {
+          if (!gm) {
+            gm=true;
+            document.getElementById('typingMsg')?.remove();
+            inner.insertAdjacentHTML('beforeend',
+              `<div class="msg assistant" id="streamMsg"><div class="msg-inner"><div class="msg-av"><span>B</span></div><div class="msg-bubble" id="streamBubble"><span class="cursor"></span></div></div></div>`);
+            sb=document.getElementById('streamBubble');
+          }
+          st+=msg.text; sb.innerHTML=esc(st)+'<span class="cursor"></span>'; scrollBottom();
+        } else if (msg.type==='done') {
+          const se=document.getElementById('streamMsg');
+          if (se) se.outerHTML=msgHtml('ai-'+Date.now(),'assistant',msg.full_text||st);
+        } else if (msg.type==='error') {
+          document.getElementById('typingMsg')?.remove();
+          inner.insertAdjacentHTML('beforeend',msgHtml('err-'+Date.now(),'assistant',msg.text));
+          scrollBottom();
+        }
+      }
+    }
+  } catch {
+    document.getElementById('typingMsg')?.remove();
+    inner.insertAdjacentHTML('beforeend',msgHtml('err-'+Date.now(),'assistant','Er ging iets mis. Probeer het opnieuw.'));
+    scrollBottom();
+  } finally {
+    isStreaming=false;
+    const b=document.getElementById('actionBtn');
+    b.className='send-btn inactive';
+    b.innerHTML=`<svg id="iconSend" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg><div id="iconStop" class="stop-sq" style="display:none;"></div>`;
+    scrollBottom();
+  }
+}
+
+// ── Utilities ──
+function scrollBottom() {
+  const c=document.getElementById('msgContainer');
+  setTimeout(()=>c.scrollTop=c.scrollHeight,30);
+}
+function autoResize(el) {
+  el.style.height='24px';
+  el.style.height=Math.min(el.scrollHeight,140)+'px';
+}
+function handleKey(e) {
+  if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); handleActionBtn(); }
+}
+function esc(s) {
+  const d=document.createElement('div'); d.textContent=s; return d.innerHTML;
+}
+
+init();
+</script>
+</body>
+</html>
