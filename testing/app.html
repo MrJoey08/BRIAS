@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,7 +32,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);}
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:4px;}
-::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.14);}
 textarea::placeholder{color:rgba(228,224,227,.18);}
 .noise{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.028;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:200px;}
 @keyframes bDot{0%,60%,100%{opacity:.2;transform:scale(.8);}30%{opacity:.7;transform:scale(1.1);}}
@@ -40,12 +39,9 @@ textarea::placeholder{color:rgba(228,224,227,.18);}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
 @keyframes logoReveal{from{opacity:0;transform:translateY(12px) scale(.96);}to{opacity:1;transform:translateY(0) scale(1);}}
-.hidden{display:none!important;}
 
 /* ── App ── */
 .app{position:relative;z-index:10;display:flex;flex-direction:column;height:100vh;animation:fadeIn .4s ease both;}
-
-/* ── Topbar ── */
 .topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;}
 .topbar-logo{font-family:var(--font-display);font-size:22px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.03em;}
 
@@ -96,8 +92,7 @@ textarea::placeholder{color:rgba(228,224,227,.18);}
 .send-btn{width:32px;height:32px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
 .send-btn.active{background:var(--grad);box-shadow:0 2px 16px rgba(212,74,122,.2);}
 .send-btn.inactive{background:var(--surface);opacity:.3;cursor:default;}
-.stop-btn{width:32px;height:32px;border-radius:12px;border:1px solid rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .15s;}
-.stop-btn:hover{border-color:rgba(255,255,255,.28);}
+.stop-btn{width:32px;height:32px;border-radius:12px;border:1px solid rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .stop-sq{width:9px;height:9px;border-radius:3px;background:rgba(255,255,255,.4);}
 
 /* ── Drawer ── */
@@ -132,19 +127,26 @@ textarea::placeholder{color:rgba(228,224,227,.18);}
 .drawer-settings-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .18s;}
 .drawer-settings-btn:hover{background:rgba(255,255,255,.08);}
 
-/* ── Settings ── */
+/* ── Settings overlay — fills full screen, NO scroll on tabs ── */
 .settings-overlay{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;background:rgba(10,7,9,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);opacity:0;pointer-events:none;transition:opacity .3s ease;}
 .settings-overlay.open{opacity:1;pointer-events:all;}
+
 .settings-header{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0;border-bottom:1px solid var(--border);}
 .settings-title{font-family:var(--font-display);font-size:22px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .settings-close-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:background .15s;}
 .settings-close-btn:hover{background:rgba(255,255,255,.1);}
-.settings-tabs{display:flex;gap:6px;padding:14px 24px;flex-shrink:0;border-bottom:1px solid var(--border);}
-.stab{padding:8px 18px;border-radius:20px;font-size:12px;font-weight:400;color:rgba(228,224,227,.28);transition:all .22s;white-space:nowrap;background:rgba(255,255,255,.04);}
-.stab:hover{color:rgba(228,224,227,.5);background:rgba(255,255,255,.07);}
-.stab.active{background:var(--grad);color:#fff;font-weight:500;box-shadow:0 3px 16px rgba(212,74,122,.28);}
-.settings-content{flex:1;display:flex;justify-content:center;overflow-y:auto;padding:28px;}
-.settings-body{width:100%;max-width:540px;}
+
+/* tabs — fixed row, no scroll, fill width */
+.settings-tabs{display:flex;flex-shrink:0;border-bottom:1px solid var(--border);padding:0;}
+.stab{flex:1;padding:14px 8px;font-size:12px;font-weight:400;color:var(--text-dim);transition:all .22s;white-space:nowrap;text-align:center;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.stab:hover{color:var(--text-sub);}
+/* active tab: gradient underline, text stays same grey — NOT white */
+.stab.active{color:var(--text-sub);border-bottom-color:var(--orange);}
+
+/* body scrolls, not the tabs */
+.settings-content{flex:1;overflow-y:auto;display:flex;justify-content:center;padding:28px 20px;}
+.settings-body{width:100%;max-width:560px;}
+
 .s-section{margin-bottom:24px;}
 .s-section-title{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;font-weight:500;}
 .s-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;background:rgba(255,255,255,.03);border-radius:14px;margin-bottom:5px;gap:16px;}
@@ -153,7 +155,7 @@ textarea::placeholder{color:rgba(228,224,227,.18);}
 .s-row-sub{font-size:11px;color:var(--text-dim);}
 .s-row-val{font-size:12px;color:var(--text-dim);flex-shrink:0;}
 
-/* 3 visually distinct button styles */
+/* 3 distinct button styles */
 .s-btn-ghost{padding:7px 16px;border-radius:20px;font-size:12px;font-weight:500;color:rgba(232,118,74,.9);background:rgba(232,118,74,.1);box-shadow:inset 0 0 0 1px rgba(232,118,74,.25);transition:all .18s;white-space:nowrap;flex-shrink:0;}
 .s-btn-ghost:hover{background:rgba(232,118,74,.18);box-shadow:inset 0 0 0 1px rgba(232,118,74,.45);}
 .s-btn-neutral{padding:7px 16px;border-radius:20px;font-size:12px;font-weight:400;color:var(--text-sub);background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.09);transition:all .18s;white-space:nowrap;flex-shrink:0;}
@@ -161,11 +163,17 @@ textarea::placeholder{color:rgba(228,224,227,.18);}
 .s-btn-danger{padding:7px 16px;border-radius:20px;font-size:12px;font-weight:400;color:rgba(220,80,80,.75);background:rgba(220,80,80,.07);box-shadow:inset 0 0 0 1px rgba(220,80,80,.18);transition:all .18s;white-space:nowrap;flex-shrink:0;}
 .s-btn-danger:hover{background:rgba(220,80,80,.13);box-shadow:inset 0 0 0 1px rgba(220,80,80,.35);color:rgba(220,80,80,.95);}
 
-/* toggle */
+/* toggle:
+   OFF = white knob on dark track
+   ON  = grey knob (blends into track) on gradient track */
 .toggle{width:42px;height:23px;border-radius:12px;background:rgba(255,255,255,.1);position:relative;transition:background .28s;flex-shrink:0;}
-.toggle.on{background:var(--grad);box-shadow:0 2px 10px rgba(212,74,122,.25);}
-.toggle::after{content:'';position:absolute;width:17px;height:17px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .26s cubic-bezier(.34,1.4,.6,1);box-shadow:0 1px 4px rgba(0,0,0,.25);}
-.toggle.on::after{left:22px;}
+.toggle.on{background:var(--grad);box-shadow:0 2px 10px rgba(212,74,122,.2);}
+.toggle::after{content:'';position:absolute;width:17px;height:17px;border-radius:50%;top:3px;left:3px;transition:left .26s cubic-bezier(.34,1.4,.6,1),background .28s;}
+/* off: white knob */
+.toggle::after{background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25);}
+/* on: grey knob so it blends softly with the gradient track */
+.toggle.on::after{left:22px;background:rgba(228,224,227,.55);box-shadow:none;}
+
 .about-logo{font-family:var(--font-display);font-size:42px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:block;}
 </style>
 </head>
@@ -182,19 +190,19 @@ textarea::placeholder{color:rgba(228,224,227,.18);}
     <div class="messages-inner" id="msgInner">
       <div class="welcome" id="welcomeScreen">
         <div class="welcome-logo">BRIAS</div>
-        <div class="welcome-sub">Wat speelt er?</div>
+        <div class="welcome-sub">What's on your mind?</div>
       </div>
     </div>
   </div>
   <div class="input-area">
     <div class="input-box">
-      <textarea id="msgInput" rows="1" placeholder="Vertel me iets..." oninput="autoResize(this);updateBtn();" onkeydown="handleKey(event)"></textarea>
+      <textarea id="msgInput" rows="1" placeholder="I'm here." oninput="autoResize(this);updateBtn();" onkeydown="handleKey(event)"></textarea>
       <button class="send-btn inactive" id="actionBtn" onclick="handleActionBtn()">
         <svg id="iconSend" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
         <div id="iconStop" class="stop-sq" style="display:none;"></div>
       </button>
     </div>
-    <div class="input-footer">BRIAS is geen vervanging voor professionele hulp. Ze is AI en kan fouten maken.</div>
+    <div class="input-footer">BRIAS is not a substitute for professional help. She's AI and can make mistakes.</div>
   </div>
 </div>
 
@@ -212,19 +220,19 @@ textarea::placeholder{color:rgba(228,224,227,.18);}
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="url(#ng1)"/>
           </svg>
         </div>
-        <div class="nav-texts"><div class="nav-name">Chat</div><div class="nav-sub">Jouw gesprek met BRIAS</div></div>
+        <div class="nav-texts"><div class="nav-name">Chat</div><div class="nav-sub">Your conversation with BRIAS</div></div>
       </button>
       <button class="nav-item" onclick="window.location.href='diary.html'">
         <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
-        <div class="nav-texts"><div class="nav-name">Journal</div><div class="nav-sub">Jullie schrijven hier samen</div></div>
+        <div class="nav-texts"><div class="nav-name">Journal</div><div class="nav-sub">You and BRIAS write here together</div></div>
       </button>
       <button class="nav-item">
         <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-        <div class="nav-texts"><div class="nav-name">Agenda <span class="soon-badge">binnenkort</span></div><div class="nav-sub">Mentale stappen bijhouden</div></div>
+        <div class="nav-texts"><div class="nav-name">Agenda <span class="soon-badge">soon</span></div><div class="nav-sub">Keep track of mental steps</div></div>
       </button>
       <button class="nav-item">
         <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
-        <div class="nav-texts"><div class="nav-name">Mindspace <span class="soon-badge">binnenkort</span></div><div class="nav-sub">Dump het hier, sort later</div></div>
+        <div class="nav-texts"><div class="nav-name">Mindspace <span class="soon-badge">soon</span></div><div class="nav-sub">Dump it here, sort later</div></div>
       </button>
     </div>
     <div class="drawer-divider"></div>
@@ -249,7 +257,7 @@ textarea::placeholder{color:rgba(228,224,227,.18);}
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.5)" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
   </div>
-  <div class="settings-tabs">
+  <div class="settings-tabs" id="settingsTabs">
     <button class="stab active" onclick="switchTab(0)">Account</button>
     <button class="stab" onclick="switchTab(1)">Subscription</button>
     <button class="stab" onclick="switchTab(2)">Permissions</button>
@@ -298,37 +306,35 @@ function doLogout() {
   window.location.href='auth.html';
 }
 
-// drawer
 function toggleDrawer() { document.getElementById('drawer').classList.contains('open')?closeDrawer():openDrawer(); }
 function openDrawer() { document.getElementById('drawer').classList.add('open'); document.getElementById('menuBtn').classList.add('open'); }
 function closeDrawer() { document.getElementById('drawer').classList.remove('open'); document.getElementById('menuBtn').classList.remove('open'); }
 
-// settings
 const tabs = [
   ()=>`
     <div class="s-section">
-      <div class="s-section-title">Profiel</div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Naam</div></div><button class="s-btn-neutral">${esc(meData?.display_name||meData?.username||'—')}</button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Leeftijd</div></div><button class="s-btn-neutral">${esc(String(meData?.age||'—'))}</button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">E-mail</div></div><div class="s-row-val">${esc(meData?.email||'—')}</div></div>
+      <div class="s-section-title">Profile</div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Name</div></div><button class="s-btn-neutral">${esc(meData?.display_name||meData?.username||'—')}</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Age</div></div><button class="s-btn-neutral">${esc(String(meData?.age||'—'))}</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Email</div></div><div class="s-row-val">${esc(meData?.email||'—')}</div></div>
     </div>
     <div class="s-section">
-      <div class="s-section-title">Beheer</div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Wachtwoord</div></div><button class="s-btn-ghost">Wijzigen</button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Uitloggen</div></div><button class="s-btn-neutral" onclick="doLogout()">Uitloggen</button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Account verwijderen</div></div><button class="s-btn-danger">Verwijderen</button></div>
+      <div class="s-section-title">Manage</div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Password</div></div><button class="s-btn-ghost">Change</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Sign out</div></div><button class="s-btn-neutral" onclick="doLogout()">Sign out</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Delete account</div></div><button class="s-btn-danger">Delete</button></div>
     </div>`,
   ()=>``,
   ()=>`
     <div class="s-section">
-      <div class="s-section-title">Apparaat</div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Notificaties</div><div class="s-row-sub">Laat BRIAS bij je inchecken</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Microfoon</div><div class="s-row-sub">Voor spraakberichten</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
+      <div class="s-section-title">Device</div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Notifications</div><div class="s-row-sub">Let BRIAS check in on you</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Microphone</div><div class="s-row-sub">For voice messages</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
     </div>
     <div class="s-section">
       <div class="s-section-title">Data</div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Gesprekken opslaan</div><div class="s-row-sub">Bewaar je chatgeschiedenis</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Journal opslaan</div><div class="s-row-sub">Lokaal op jouw apparaat</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Save conversations</div><div class="s-row-sub">Keep your chat history</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Save journal</div><div class="s-row-sub">Stored locally on your device</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
     </div>`,
   ()=>`<span class="about-logo">BRIAS</span>`
 ];
@@ -340,10 +346,9 @@ function switchTab(i) {
   document.getElementById('settingsBody').innerHTML = tabs[i]();
 }
 
-// messages
 function renderMessages(msgs) {
   const inner = document.getElementById('msgInner');
-  if (!msgs.length) { inner.innerHTML=`<div class="welcome" id="welcomeScreen"><div class="welcome-logo">BRIAS</div><div class="welcome-sub">Wat speelt er?</div></div>`; return; }
+  if (!msgs.length) { inner.innerHTML=`<div class="welcome" id="welcomeScreen"><div class="welcome-logo">BRIAS</div><div class="welcome-sub">What's on your mind?</div></div>`; return; }
   inner.innerHTML = msgs.map(m=>msgHtml(m.id,m.role,m.content)).join('');
   scrollBottom();
 }
@@ -351,7 +356,7 @@ function renderMessages(msgs) {
 function msgHtml(id, role, content) {
   const isUser = role==='user';
   const av = isUser ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.3)" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>` : `<span>B</span>`;
-  const cp = `<button class="msg-act-btn" onclick="copyMsg(this,'${id}')" title="Kopiëren"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>`;
+  const cp = `<button class="msg-act-btn" onclick="copyMsg(this,'${id}')" title="Copy"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>`;
   return `<div class="msg ${isUser?'user':'assistant'}" id="msg-${id}"><div class="msg-inner"><div class="msg-avatar">${av}</div><div class="msg-body"><div class="msg-bubble" id="bubble-${id}">${esc(content)}</div><div class="msg-actions">${cp}</div></div></div></div>`;
 }
 
@@ -361,7 +366,6 @@ async function copyMsg(btn, id) {
   btn.style.color='var(--orange)'; setTimeout(()=>btn.style.color='',1500);
 }
 
-// input
 function updateBtn() {
   if (isStreaming) return;
   const has = document.getElementById('msgInput').value.trim().length>0;
@@ -416,7 +420,7 @@ async function sendAsStream(content, chatId) {
     }
   } catch {
     document.getElementById('typingMsg')?.remove();
-    inner.insertAdjacentHTML('beforeend',msgHtml('err-'+Date.now(),'assistant','Er ging iets mis. Probeer het opnieuw.'));
+    inner.insertAdjacentHTML('beforeend',msgHtml('err-'+Date.now(),'assistant','Something went wrong. Please try again.'));
     scrollBottom();
   } finally { isStreaming=false; setStopMode(false); scrollBottom(); }
 }
