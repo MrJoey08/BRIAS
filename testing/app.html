@@ -45,7 +45,7 @@ body.light .settings-overlay{background:rgba(235,224,214,.92);}
 body.light .drawer-panel{background:var(--sidebar);}
 body.light ::-webkit-scrollbar-thumb{background:rgba(80,40,20,.12);}
 html,body{height:100%;overflow:hidden;}
-body{font-family:var(--font);background:var(--bg);color:var(--text);}
+body{font-family:var(--font);background:var(--bg);color:var(--text);transition:background .5s ease,color .4s ease;}
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:4px;}
@@ -235,9 +235,15 @@ textarea::placeholder{color:var(--text-dim);}
 /* Theme toggle — two-option selector */
 .theme-toggle{display:flex;gap:0;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;overflow:hidden;padding:3px;gap:3px;}
 body.light .theme-toggle{background:rgba(80,40,20,.06);}
-.theme-opt{flex:1;padding:8px 14px;border-radius:9px;font-size:12.5px;font-weight:400;color:var(--text-muted);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;}
-.theme-opt.active{background:var(--grad);color:#fff;font-weight:500;}
+.theme-opt{flex:1;padding:8px 14px;border-radius:9px;font-size:12.5px;font-weight:400;color:var(--text-muted);transition:all .35s cubic-bezier(.34,1.2,.6,1);display:flex;align-items:center;justify-content:center;gap:6px;position:relative;overflow:hidden;}
+.theme-opt::after{content:'';position:absolute;inset:0;background:var(--grad);opacity:0;transition:opacity .35s ease;border-radius:9px;}
+.theme-opt.active{background:transparent;color:#fff;font-weight:500;}
+.theme-opt.active::after{opacity:1;}
+.theme-opt span,.theme-opt svg{position:relative;z-index:1;}
 body.light .theme-opt:not(.active){color:var(--text-sub);}
+
+/* Smooth transition on all major elements for theme switch */
+.topbar,.drawer-panel,.settings-overlay,.s-row,.s-btn,.toggle,.msg-bubble,.input-box,.nav-item,.drawer-backdrop{transition:background .45s ease,border-color .45s ease,color .35s ease;}
 
 /* About */
 .about-logo{font-family:var(--font-display);font-size:42px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:block;}
