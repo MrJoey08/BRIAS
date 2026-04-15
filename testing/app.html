@@ -233,10 +233,15 @@ body.light .settings-overlay{background:rgba(228,214,199,.97);}
   transition:left .26s cubic-bezier(.34,1.4,.6,1),background .28s,box-shadow .28s;
   box-shadow:0 1px 4px rgba(0,0,0,.3);
 }
-/* on knob: semi-transparent white so gradient glows through */
+/* on knob: matches s-row bg so it blends into the gradient track */
 .toggle.on::after{
   left:22px;
-  background:rgba(255,255,255,.25);
+  background:#1a161a;
+  box-shadow:none;
+}
+body.light .toggle.on::after{
+  left:22px;
+  background:#ddc9b3;
   box-shadow:none;
 }
 
@@ -600,7 +605,7 @@ const tabs = [
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
             <span>Light</span>
           </button>
-        </div>${document.body.classList.contains('light') ? "<script>document.getElementById('themeToggle')?.classList.add('pill-right')<\/script>" : ''}
+        </div>
       </div>
     </div>`,
   ()=>`<span class="about-logo">BRIAS</span>`
@@ -611,6 +616,9 @@ function closeSettings() { document.getElementById('settingsOverlay').classList.
 function switchTab(i) {
   document.querySelectorAll('.stab').forEach((t,j)=>t.classList.toggle('active',j===i));
   document.getElementById('settingsBody').innerHTML = tabs[i]();
+  // init pill position after rendering
+  const toggle = document.getElementById('themeToggle');
+  if (toggle) toggle.classList.toggle('pill-right', document.body.classList.contains('light'));
 }
 function setTheme(mode) {
   if (mode==='light') document.body.classList.add('light');
