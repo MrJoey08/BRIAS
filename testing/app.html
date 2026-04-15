@@ -167,7 +167,7 @@ textarea::placeholder{color:var(--text-dim);}
 .stab.active{
   color:var(--orange);
   font-weight:500;
-  border-bottom-color:var(--orange);
+  border-bottom:2px solid var(--orange);
 }
 
 .settings-content{flex:1;overflow-y:auto;display:flex;justify-content:center;padding:28px 20px;}
@@ -225,21 +225,22 @@ textarea::placeholder{color:var(--text-dim);}
   transition:left .26s cubic-bezier(.34,1.4,.6,1),background .28s,box-shadow .28s;
   box-shadow:0 1px 4px rgba(0,0,0,.3);
 }
-/* on knob: same dark-ish grey as the surrounding card bg — blends in */
+/* on knob: semi-transparent white so gradient glows through */
 .toggle.on::after{
   left:22px;
-  background:#1e181e;
+  background:rgba(255,255,255,.25);
   box-shadow:none;
 }
 
 /* Theme toggle — two-option selector */
-.theme-toggle{display:flex;gap:0;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;overflow:hidden;padding:3px;gap:3px;}
+.theme-toggle{display:flex;gap:3px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;overflow:hidden;padding:3px;}
 body.light .theme-toggle{background:rgba(80,40,20,.06);}
 .theme-opt{flex:1;padding:8px 14px;border-radius:9px;font-size:12.5px;font-weight:400;color:var(--text-muted);transition:all .35s cubic-bezier(.34,1.2,.6,1);display:flex;align-items:center;justify-content:center;gap:6px;position:relative;overflow:hidden;}
 .theme-opt::after{content:'';position:absolute;inset:0;background:var(--grad);opacity:0;transition:opacity .35s ease;border-radius:9px;}
 .theme-opt.active{background:transparent;color:#fff;font-weight:500;}
 .theme-opt.active::after{opacity:1;}
-.theme-opt span,.theme-opt svg{position:relative;z-index:1;}
+.theme-opt svg,.theme-opt span,.theme-opt svg+*{position:relative;z-index:1;}
+.theme-opt *{position:relative;z-index:1;}
 body.light .theme-opt:not(.active){color:var(--text-sub);}
 
 /* Smooth transition on all major elements for theme switch */
@@ -386,7 +387,6 @@ body.light .theme-opt:not(.active){color:var(--text-sub);}
       <textarea id="msgInput" rows="1" placeholder="I'm here." oninput="autoResize(this);updateBtn();" onkeydown="handleKey(event)"></textarea>
       <button class="send-btn inactive" id="actionBtn" onclick="handleActionBtn()">
         <svg id="iconSend" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
-        <div id="iconStop" class="stop-sq" style="display:none;"></div>
       </button>
     </div>
     <div class="input-footer">BRIAS is not a substitute for professional help. She's AI and can make mistakes.</div>
@@ -563,11 +563,11 @@ const tabs = [
         <div class="theme-toggle">
           <button class="theme-opt ${!document.body.classList.contains('light')?'active':''}" onclick="setTheme('dark')">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-            Dark
+            <span>Dark</span>
           </button>
           <button class="theme-opt ${document.body.classList.contains('light')?'active':''}" onclick="setTheme('light')">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-            Light
+            <span>Light</span>
           </button>
         </div>
       </div>
