@@ -75,17 +75,43 @@ textarea::placeholder{color:rgba(228,224,227,.18);}
 .welcome-sub{font-family:var(--font-serif);font-size:15px;font-weight:300;font-style:italic;color:var(--text-muted);animation:fadeUp .6s ease .2s both;}
 .msg{display:flex;margin-bottom:10px;animation:fadeUp .22s ease;}
 .msg.user{justify-content:flex-end;}
-.msg-inner{display:flex;gap:10px;max-width:74%;align-items:flex-start;}
+.msg-inner{display:flex;gap:10px;max-width:74%;align-items:flex-end;}
 .msg.user .msg-inner{flex-direction:row-reverse;}
+/* BRIAS avatar — keep it */
 .msg-avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;}
 .msg.assistant .msg-avatar{background:var(--grad);}
+/* user: no avatar */
 .msg.user .msg-avatar{display:none;}
 .msg-avatar span{font-family:var(--font-display);font-size:11px;color:#fff;font-weight:600;font-style:italic;}
 .msg-body{display:flex;flex-direction:column;gap:4px;min-width:0;}
-.msg-bubble{padding:12px 18px;font-family:var(--font-serif);font-size:14px;font-weight:300;line-height:1.7;word-break:break-word;color:var(--text);}
-.msg.user .msg-bubble{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:20px 20px 6px 20px;}
-.msg.user .msg-bubble.bubble-short{border-radius:50px;padding:11px 16px;min-width:42px;text-align:center;}
-.msg.assistant .msg-bubble{border:1px solid var(--border);border-radius:20px 20px 20px 6px;}
+
+/* user bubble — morphs from circle to pill naturally */
+.msg-bubble{
+  padding:12px 18px;
+  font-family:var(--font-serif);font-size:14px;font-weight:300;line-height:1.7;
+  word-break:break-word;color:var(--text);
+}
+.msg.user .msg-bubble{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:22px 22px 6px 22px;
+  min-width:0;
+  display:inline-block;
+  padding:11px 18px;
+}
+/* very short message (≤12 chars) — near-circular pill */
+.msg.user .msg-bubble.bubble-short{
+  border-radius:50px;
+  padding:11px 16px;
+  min-width:42px;
+  text-align:center;
+  line-height:1.5;
+}
+body.light .msg.user .msg-bubble{
+  background:rgba(80,40,20,.07);
+  border-color:rgba(80,40,20,.11);
+}
+.msg.assistant .msg-bubble{border:1px solid var(--border);border-radius:22px 22px 22px 6px;}
 .msg-actions{display:flex;gap:3px;opacity:0;transition:opacity .15s;padding:0 4px;}
 .msg:hover .msg-actions{opacity:1;}
 .msg.user .msg-actions{justify-content:flex-end;}
@@ -502,10 +528,11 @@ function renderMessages(msgs) {
 
 function msgHtml(id, role, content) {
   const isUser = role==='user';
-  const av = isUser ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.3)" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>` : `<span>B</span>`;
+  const av = isUser ? '' : `<div class="msg-avatar"><span>B</span></div>`;
   const cp = `<button class="msg-act-btn" onclick="copyMsg(this,'${id}')" title="Copy"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>`;
+  // short = ≤12 chars, makes the bubble near-circular
   const shortClass = isUser && content.trim().length <= 12 ? ' bubble-short' : '';
-  return `<div class="msg ${isUser?'user':'assistant'}" id="msg-${id}"><div class="msg-inner"><div class="msg-avatar">${av}</div><div class="msg-body"><div class="msg-bubble${shortClass}" id="bubble-${id}">${esc(content)}</div><div class="msg-actions">${cp}</div></div></div></div>`;
+  return `<div class="msg ${isUser?'user':'assistant'}" id="msg-${id}"><div class="msg-inner">${av}<div class="msg-body"><div class="msg-bubble${shortClass}" id="bubble-${id}">${esc(content)}</div><div class="msg-actions">${cp}</div></div></div></div>`;
 }
 
 async function copyMsg(btn, id) {
@@ -537,7 +564,7 @@ async function sendAsStream(content, chatId) {
   isStreaming=true; setStopMode(true);
   document.getElementById('welcomeScreen')?.remove();
   const inner = document.getElementById('msgInner');
-  inner.insertAdjacentHTML('beforeend',`<div class="msg user" id="msg-pending"><div class="msg-inner"><div class="msg-avatar"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.3)" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="msg-body"><div class="msg-bubble${content.trim().length<=12?' bubble-short':''}">${esc(content)}</div></div></div></div>`);
+  inner.insertAdjacentHTML('beforeend',`<div class="msg user" id="msg-pending"><div class="msg-inner"><div class="msg-body"><div class="msg-bubble${content.trim().length<=12?' bubble-short':''}">${esc(content)}</div></div></div></div>`);
   scrollBottom();
   inner.insertAdjacentHTML('beforeend',`<div class="msg assistant" id="typingMsg"><div class="msg-inner"><div class="msg-avatar"><span>B</span></div><div class="msg-body"><div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div></div></div></div>`);
   scrollBottom();
