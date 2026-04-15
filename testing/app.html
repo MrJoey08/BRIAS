@@ -595,9 +595,11 @@ function setTheme(mode) {
   if (mode==='light') document.body.classList.add('light');
   else document.body.classList.remove('light');
   localStorage.setItem('brias_theme', mode);
-  // re-render current tab so toggle buttons update
-  const active = [...document.querySelectorAll('.stab')].findIndex(t=>t.classList.contains('active'));
-  if (active>=0) document.getElementById('settingsBody').innerHTML = tabs[active]();
+  // update buttons in place so CSS transition can run
+  document.querySelectorAll('.theme-opt').forEach(btn => {
+    const isDark = btn.getAttribute('onclick').includes('dark');
+    btn.classList.toggle('active', mode==='dark' ? isDark : !isDark);
+  });
 }
 
 function renderMessages(msgs) {
