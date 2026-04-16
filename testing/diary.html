@@ -120,18 +120,36 @@ body.light .who-btn.active{background:rgba(80,40,20,.08);color:var(--text);}
 
 /* Month nav */
 .month-nav{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 16px 10px;flex-shrink:0;
+  display:grid;grid-template-columns:28px 1fr 28px;align-items:center;gap:4px;
+  padding:14px 12px 10px;flex-shrink:0;
 }
-.month-label{font-family:var(--font-display);font-size:15px;font-weight:500;font-style:italic;color:var(--text-sub);}
-.month-arrows{display:flex;gap:4px;}
+.month-label{font-family:var(--font-display);font-size:16px;font-weight:500;font-style:italic;color:var(--text-sub);text-align:center;cursor:default;letter-spacing:.01em;}
+.month-arrows{display:contents;}
 .arr-btn{
-  width:26px;height:26px;border-radius:8px;border:none;background:transparent;
+  width:28px;height:28px;border-radius:8px;border:none;background:transparent;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   color:var(--text-muted);transition:background .12s,color .12s;
 }
 .arr-btn:hover:not(:disabled){background:var(--surface);color:var(--text-sub);}
 .arr-btn:disabled{opacity:.2;cursor:default;}
+
+/* Sidebar Today button */
+.sidebar-today{
+  display:flex;align-items:center;justify-content:center;
+  margin:0 12px 12px;padding:7px 0;
+  border-radius:10px;border:1px solid var(--border);
+  background:transparent;cursor:pointer;font-family:var(--font);
+  font-size:11.5px;font-weight:300;color:var(--text-muted);
+  transition:border-color .25s,color .25s,box-shadow .25s;width:calc(100% - 24px);
+}
+body.light .sidebar-today{border-color:rgba(80,40,20,.1);}
+.sidebar-today:hover{border-color:rgba(232,118,74,.3);color:var(--orange);}
+@keyframes sidebarTodayPulse{0%,100%{box-shadow:0 0 0 0 rgba(232,118,74,.0);}50%{box-shadow:0 0 14px 2px rgba(232,118,74,.18);}}
+.sidebar-today.is-today{
+  border-color:rgba(232,118,74,.3);color:var(--orange);
+  box-shadow:0 0 10px rgba(232,118,74,.14);
+  animation:sidebarTodayPulse 2.8s ease-in-out infinite;
+}
 
 /* Mini calendar */
 .mini-cal{padding:0 12px 14px;flex-shrink:0;}
@@ -372,13 +390,35 @@ body.light .sub-card-perks{border-top-color:rgba(80,40,20,.1);}
   display:none;position:fixed;bottom:72px;left:0;right:0;z-index:25;
   background:rgba(16,12,14,.98);backdrop-filter:blur(32px);
   border-top:1px solid var(--border2);border-radius:20px 20px 0 0;
-  padding:20px 16px 24px;
+  padding:16px 16px 28px;
 }
 body.light .cal-sheet{background:rgba(237,224,213,.98);}
 .cal-sheet.open{display:block;animation:slideUp .25s cubic-bezier(.16,1,.3,1);}
 @keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
-.cal-sheet-handle{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,.15);margin:0 auto 16px;cursor:grab;}
+.cal-sheet-handle{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,.15);margin:0 auto 14px;cursor:grab;}
 body.light .cal-sheet-handle{background:rgba(80,40,20,.2);}
+
+/* Fixed-height calendar header — arrows never shift between months */
+.sheet-cal-header{
+  display:grid;grid-template-columns:44px 1fr 44px;align-items:center;
+  height:48px;margin-bottom:12px;
+}
+.sheet-cal-label{
+  font-family:var(--font-display);font-size:22px;font-weight:500;font-style:italic;
+  color:var(--text-sub);cursor:pointer;text-align:center;
+  padding:4px 8px;border-radius:8px;transition:background .15s;
+}
+.sheet-cal-label:hover{background:rgba(255,255,255,.05);}
+body.light .sheet-cal-label:hover{background:rgba(80,40,20,.06);}
+.sheet-arr{
+  width:40px;height:40px;border-radius:12px;border:1px solid var(--border);
+  background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--text-sub);transition:background .12s,border-color .12s,color .12s;margin:0 auto;
+}
+.sheet-arr:hover:not(:disabled){background:var(--surface);border-color:rgba(255,255,255,.12);color:var(--text);}
+.sheet-arr:disabled{opacity:.18;cursor:default;}
+.sheet-arr svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+body.light .sheet-arr{border-color:rgba(80,40,20,.12);color:var(--text-sub);}
 
 /* ── Mobile bottom bar (journal-specific) ── */
 .bottom-nav{
@@ -407,13 +447,16 @@ body.light .bn-who-btn.active{background:rgba(80,40,20,.08);color:var(--text);}
 .bn-spacer{flex:1;}
 
 .bn-btn{
-  width:40px;height:40px;border-radius:14px;display:flex;align-items:center;justify-content:center;
-  border:none;background:transparent;cursor:pointer;color:var(--text-muted);
-  transition:background .15s,color .15s;flex-shrink:0;
+  display:flex;align-items:center;gap:7px;
+  padding:7px 13px;border-radius:13px;border:1px solid var(--border);
+  background:transparent;cursor:pointer;font-family:var(--font);
+  font-size:12px;font-weight:300;color:var(--text-muted);
+  transition:border-color .25s,color .25s,background .15s;flex-shrink:0;
 }
-.bn-btn:hover{background:var(--surface);color:var(--text-sub);}
-.bn-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;}
-.bn-btn.cal-active{color:var(--orange);}
+body.light .bn-btn{border-color:rgba(80,40,20,.12);}
+.bn-btn:hover{border-color:rgba(255,255,255,.14);color:var(--text-sub);}
+.bn-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;flex-shrink:0;}
+.bn-btn.cal-active{border-color:rgba(232,118,74,.35);color:var(--orange);}
 
 .bn-today{
   padding:7px 14px;border-radius:13px;border:1px solid var(--border);
@@ -499,18 +542,17 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
       </div>
 
       <div class="month-nav">
+        <button class="arr-btn" id="sidePrevBtn" onclick="sideNav(-1)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
         <div class="month-label" id="sideMonthLabel"></div>
-        <div class="month-arrows">
-          <button class="arr-btn" id="sidePrevBtn" onclick="sideNav(-1)">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-          </button>
-          <button class="arr-btn" id="sideNextBtn" onclick="sideNav(1)">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-        </div>
+        <button class="arr-btn" id="sideNextBtn" onclick="sideNav(1)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
       </div>
 
       <div class="mini-cal"><div class="mini-cal-grid" id="miniCalGrid"></div></div>
+      <button class="sidebar-today" id="sidebarToday" onclick="goToday()">Today</button>
       <div class="year-section" id="yearSection"></div>
     </div>
 
@@ -531,16 +573,13 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
         <div class="cal-sheet-handle" id="calHandle"></div>
         <div id="sheetPicker" style="display:none;"><div id="sheetPickerInner"></div></div>
         <div id="sheetCalView">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <button class="arr-btn" id="sheetPrevBtn" onclick="sheetNav(-1)" style="width:36px;height:36px;border-radius:10px;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+          <div class="sheet-cal-header">
+            <button class="sheet-arr" id="sheetPrevBtn" onclick="sheetNav(-1)">
+              <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
-            <div id="sheetMonthLabel" onclick="openSheetPicker()"
-              style="font-family:var(--font-display);font-size:20px;font-weight:500;font-style:italic;color:var(--text-sub);cursor:pointer;padding:4px 12px;border-radius:8px;transition:background .15s;"
-              onmouseover="this.style.background='rgba(255,255,255,.05)'" onmouseout="this.style.background=''">
-            </div>
-            <button class="arr-btn" id="sheetNextBtn" onclick="sheetNav(1)" style="width:36px;height:36px;border-radius:10px;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            <div class="sheet-cal-label" id="sheetMonthLabel" onclick="openSheetPicker()"></div>
+            <button class="sheet-arr" id="sheetNextBtn" onclick="sheetNav(1)">
+              <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
           </div>
           <div class="mini-cal-grid" id="sheetCalGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;"></div>
@@ -562,9 +601,10 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
     <button class="bn-who-btn" id="bnBrias" onclick="setWho('brias')">BRIAS</button>
   </div>
   <div class="bn-spacer"></div>
-  <!-- Calendar icon -->
-  <button class="bn-btn" id="bnCal" onclick="toggleMobileCal()" title="Calendar">
+  <!-- Calendar btn -->
+  <button class="bn-btn" id="bnCal" onclick="toggleMobileCal()">
     <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Calendar
   </button>
   <!-- Today — glows when on today -->
   <button class="bn-today" id="bnToday" onclick="goToday()">Today</button>
@@ -980,9 +1020,11 @@ function renderAll(){
 }
 
 function updateTodayGlow(){
-  const btn=document.getElementById('bnToday');
-  if(!btn) return;
-  btn.classList.toggle('is-today', isToday(viewDate));
+  const onToday = isToday(viewDate);
+  const bnBtn=document.getElementById('bnToday');
+  if(bnBtn) bnBtn.classList.toggle('is-today', onToday);
+  const sideBtn=document.getElementById('sidebarToday');
+  if(sideBtn) sideBtn.classList.toggle('is-today', onToday);
 }
 
 // ── Mobile calendar sheet ──
