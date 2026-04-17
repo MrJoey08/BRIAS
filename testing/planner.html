@@ -220,15 +220,6 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
 .bn-today:hover{border-color:rgba(232,118,74,.3);color:var(--orange);}
 @keyframes todayPulse{0%,100%{box-shadow:0 0 0 0 rgba(232,118,74,.0);}50%{box-shadow:0 0 12px 2px rgba(232,118,74,.22);}}
 .bn-today.is-today{border-color:rgba(232,118,74,.35);color:var(--orange);box-shadow:0 0 10px rgba(232,118,74,.18);animation:todayPulse 2.8s ease-in-out infinite;}
-.bn-new{
-  display:flex;align-items:center;gap:6px;
-  padding:8px 16px;border-radius:13px;border:none;
-  background:var(--grad);color:#fff;
-  font-family:var(--font);font-size:12px;font-weight:500;
-  transition:opacity .15s,transform .12s;flex-shrink:0;
-}
-.bn-new svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;flex-shrink:0;}
-.bn-new:hover{opacity:.85;transform:translateY(-1px);}
 .content-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
 
 /* ── Card Detail View ── */
@@ -741,11 +732,13 @@ body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}
     <button class="bn-who-btn" id="bnCalendar" onclick="setMobileView('calendar')">Calendar</button>
   </div>
   <div class="bn-spacer"></div>
-  <!-- New button with BRIAS gradient -->
-  <button class="bn-new" id="bnNew" onclick="mobileAdd()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    New
+  <!-- Calendar btn -->
+  <button class="bn-btn" id="bnCalBtn" onclick="setMobileView('calendar')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Calendar
   </button>
+  <!-- New card -->
+  <button class="bn-today" id="bnNew" onclick="mobileAdd()">+ New</button>
 </div>
 
 <!-- Card Create/Edit Modal -->
@@ -805,6 +798,15 @@ body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}
       <div class="form-group">
         <label class="form-label">Duration (minutes)</label>
         <input type="number" class="form-input" id="evDurInput" value="60" min="15" step="15">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Color</label>
+        <div class="color-picker">
+          <div class="color-opt blue selected" onclick="selectEvColor('blue')"></div>
+          <div class="color-opt green" onclick="selectEvColor('green')"></div>
+          <div class="color-opt yellow" onclick="selectEvColor('yellow')"></div>
+          <div class="color-opt red" onclick="selectEvColor('red')"></div>
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label">Link to card (optional)</label>
@@ -868,42 +870,28 @@ body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}
     <div class="drawer-nav">
       <div class="nav-section-label">Navigate</div>
       <button class="nav-item" onclick="location.href='/'">
-        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
-        <div class="nav-texts"><div class="nav-name">Chat</div><div class="nav-sub">Your conversation with BRIAS</div></div>
+        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.4)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <div class="nav-texts"><div class="nav-name">Chat</div><div class="nav-sub">Talk with BRIAS</div></div>
       </button>
       <button class="nav-item" onclick="location.href='/journal'">
-        <div class="nav-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
-            <defs><linearGradient id="ng1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e8764a"/><stop offset="100%" stop-color="#d44a7a"/></linearGradient></defs>
-            <path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="rgba(228,224,227,.25)"/>
-            <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" stroke="rgba(228,224,227,.25)"/>
-          </svg>
-        </div>
-        <div class="nav-texts"><div class="nav-name">Journal</div><div class="nav-sub">You and BRIAS write here together</div></div>
+        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.4)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div class="nav-texts"><div class="nav-name">Journal</div><div class="nav-sub">Daily diary</div></div>
       </button>
-      <button class="nav-item active" onclick="closeDrawer()">
-        <div class="nav-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <defs><linearGradient id="ng2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e8764a"/><stop offset="100%" stop-color="#d44a7a"/></linearGradient></defs>
-            <rect x="3" y="4" width="18" height="18" rx="2" stroke="url(#ng2)"/>
-            <line x1="16" y1="2" x2="16" y2="6" stroke="url(#ng2)"/>
-            <line x1="8" y1="2" x2="8" y2="6" stroke="url(#ng2)"/>
-            <line x1="3" y1="10" x2="21" y2="10" stroke="url(#ng2)"/>
-          </svg>
-        </div>
+      <button class="nav-item active">
+        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
         <div class="nav-texts"><div class="nav-name">Planner</div><div class="nav-sub">Goals & calendar</div></div>
       </button>
       <button class="nav-item">
-        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
-        <div class="nav-texts"><div class="nav-name">Mindspace <span class="soon-badge">soon</span></div><div class="nav-sub">Dump it here, sort later</div></div>
+        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.4)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <div class="nav-texts"><div class="nav-name">Mindspace <span class="soon-badge">soon</span></div><div class="nav-sub">BRIAS's observations</div></div>
       </button>
     </div>
     <div class="drawer-divider"></div>
     <div class="drawer-footer">
-      <div class="footer-av"><span id="drawerInitial">—</span></div>
+      <div class="footer-av"><span id="drawerInitial">?</span></div>
       <div class="footer-info">
-        <div class="footer-name" id="drawerName">—</div>
-        <div class="footer-handle" id="drawerHandle">—</div>
+        <div class="footer-name" id="drawerName">You</div>
+        <div class="footer-handle">brias.eu</div>
       </div>
       <button class="drawer-settings-btn" onclick="openSettings();closeDrawer();" title="Settings">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.35)" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
@@ -935,28 +923,6 @@ body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}
 <script>
 // Apply saved theme immediately
 (function(){const t=localStorage.getItem('brias_theme');if(t==='light')document.body.classList.add('light');})();
-
-const API = 'https://api.brias.eu';
-let meData = null;
-
-// ── Auth ──
-(async function() {
-  const token = localStorage.getItem('brias_token');
-  if (!token) { window.location.href = 'auth.html'; return; }
-  try {
-    const r = await fetch(API + '/api/me', { headers: { 'Authorization': 'Bearer ' + token }, signal: AbortSignal.timeout(3000) });
-    const d = await r.json();
-    if (!d.logged_in) { localStorage.removeItem('brias_token'); localStorage.removeItem('brias_username'); window.location.href = 'auth.html'; return; }
-    meData = d;
-    const name = d.display_name || d.username || localStorage.getItem('brias_username') || '—';
-    const di=document.getElementById('drawerInitial'); if(di)di.textContent=name.charAt(0).toUpperCase();
-    const dn=document.getElementById('drawerName'); if(dn)dn.textContent=name;
-    const dh=document.getElementById('drawerHandle'); if(dh)dh.textContent=d.email||d.username||'—';
-  } catch { /* stay logged in offline */ }
-})();
-
-function getUsername(){ return meData?.display_name||meData?.username||localStorage.getItem('brias_username')||'You'; }
-function doLogout(){ localStorage.removeItem('brias_token');localStorage.removeItem('brias_username');window.location.href='auth.html'; }
 // ── Constants & helpers ──
 const TODAY = new Date();
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -1027,10 +993,6 @@ function toggleDrawer(){
   const d=document.getElementById('drawer'),b=document.getElementById('menuBtn');
   d.classList.toggle('open');b.classList.toggle('open');
 }
-function closeDrawer(){
-  const d=document.getElementById('drawer'),b=document.getElementById('menuBtn');
-  d.classList.remove('open');b.classList.remove('open');
-}
 function closeDrawerOutside(e){if(e.target===document.getElementById('drawer')||e.target.classList.contains('drawer-backdrop')){const d=document.getElementById('drawer'),b=document.getElementById('menuBtn');d.classList.remove('open');b.classList.remove('open');}}
 
 // ── View switching ──
@@ -1046,6 +1008,8 @@ function setMobileView(v){
   const bc=document.getElementById('bnCards'),bk=document.getElementById('bnCalendar');
   if(bc)bc.classList.toggle('active',v==='cards');
   if(bk)bk.classList.toggle('active',v==='calendar');
+  const calBtn=document.getElementById('bnCalBtn');
+  if(calBtn)calBtn.classList.toggle('active',v==='calendar');
   renderContent();
 }
 
@@ -1344,6 +1308,9 @@ function openEventModal(date,cardId){
   const dt=date?new Date(date):new Date();
   if(!date){dt.setHours(10,0,0,0);}
   document.getElementById('evDateInput').value=dt.toISOString().slice(0,16);
+  // Color
+  document.querySelectorAll('.color-opt').forEach(el=>el.classList.remove('selected'));
+  document.querySelector('.color-opt.blue').classList.add('selected');
   // Card link options
   populateCardSelect(cardId||'');
   document.getElementById('eventModal').classList.add('open');
@@ -1371,10 +1338,9 @@ function saveEvent(){
   const cardId=document.getElementById('evCardLink').value;
   if(editingEventId){
     const ev=events.find(e=>e.id===editingEventId);
-    // Only allow color change if BRIAS added it; user events stay blue
-    if(ev){ev.title=title;ev.date=dateStr;ev.duration=dur;ev.notes=notes;ev.cardId=cardId;if(!ev.briasAdded)ev.color='blue';}
+    if(ev){ev.title=title;ev.date=dateStr;ev.duration=dur;ev.notes=notes;ev.cardId=cardId;ev.color=selectedEvColor;}
   } else {
-    events.push({id:uid(),title,date:dateStr,duration:dur,color:'blue',notes,cardId,briasAdded:false});
+    events.push({id:uid(),title,date:dateStr,duration:dur,color:selectedEvColor,notes,cardId,briasAdded:false});
   }
   saveEvents(events);
   closeEventModal();renderCalendar();renderContent();
@@ -1415,6 +1381,9 @@ function editEventFromPopup(){
   document.getElementById('evDateInput').value=d.toISOString().slice(0,16);
   document.getElementById('evDurInput').value=ev.duration||60;
   document.getElementById('evNotesInput').value=ev.notes||'';
+  document.querySelectorAll('.color-opt').forEach(el=>el.classList.remove('selected'));
+  const cEl=document.querySelector(`.color-opt.${ev.color||'blue'}`);
+  if(cEl)cEl.classList.add('selected');
   populateCardSelect(ev.cardId||'');
   document.getElementById('eventModal').classList.add('open');
   document.getElementById('eventPopup').classList.remove('open');
@@ -1451,8 +1420,8 @@ function renderCalendar(){
   // Get events for this week
   const weekEvents=events.filter(e=>{const d=ds(new Date(e.date));return d>=weekStart&&d<=weekEnd;});
 
-  // Hours to show — full 24h
-  const hours=[];for(let h=0;h<=23;h++)hours.push(h);
+  // Hours to show
+  const hours=[];for(let h=6;h<23;h++)hours.push(h);
 
   // Header row
   let headerHtml=`<div class="cal-time-col"></div>`;
@@ -1469,7 +1438,7 @@ function renderCalendar(){
   // Time slots
   let slotsHtml='';
   hours.forEach(h=>{
-    const hStr=clockFormat===12?(h===0?'12 AM':h<12?`${h} AM`:h===12?'12 PM':`${h-12} PM`):`${String(h).padStart(2,'0')}:00`;
+    const hStr=clockFormat===12?(h===12?'12 PM':h<12?`${h} AM`:h===24?'12 AM':`${h-12} PM`):`${String(h).padStart(2,'0')}:00`;
     slotsHtml+=`<div class="cal-time-slot">${hStr}</div>`;
     days.forEach(d=>{
       const dStr=ds(d);
@@ -1522,30 +1491,8 @@ function renderCalendar(){
   </div>`;
 
   scroll.innerHTML=calHtml;
-  // Scroll to current time (or 8am), and on mobile center today column
-  setTimeout(()=>{
-    const w=scroll.querySelector('.cal-grid-wrap');
-    if(w){
-      const now=new Date();
-      const targetHour=isCurWeek?now.getHours():8;
-      w.scrollTop=Math.max(0,targetHour*52-100);
-    }
-    // On mobile: horizontally center the today column
-    if(window.innerWidth<=700){
-      const grid=scroll.querySelector('.cal-grid');
-      if(grid){
-        const todayCol=grid.querySelectorAll('.cal-day-header');
-        const todayIdx=[...days].findIndex(d=>ds(d)===todayStr);
-        if(todayIdx>=0&&todayCol[todayIdx]){
-          const w2=scroll.querySelector('.cal-grid-wrap');
-          const colW=todayCol[todayIdx].offsetWidth;
-          const timeColW=54;
-          const scrollX=timeColW+todayIdx*colW-(window.innerWidth/2)+(colW/2);
-          if(w2)w2.scrollLeft=Math.max(0,scrollX);
-        }
-      }
-    }
-  },0);
+  // Scroll to 8am
+  setTimeout(()=>{const w=scroll.querySelector('.cal-grid-wrap');if(w)w.scrollTop=Math.max(0,(8-6)*52);},0);
 }
 
 function weekNav(dir){
@@ -1674,11 +1621,11 @@ const tabs=[
     <div class="s-section">
       <div class="s-section-title">Profile</div>
       <div class="s-row"><div class="s-row-left"><div class="s-row-label">Name</div></div><button class="s-btn">${esc(getUsername())}</button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Email</div></div><div class="s-row-val">${esc(meData?.email||'—')}</div></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Email</div></div><div class="s-row-val">—</div></div>
     </div>
     <div class="s-section">
       <div class="s-section-title">Manage</div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Sign out</div></div><button class="s-btn" onclick="doLogout()">Sign out</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Sign out</div></div><button class="s-btn" onclick="localStorage.removeItem('brias_token');window.location.href='/'">Sign out</button></div>
       <div class="s-row"><div class="s-row-left"><div class="s-row-label">Delete account</div></div><button class="s-btn danger">Delete</button></div>
     </div>`,
   ()=>`<p class="sub-intro" style="font-family:var(--font-serif);font-size:14px;font-weight:300;font-style:italic;line-height:1.65;color:var(--text-muted);margin-bottom:20px;">Manage your BRIAS plan.</p>
