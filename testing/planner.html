@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BRIAS · Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=DM+Sans:wght@300;400;500&family=Bitter:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+button{outline:none!important;border:none;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#131013;
+  --sidebar:#151215;
+  --border:rgba(255,255,255,.07);
+  --border2:rgba(255,255,255,.13);
+  --surface:rgba(255,255,255,.05);
+  --text:#e4e0e3;
+  --text-sub:rgba(228,224,227,.44);
+  --text-muted:rgba(228,224,227,.26);
+  --text-dim:rgba(228,224,227,.14);
+  --input-bg:rgba(255,255,255,.04);
+  --input-border:rgba(255,255,255,.08);
+  --input-focus:rgba(232,118,74,.28);
+  --orange:#e8764a;
+  --pink:#d44a7a;
+  --grad:linear-gradient(135deg,#e8764a,#d44a7a);
+  --font:'DM Sans',-apple-system,sans-serif;
+  --font-display:'Cormorant Garamond',Georgia,serif;
+  --font-serif:'Bitter',Georgia,serif;
+
+  /* Calendar event colors */
+  --cal-blue:rgba(74,140,232,.85);
+  --cal-blue-bg:rgba(74,140,232,.1);
+  --cal-blue-border:rgba(74,140,232,.3);
+  --cal-green:rgba(74,192,128,.85);
+  --cal-green-bg:rgba(74,192,128,.1);
+  --cal-green-border:rgba(74,192,128,.3);
+  --cal-yellow:rgba(232,190,74,.85);
+  --cal-yellow-bg:rgba(232,190,74,.1);
+  --cal-yellow-border:rgba(232,190,74,.3);
+  --cal-red:rgba(232,74,74,.85);
+  --cal-red-bg:rgba(232,74,74,.1);
+  --cal-red-border:rgba(232,74,74,.3);
+}
+body.light{
+  --bg:#f0e6dc;
+  --sidebar:#ede0d5;
+  --border:rgba(80,40,20,.1);
+  --border2:rgba(80,40,20,.18);
+  --surface:rgba(80,40,20,.06);
+  --text:#2e1f18;
+  --text-sub:rgba(46,31,24,.6);
+  --text-muted:rgba(46,31,24,.4);
+  --text-dim:rgba(46,31,24,.22);
+  --input-bg:rgba(80,40,20,.05);
+  --input-border:rgba(80,40,20,.1);
+  --input-focus:rgba(232,118,74,.35);
+}
+
+html,body{height:100%;overflow:hidden;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);transition:background .5s ease,color .4s ease;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:4px;}
+body.light ::-webkit-scrollbar-thumb{background:rgba(80,40,20,.12);}
+
+canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.38;transition:opacity .5s ease;}
+body.light canvas{opacity:0;}
+.noise{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.028;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:200px;}
+
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes contentSwap{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+@keyframes modalIn{from{opacity:0;transform:translateY(16px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(232,118,74,0);}50%{box-shadow:0 0 14px 2px rgba(232,118,74,.18);}}
+
+/* ── App shell ── */
+.app{position:relative;z-index:10;display:flex;flex-direction:column;height:100vh;animation:fadeIn .4s ease both;}
+
+/* ── Topbar ── */
+.topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;transition:border-color .45s ease;}
+.topbar-logo{font-family:var(--font-display);font-size:22px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.03em;}
+
+.menu-btn{position:absolute;left:16px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;}
+.lns{display:flex;flex-direction:column;gap:4px;align-items:center;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
+.ln{display:block;width:26px;height:5px;border-radius:100px;background:var(--grad);flex-shrink:0;transition:transform .52s cubic-bezier(.22,1.35,.5,1),opacity .38s ease;}
+.menu-btn.open .ln:nth-child(1){transform:translateY(9px) rotate(45deg);}
+.menu-btn.open .ln:nth-child(2){opacity:0;transform:scaleX(0);}
+.menu-btn.open .ln:nth-child(3){transform:translateY(-9px) rotate(-45deg);}
+
+/* Nav switcher in topbar — hidden, already in drawer */
+.topbar-nav{display:none;}
+.topbar-right{display:none;}
+.topbar-icon-btn{display:none;}
+
+/* Sidebar view toggle icons */
+.sidebar-view-toggle{
+  display:flex;gap:4px;padding:10px 10px 0;flex-shrink:0;
+}
+.svt{
+  flex:1;padding:8px 4px;border-radius:10px;border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  font-family:var(--font);font-size:11px;font-weight:300;color:var(--text-muted);
+  transition:background .12s,color .12s,border-color .15s;
+}
+.svt svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.svt:hover{background:var(--surface);color:var(--text-sub);}
+.svt.active{background:rgba(232,118,74,.08);border-color:rgba(232,118,74,.25);color:var(--orange);}
+body.light .svt.active{background:rgba(232,118,74,.08);}
+
+/* ── Main layout ── */
+.main-body{flex:1;display:flex;overflow:hidden;}
+
+/* ── Left sidebar ── */
+.planner-sidebar{
+  width:260px;flex-shrink:0;border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+  background:rgba(14,11,13,.5);
+  transition:background .45s ease,border-color .45s ease;
+}
+body.light .planner-sidebar{background:var(--sidebar);}
+
+.sidebar-header{
+  padding:16px 16px 12px;border-bottom:1px solid var(--border);flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.sidebar-header-label{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--text-dim);font-weight:500;}
+.new-card-btn{
+  display:flex;align-items:center;gap:5px;
+  padding:5px 10px;border-radius:8px;border:1px solid rgba(232,118,74,.25);
+  background:rgba(232,118,74,.06);color:var(--orange);
+  font-family:var(--font);font-size:11px;font-weight:400;
+  transition:background .15s,border-color .15s;
+}
+.new-card-btn:hover{background:rgba(232,118,74,.12);border-color:rgba(232,118,74,.4);}
+.new-card-btn svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;}
+
+/* Card filter tabs */
+.card-filter-tabs{display:flex;padding:10px 10px 0;gap:2px;flex-shrink:0;}
+.cft{
+  flex:1;padding:6px 4px;border-radius:8px;
+  font-family:var(--font);font-size:11px;font-weight:300;color:var(--text-muted);
+  transition:background .12s,color .12s;text-align:center;
+}
+.cft:hover{background:var(--surface);color:var(--text-sub);}
+.cft.active{background:rgba(255,255,255,.06);color:var(--text);}
+body.light .cft.active{background:rgba(80,40,20,.08);color:var(--text);}
+
+/* Content scroll */
+.content-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+
+/* Card list */
+.card-list{flex:1;overflow-y:auto;padding:8px 8px 20px;}
+.card-item{
+  border:1px solid var(--border);border-radius:13px;margin-bottom:5px;
+  padding:11px 13px;cursor:pointer;transition:background .12s,border-color .15s;
+  animation:fadeUp .2s ease;
+}
+.card-item:hover{background:var(--surface);}
+.card-item.active{background:rgba(232,118,74,.07);border-color:rgba(232,118,74,.22);}
+body.light .card-item.active{background:rgba(232,118,74,.07);}
+.card-item-top{display:flex;align-items:center;gap:7px;margin-bottom:5px;}
+.type-badge{
+  font-size:9px;letter-spacing:.07em;text-transform:uppercase;font-weight:500;
+  padding:2px 7px;border-radius:20px;flex-shrink:0;
+}
+.type-badge.dream{background:rgba(74,140,232,.12);color:rgba(74,140,232,.9);}
+.type-badge.problem{background:rgba(212,74,122,.12);color:rgba(212,74,122,.9);}
+.card-item-title{font-size:13px;font-weight:400;color:var(--text-sub);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.card-item-active .card-item-title{color:var(--text);}
+.card-item-meta{font-size:11px;color:var(--text-dim);display:flex;align-items:center;gap:8px;}
+.status-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.status-dot.active{background:rgba(74,192,128,.7);}
+.status-dot.paused{background:rgba(232,190,74,.6);}
+.status-dot.achieved{background:rgba(232,118,74,.6);}
+.brias-tag{
+  font-size:9px;padding:1px 5px;border-radius:6px;
+  background:rgba(232,118,74,.1);color:var(--orange);letter-spacing:.04em;
+}
+
+/* ── Main content ── */
+.content-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+/* Mobile view tabs — removed, handled by bottom nav */
+.mobile-view-tabs{display:none!important;}
+
+/* ── Bottom nav (mobile) — diary style ── */
+.bottom-nav{
+  display:none;position:fixed;bottom:16px;left:16px;right:16px;z-index:30;
+  height:62px;background:rgba(18,13,17,.9);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  border:1px solid rgba(255,255,255,.08);border-radius:22px;
+  align-items:center;padding:0 8px;
+  box-shadow:0 8px 32px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06);
+}
+body.light .bottom-nav{background:rgba(237,224,213,.96);border-color:rgba(80,40,20,.1);box-shadow:0 4px 24px rgba(80,40,20,.08),inset 0 1px 0 rgba(255,255,255,.7);}
+.bn-spacer{flex:1;}
+.bn-who{display:flex;border-radius:13px;border:1px solid var(--border);background:rgba(255,255,255,.03);overflow:hidden;flex-shrink:0;}
+body.light .bn-who{border-color:rgba(80,40,20,.1);background:rgba(80,40,20,.04);}
+.bn-who-btn{padding:7px 14px;border:none;background:transparent;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:300;color:var(--text-muted);transition:background .15s,color .15s;white-space:nowrap;}
+.bn-who-btn.active{background:rgba(255,255,255,.07);color:var(--text);}
+body.light .bn-who-btn.active{background:rgba(80,40,20,.08);color:var(--text);}
+.bn-btn{
+  display:flex;align-items:center;gap:7px;
+  padding:7px 13px;border-radius:13px;border:1px solid var(--border);
+  background:transparent;cursor:pointer;font-family:var(--font);
+  font-size:12px;font-weight:300;color:var(--text-muted);
+  transition:border-color .25s,color .25s,background .15s;flex-shrink:0;
+}
+body.light .bn-btn{border-color:rgba(80,40,20,.12);}
+.bn-btn:hover{border-color:rgba(255,255,255,.14);color:var(--text-sub);}
+.bn-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;flex-shrink:0;}
+.bn-btn.active{border-color:rgba(232,118,74,.35);color:var(--orange);}
+.bn-today{
+  padding:7px 14px;border-radius:13px;border:1px solid var(--border);
+  background:transparent;cursor:pointer;font-family:var(--font);
+  font-size:12px;font-weight:300;color:var(--text-muted);
+  transition:border-color .25s,color .25s,box-shadow .25s;flex-shrink:0;margin-left:4px;
+}
+body.light .bn-today{border-color:rgba(80,40,20,.12);}
+.bn-today:hover{border-color:rgba(232,118,74,.3);color:var(--orange);}
+@keyframes todayPulse{0%,100%{box-shadow:0 0 0 0 rgba(232,118,74,.0);}50%{box-shadow:0 0 12px 2px rgba(232,118,74,.22);}}
+.bn-today.is-today{border-color:rgba(232,118,74,.35);color:var(--orange);box-shadow:0 0 10px rgba(232,118,74,.18);animation:todayPulse 2.8s ease-in-out infinite;}
+.content-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+
+/* ── Card Detail View ── */
+.card-detail{flex:1;padding:40px 48px 80px;max-width:780px;width:100%;margin:0 auto;animation:contentSwap .25s ease;}
+
+.card-detail-header{margin-bottom:28px;}
+.card-detail-back{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;color:var(--text-dim);margin-bottom:18px;
+  transition:color .15s;
+}
+.card-detail-back:hover{color:var(--text-muted);}
+.card-detail-back svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+.card-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:10px;}
+.card-detail-title{font-family:var(--font-display);font-size:clamp(28px,5vw,40px);font-weight:300;font-style:italic;color:var(--text-sub);letter-spacing:-.01em;line-height:1.1;}
+.card-title-badges{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-top:6px;}
+.status-badge{
+  font-size:10px;padding:4px 10px;border-radius:20px;font-weight:400;
+  letter-spacing:.04em;
+}
+.status-badge.active{background:rgba(74,192,128,.1);color:rgba(74,192,128,.9);border:1px solid rgba(74,192,128,.2);}
+.status-badge.paused{background:rgba(232,190,74,.1);color:rgba(232,190,74,.9);border:1px solid rgba(232,190,74,.2);}
+.status-badge.achieved{background:rgba(232,118,74,.1);color:var(--orange);border:1px solid rgba(232,118,74,.2);}
+.card-detail-meta{font-size:11.5px;color:var(--text-dim);display:flex;align-items:center;gap:12px;}
+
+/* Card sections */
+.card-section{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  margin-bottom:14px;overflow:hidden;transition:border-color .2s;
+}
+.card-section:focus-within{border-color:rgba(232,118,74,.18);}
+.card-section-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px 0;
+}
+.card-section-label{
+  font-size:10px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--text-dim);font-weight:500;
+}
+.card-section-action{
+  font-size:11px;color:var(--text-dim);padding:3px 8px;border-radius:7px;
+  border:1px solid var(--border);transition:color .15s,border-color .15s;
+}
+.card-section-action:hover{color:var(--orange);border-color:rgba(232,118,74,.25);}
+
+/* Plan text */
+.plan-area{
+  width:100%;min-height:120px;background:transparent;border:none;outline:none;
+  color:var(--text-sub);font-family:var(--font-serif);font-size:14px;font-weight:300;
+  line-height:1.85;padding:12px 18px 18px;resize:none;caret-color:var(--orange);
+}
+.plan-area::placeholder{color:var(--text-dim);font-style:italic;}
+.plan-ro{
+  padding:12px 18px 18px;font-family:var(--font-serif);font-size:14px;
+  font-weight:300;line-height:1.85;color:var(--text-sub);
+  white-space:pre-wrap;word-break:break-word;min-height:80px;
+}
+.plan-ro.empty{color:var(--text-dim);font-style:italic;}
+
+/* Linked events in card */
+.linked-events{padding:10px 14px 14px;}
+.linked-event-item{
+  display:flex;align-items:center;gap:10px;padding:8px 10px;
+  border-radius:10px;margin-bottom:4px;cursor:pointer;
+  transition:background .12s;
+}
+.linked-event-item:hover{background:rgba(255,255,255,.04);}
+.ev-color-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.ev-color-dot.blue{background:var(--cal-blue);}
+.ev-color-dot.green{background:var(--cal-green);}
+.ev-color-dot.yellow{background:var(--cal-yellow);}
+.ev-color-dot.red{background:var(--cal-red);}
+.ev-label{font-size:12.5px;color:var(--text-sub);flex:1;}
+.ev-date{font-size:11px;color:var(--text-dim);}
+.no-events-hint{padding:10px 14px 14px;font-size:12.5px;color:var(--text-dim);font-style:italic;}
+
+/* History log */
+.history-list{padding:10px 14px 14px;}
+.history-item{padding:10px 12px;border-radius:10px;margin-bottom:5px;background:rgba(255,255,255,.03);}
+body.light .history-item{background:rgba(80,40,20,.04);}
+.history-item-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.history-item-type{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim);font-weight:500;}
+.history-item-date{font-size:10.5px;color:var(--text-dim);}
+.history-item-text{font-family:var(--font-serif);font-size:13px;font-weight:300;color:var(--text-sub);line-height:1.7;}
+.history-item-text.brias{font-style:italic;color:rgba(232,118,74,.7);}
+
+/* Card action buttons */
+.card-actions{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;}
+.card-action-btn{
+  display:flex;align-items:center;gap:7px;
+  padding:8px 16px;border-radius:11px;border:1px solid var(--border);
+  font-family:var(--font);font-size:12px;font-weight:300;color:var(--text-muted);
+  transition:all .15s;
+}
+.card-action-btn:hover{border-color:var(--border2);color:var(--text-sub);}
+.card-action-btn.evaluate{border-color:rgba(232,118,74,.25);color:var(--orange);}
+.card-action-btn.evaluate:hover{background:rgba(232,118,74,.07);border-color:rgba(232,118,74,.4);}
+.card-action-btn.achieve{border-color:rgba(74,192,128,.2);color:rgba(74,192,128,.8);}
+.card-action-btn.achieve:hover{background:rgba(74,192,128,.07);border-color:rgba(74,192,128,.35);}
+.card-action-btn.pause{border-color:rgba(232,190,74,.2);color:rgba(232,190,74,.8);}
+.card-action-btn.pause:hover{background:rgba(232,190,74,.07);border-color:rgba(232,190,74,.35);}
+.card-action-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+
+/* Empty state */
+.empty-state{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;padding:40px;text-align:center;
+}
+.empty-state-icon{width:56px;height:56px;border-radius:18px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:4px;}
+.empty-state-icon svg{width:22px;height:22px;stroke:var(--text-dim);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.empty-state-title{font-family:var(--font-display);font-size:22px;font-style:italic;font-weight:300;color:var(--text-muted);}
+.empty-state-sub{font-size:13px;font-weight:300;color:var(--text-dim);max-width:280px;line-height:1.65;}
+
+/* ── Calendar View ── */
+.calendar-view{flex:1;display:flex;flex-direction:column;overflow:hidden;animation:contentSwap .25s ease;}
+.cal-header{
+  padding:16px 24px 12px;border-bottom:1px solid var(--border);flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.cal-week-nav{display:flex;align-items:center;gap:8px;}
+.cal-week-label{font-family:var(--font-display);font-size:17px;font-style:italic;font-weight:400;color:var(--text-sub);min-width:170px;text-align:center;}
+.cal-nav-btn{
+  width:30px;height:30px;border-radius:9px;border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;color:var(--text-muted);
+  transition:background .12s,color .12s,border-color .15s;
+}
+.cal-nav-btn:hover{background:var(--surface);color:var(--text-sub);}
+.cal-nav-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;}
+.cal-today-btn{
+  padding:6px 14px;border-radius:9px;border:1px solid var(--border);
+  font-family:var(--font);font-size:12px;font-weight:300;color:var(--text-muted);
+  transition:all .15s;
+}
+.cal-today-btn:hover{border-color:rgba(232,118,74,.3);color:var(--orange);}
+.cal-today-btn.is-cur-week{border-color:rgba(232,118,74,.3);color:var(--orange);animation:pulse 2.8s ease-in-out infinite;}
+
+/* Cal legend */
+.cal-legend{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-dim);}
+.legend-dot{width:7px;height:7px;border-radius:50%;}
+.legend-dot.blue{background:var(--cal-blue);}
+.legend-dot.green{background:var(--cal-green);}
+.legend-dot.yellow{background:var(--cal-yellow);}
+.legend-dot.red{background:var(--cal-red);}
+
+/* Calendar grid */
+.cal-grid-wrap{flex:1;overflow:auto;padding:0 16px 20px;}
+.cal-grid{display:grid;grid-template-columns:52px repeat(7,1fr);min-width:600px;}
+.cal-day-header{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:12px 4px 10px;position:sticky;top:0;z-index:5;
+  background:var(--bg);border-bottom:1px solid var(--border);
+  transition:background .45s ease;
+}
+body.light .cal-day-header{background:var(--bg);}
+.cal-time-col{border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5;background:var(--bg);}
+.cal-day-name{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--text-dim);font-weight:500;margin-bottom:4px;}
+.cal-day-num{
+  width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:300;color:var(--text-muted);
+}
+.cal-day-num.today{background:var(--grad);color:#fff;font-weight:500;}
+.cal-day-num.has-dot{position:relative;}
+.cal-day-num.has-dot::after{
+  content:'';position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);
+  width:4px;height:4px;border-radius:50%;background:rgba(232,118,74,.5);
+}
+
+/* All-day row */
+.cal-allday-row{display:contents;}
+.cal-allday-cell{
+  border-bottom:1px solid var(--border);border-right:1px solid var(--border);
+  padding:6px 4px;min-height:32px;
+}
+.cal-allday-label{padding:6px 8px 6px 4px;font-size:10px;color:var(--text-dim);border-bottom:1px solid var(--border);display:flex;align-items:center;}
+
+/* Time slots */
+.cal-time-slot{font-size:10px;color:var(--text-dim);text-align:right;padding:0 8px 0 0;height:52px;display:flex;align-items:flex-start;justify-content:flex-end;padding-top:4px;border-right:1px solid var(--border);}
+.cal-cell{
+  border-right:1px solid var(--border);border-bottom:1px solid rgba(255,255,255,.03);
+  height:52px;position:relative;cursor:pointer;transition:background .1s;
+}
+body.light .cal-cell{border-bottom-color:rgba(80,40,20,.05);}
+.cal-cell:hover{background:rgba(255,255,255,.025);}
+body.light .cal-cell:hover{background:rgba(80,40,20,.03);}
+.cal-cell.today-col{background:rgba(232,118,74,.025);}
+
+/* Events in cells */
+.cal-event{
+  position:absolute;left:3px;right:3px;top:3px;
+  border-radius:7px;padding:3px 7px;
+  font-size:11px;font-weight:400;line-height:1.35;
+  cursor:pointer;z-index:2;transition:opacity .12s,transform .1s;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  display:flex;align-items:center;gap:5px;
+}
+.cal-event:hover{opacity:.8;transform:translateY(-1px);}
+.cal-event.blue{background:var(--cal-blue-bg);border-left:2px solid var(--cal-blue);color:rgba(74,140,232,.95);}
+.cal-event.green{background:var(--cal-green-bg);border-left:2px solid var(--cal-green);color:rgba(74,192,128,.95);}
+.cal-event.yellow{background:var(--cal-yellow-bg);border-left:2px solid var(--cal-yellow);color:rgba(232,190,74,.95);}
+.cal-event.red{background:var(--cal-red-bg);border-left:2px solid var(--cal-red);color:rgba(232,74,74,.95);}
+.brias-ev-icon{width:10px;height:10px;flex-shrink:0;opacity:.7;}
+
+/* Add event btn on cell hover */
+.cal-cell-add{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:20px;height:20px;border-radius:6px;background:var(--surface);
+  display:none;align-items:center;justify-content:center;
+  color:var(--text-dim);font-size:15px;font-weight:300;line-height:1;
+}
+.cal-cell:hover .cal-cell-add{display:flex;}
+
+/* ── Modal ── */
+.modal-backdrop{
+  position:fixed;inset:0;z-index:60;background:rgba(8,6,8,.75);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.modal-backdrop.open{display:flex;}
+body.light .modal-backdrop{background:rgba(30,12,0,.4);}
+.modal{
+  background:var(--sidebar);border:1px solid var(--border2);border-radius:20px;
+  width:100%;max-width:460px;display:flex;flex-direction:column;
+  animation:modalIn .3s cubic-bezier(.16,1,.3,1);
+  max-height:90vh;overflow:hidden;
+}
+.modal-header{padding:20px 22px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-family:var(--font-display);font-size:20px;font-style:italic;font-weight:400;color:var(--text-sub);}
+.modal-close{width:28px;height:28px;border-radius:9px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:background .15s,color .15s;}
+.modal-close:hover{background:rgba(255,255,255,.1);color:var(--text-sub);}
+.modal-close svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;}
+body.light .modal-close{background:rgba(80,40,20,.06);}
+body.light .modal-close:hover{background:rgba(80,40,20,.12);}
+.modal-body{padding:20px 22px;overflow-y:auto;}
+.modal-footer{padding:14px 22px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;}
+
+/* Form elements */
+.form-group{margin-bottom:16px;}
+.form-label{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--text-dim);font-weight:500;margin-bottom:7px;display:block;}
+.form-input{
+  width:100%;background:var(--input-bg);border:1px solid var(--input-border);
+  border-radius:11px;padding:10px 14px;
+  color:var(--text);font-family:var(--font);font-size:13.5px;font-weight:300;
+  outline:none;transition:border-color .2s;
+}
+.form-input:focus{border-color:var(--input-focus);}
+.form-input::placeholder{color:var(--text-dim);}
+textarea.form-input{resize:none;line-height:1.7;font-family:var(--font-serif);}
+.form-select{
+  width:100%;background:var(--input-bg);border:1px solid var(--input-border);
+  border-radius:11px;padding:10px 14px;
+  color:var(--text-sub);font-family:var(--font);font-size:13.5px;font-weight:300;
+  outline:none;transition:border-color .2s;cursor:pointer;
+  -webkit-appearance:none;appearance:none;
+}
+.form-select:focus{border-color:var(--input-focus);}
+
+/* Type selector */
+.type-selector{display:flex;gap:8px;}
+.type-opt{
+  flex:1;padding:9px;border-radius:11px;border:1px solid var(--border);
+  font-family:var(--font);font-size:12.5px;font-weight:300;color:var(--text-muted);
+  transition:background .3s ease,border-color .3s ease,color .3s ease,transform .18s ease,box-shadow .3s ease;
+  text-align:center;
+}
+.type-opt:hover{border-color:var(--border2);color:var(--text-sub);transform:translateY(-1px);}
+.type-opt.dream.selected{background:rgba(74,140,232,.1);border-color:rgba(74,140,232,.35);color:rgba(74,140,232,.9);box-shadow:0 0 0 3px rgba(74,140,232,.07);}
+.type-opt.problem.selected{background:rgba(212,74,122,.1);border-color:rgba(212,74,122,.35);color:rgba(212,74,122,.9);box-shadow:0 0 0 3px rgba(212,74,122,.07);}
+@keyframes phSlideIn{from{opacity:0;transform:translateY(3px);}to{opacity:1;transform:translateY(0);}}
+
+/* Btn */
+.btn-cancel{
+  padding:8px 18px;border-radius:11px;border:1px solid var(--border);
+  font-family:var(--font);font-size:12.5px;font-weight:300;color:var(--text-muted);
+  transition:background .15s,color .15s;
+}
+.btn-cancel:hover{background:var(--surface);color:var(--text-sub);}
+.btn-primary{
+  padding:8px 20px;border-radius:11px;border:none;background:var(--grad);
+  font-family:var(--font);font-size:12.5px;font-weight:500;color:#fff;
+  transition:opacity .15s,transform .12s;
+}
+.btn-primary:hover{opacity:.85;transform:translateY(-1px);}
+.btn-primary:disabled{opacity:.3;cursor:default;transform:none;}
+
+/* Event detail popup */
+.event-popup{
+  position:fixed;z-index:70;background:var(--sidebar);border:1px solid var(--border2);
+  border-radius:14px;padding:14px 16px;width:240px;
+  box-shadow:0 8px 40px rgba(0,0,0,.4);animation:modalIn .2s cubic-bezier(.16,1,.3,1);
+  display:none;
+}
+.event-popup.open{display:block;}
+.event-popup-title{font-size:13.5px;font-weight:400;color:var(--text-sub);margin-bottom:6px;}
+.event-popup-meta{font-size:11px;color:var(--text-dim);margin-bottom:10px;}
+.event-popup-actions{display:flex;gap:6px;}
+.ep-btn{
+  flex:1;padding:6px;border-radius:8px;border:1px solid var(--border);
+  font-family:var(--font);font-size:11px;font-weight:300;color:var(--text-muted);
+  transition:all .15s;text-align:center;
+}
+.ep-btn:hover{border-color:var(--border2);color:var(--text-sub);}
+.ep-btn.danger:hover{border-color:rgba(232,74,74,.3);color:rgba(232,74,74,.8);}
+.ep-btn.jump:hover{border-color:rgba(232,118,74,.3);color:var(--orange);}
+
+/* Color picker in event form */
+.color-picker{display:flex;gap:8px;}
+.color-opt{width:28px;height:28px;border-radius:50%;cursor:pointer;transition:transform .12s,box-shadow .12s;position:relative;}
+.color-opt:hover{transform:scale(1.15);}
+.color-opt.selected::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:2px solid currentColor;}
+.color-opt.blue{background:var(--cal-blue);color:rgba(74,140,232,.7);}
+.color-opt.green{background:var(--cal-green);color:rgba(74,192,128,.7);}
+.color-opt.yellow{background:var(--cal-yellow);color:rgba(232,190,74,.7);}
+.color-opt.red{background:var(--cal-red);color:rgba(232,74,74,.7);}
+
+/* ── Settings overlay ── */
+.settings-overlay{
+  position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;
+  background:rgba(10,7,9,.96);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  opacity:0;pointer-events:none;
+  transform:translateY(12px) scale(.99);
+  transition:opacity .32s ease,transform .38s cubic-bezier(.16,1,.3,1),background .45s ease;
+}
+.settings-overlay.open{opacity:1;pointer-events:all;transform:translateY(0) scale(1);}
+body.light .settings-overlay{background:rgba(228,214,199,.97);}
+.settings-header{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0;border-bottom:1px solid var(--border);}
+.settings-title{font-family:var(--font-display);font-size:22px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.settings-close-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:background .15s;}
+.settings-close-btn:hover{background:rgba(255,255,255,.1);}
+body.light .settings-close-btn{background:rgba(80,40,20,.07);}
+body.light .settings-close-btn:hover{background:rgba(80,40,20,.13);}
+.settings-tabs{display:flex;gap:0;padding:0 24px;flex-shrink:0;border-bottom:1px solid var(--border);overflow-x:auto;}
+.settings-tabs::-webkit-scrollbar{display:none;}
+.stab{flex:1;padding:14px 6px 13px;min-width:0;border-radius:0;font-size:11px;font-weight:400;color:var(--text-muted);transition:color .2s;white-space:nowrap;text-align:center;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.stab.active{color:var(--orange);border-bottom-color:var(--orange);}
+body.light .stab.active{color:var(--orange);}
+.settings-content{flex:1;overflow-y:auto;padding:28px 24px;}
+.settings-body{max-width:580px;}
+.s-section{margin-bottom:24px;}
+.s-section-title{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--text-dim);font-weight:500;margin-bottom:8px;padding:0 2px;}
+.s-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;border-radius:13px;background:var(--surface);border:1px solid var(--border);margin-bottom:5px;}
+.s-row-left{flex:1;min-width:0;}
+.s-row-label{font-size:13px;font-weight:400;color:var(--text-sub);}
+.s-row-sub{font-size:11.5px;color:var(--text-dim);margin-top:2px;line-height:1.4;}
+.s-row-val{font-size:13px;color:var(--text-muted);flex-shrink:0;}
+.s-btn{padding:7px 15px;border-radius:10px;font-size:12.5px;font-weight:400;color:var(--text-sub);background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.07);transition:background .18s,color .18s,border-color .18s;white-space:nowrap;flex-shrink:0;}
+.s-btn:hover{background:rgba(255,255,255,.09);color:var(--text);border-color:rgba(255,255,255,.11);}
+.s-btn.danger{color:rgba(220,90,90,.65);background:transparent;border-color:rgba(220,90,90,.15);}
+.s-btn.danger:hover{background:rgba(220,70,70,.07);color:rgba(220,90,90,.85);border-color:rgba(220,90,90,.25);}
+body.light .s-btn{color:var(--text-sub);background:rgba(80,40,20,.07);border-color:rgba(80,40,20,.1);}
+body.light .s-btn:hover{background:rgba(80,40,20,.13);color:var(--text);border-color:rgba(80,40,20,.16);}
+body.light .s-btn.danger{color:rgba(160,40,40,.8);background:transparent;border-color:rgba(160,40,40,.18);}
+body.light .s-btn.danger:hover{background:rgba(160,40,40,.07);}
+.toggle{width:42px;height:23px;border-radius:12px;background:rgba(255,255,255,.1);position:relative;transition:background .28s;flex-shrink:0;cursor:pointer;}
+.toggle.on{background:var(--grad);}
+.toggle::after{content:'';position:absolute;width:17px;height:17px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .26s cubic-bezier(.34,1.4,.6,1),background .28s,box-shadow .28s;box-shadow:0 1px 4px rgba(0,0,0,.3);}
+.toggle.on::after{left:22px;background:#1a161a;box-shadow:none;}
+body.light .toggle{background:rgba(80,40,20,.16);}
+body.light .toggle.on{background:var(--grad);}
+body.light .toggle::after{background:#fff;}
+body.light .toggle.on::after{left:22px;background:#ddc9b3;box-shadow:none;}
+.theme-toggle{display:flex;position:relative;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:3px;gap:0;transition:background .45s ease,border-color .45s ease;}
+body.light .theme-toggle{background:rgba(80,40,20,.06);border-color:rgba(80,40,20,.1);}
+.theme-toggle-pill{position:absolute;top:3px;bottom:3px;width:calc(50% - 3px);background:var(--grad);border-radius:9px;transition:left .35s cubic-bezier(.34,1.2,.6,1);pointer-events:none;}
+body:not(.light) .theme-toggle-pill{left:3px;}
+.theme-toggle.pill-right .theme-toggle-pill{left:calc(50%);}
+.theme-opt{flex:1;padding:8px 14px;border-radius:9px;font-size:12.5px;font-weight:400;color:var(--text-muted);background:transparent;transition:color .3s ease;display:flex;align-items:center;justify-content:center;gap:6px;position:relative;z-index:1;}
+.theme-opt.active{color:#fff;font-weight:500;}
+body.light .theme-opt:not(.active){color:var(--text-sub);}
+/* Clock toggle */
+.clock-toggle{display:flex;position:relative;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:3px;gap:0;}
+body.light .clock-toggle{background:rgba(80,40,20,.06);border-color:rgba(80,40,20,.1);}
+.clock-toggle-pill{position:absolute;top:3px;bottom:3px;width:calc(50% - 3px);background:var(--grad);border-radius:9px;transition:left .35s cubic-bezier(.34,1.2,.6,1);pointer-events:none;left:3px;}
+.clock-toggle.pill-right .clock-toggle-pill{left:calc(50%);}
+.clock-opt{flex:1;padding:8px 14px;border-radius:9px;font-size:12.5px;font-weight:400;color:var(--text-muted);background:transparent;transition:color .3s ease;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;}
+.clock-opt.active{color:#fff;font-weight:500;}
+body.light .clock-opt:not(.active){color:var(--text-sub);}
+.about-logo{font-family:var(--font-display);font-size:42px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:block;}
+.sub-intro{font-family:var(--font-serif);font-size:14px;font-weight:300;font-style:italic;line-height:1.65;color:var(--text-muted);margin-bottom:20px;}
+.sub-cards{display:flex;flex-direction:column;gap:10px;}
+.sub-card{border:1px solid var(--border);border-radius:18px;padding:18px 20px;background:rgba(255,255,255,.03);}
+body.light .sub-card{background:rgba(80,40,20,.05);border-color:rgba(80,40,20,.1);}
+.sub-card-name{font-family:var(--font-display);font-size:17px;font-weight:600;font-style:italic;color:var(--text-sub);margin-bottom:4px;}
+.sub-card-price{font-size:20px;font-weight:500;color:var(--text-sub);margin-bottom:8px;font-family:var(--font-display);font-style:italic;}
+.sub-card-price span{font-size:12px;font-weight:300;color:var(--text-dim);font-family:var(--font);font-style:normal;}
+
+/* ── Drawer ── */
+.drawer{position:fixed;inset:0;z-index:40;pointer-events:none;}
+.drawer-backdrop{position:absolute;inset:0;background:rgba(8,6,8,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);opacity:0;transition:opacity .38s ease;}
+.drawer-panel{position:absolute;top:0;left:0;bottom:0;width:280px;background:var(--sidebar);border-radius:0 28px 28px 0;transform:translateX(-100%);transition:transform .42s cubic-bezier(.16,1,.3,1),background .45s ease;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid rgba(255,255,255,.04);}
+.drawer.open{pointer-events:all;}
+.drawer.open .drawer-backdrop{opacity:1;}
+.drawer.open .drawer-panel{transform:translateX(0);}
+body.light .drawer-panel{background:var(--sidebar);}
+body.light .drawer-backdrop{background:rgba(30,12,0,.38);backdrop-filter:blur(10px);}
+.drawer-top{padding:28px 20px 18px;flex-shrink:0;}
+.drawer-logo{font-family:var(--font-display);font-size:30px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.drawer-nav{flex:1;padding:0 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
+.nav-section-label{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--text-dim);padding:4px 12px 6px;font-weight:500;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:16px;transition:background .15s;width:100%;text-align:left;}
+.nav-item:hover{background:rgba(255,255,255,.05);}
+body.light .nav-item:hover{background:rgba(80,40,20,.06);}
+.nav-item.active{background:linear-gradient(135deg,rgba(232,118,74,.1),rgba(212,74,122,.08));}
+body.light .nav-item.active{background:linear-gradient(135deg,rgba(232,118,74,.12),rgba(212,74,122,.09));}
+.nav-icon{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.nav-item:not(.active) .nav-icon{background:rgba(255,255,255,.04);}
+body.light .nav-item:not(.active) .nav-icon{background:rgba(80,40,20,.06);}
+body.light .nav-item:not(.active) .nav-icon svg{stroke:rgba(80,40,20,.4)!important;}
+.nav-item.active .nav-icon{background:linear-gradient(135deg,rgba(232,118,74,.18),rgba(212,74,122,.16));}
+.nav-texts{flex:1;min-width:0;}
+.nav-name{font-size:13px;font-weight:400;color:var(--text-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nav-item.active .nav-name{font-weight:500;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.nav-sub{font-size:11px;color:var(--text-dim);margin-top:2px;}
+.soon-badge{font-size:9px;padding:2px 7px;border-radius:20px;background:rgba(255,255,255,.05);color:var(--text-dim);letter-spacing:.03em;margin-left:4px;vertical-align:middle;-webkit-text-fill-color:var(--text-dim);}
+body.light .soon-badge{background:rgba(80,40,20,.07);color:var(--text-dim);-webkit-text-fill-color:var(--text-dim);}
+.drawer-divider{height:1px;background:rgba(255,255,255,.05);margin:8px 10px 10px;}
+body.light .drawer-divider{background:rgba(80,40,20,.1);}
+.drawer-footer{padding:10px 14px 22px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.footer-av{width:32px;height:32px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.footer-av span{font-family:var(--font-display);font-size:13px;color:#fff;font-style:italic;font-weight:600;}
+.footer-info{flex:1;min-width:0;}
+.footer-name{font-size:13px;font-weight:400;color:var(--text-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.footer-handle{font-size:11px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.drawer-settings-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:middle;flex-shrink:0;transition:background .18s;}
+.drawer-settings-btn:hover{background:rgba(255,255,255,.08);}
+body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}
+
+/* ── Responsive ── */
+@media(max-width:700px){
+  .planner-sidebar{display:none;}
+  .topbar-nav{display:none;}
+  .topbar-right{display:none;}
+  .bottom-nav{display:flex;}
+  .card-detail{padding:20px 16px 120px;}
+  .cal-header{padding:12px 14px 10px;flex-wrap:wrap;gap:8px;}
+  .cal-legend{display:none;}
+  .cal-grid-wrap{padding:0 4px 20px;}
+}
+@media(min-width:768px){
+  :root{--text-sub:rgba(228,224,227,.62);--text-muted:rgba(228,224,227,.40);--text-dim:rgba(228,224,227,.26);}
+  .topbar{height:60px;}
+  .menu-btn{left:24px;}
+}
+</style>
+</head>
+<body>
+<canvas id="glow"></canvas>
+<div class="noise"></div>
+
+<div class="app">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <button class="menu-btn" id="menuBtn" onclick="toggleDrawer()">
+      <div class="lns"><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>
+    </button>
+    <div class="topbar-logo">Planner</div>
+  </div>
+
+  <!-- Body -->
+  <div class="main-body">
+
+    <!-- Desktop sidebar -->
+    <div class="planner-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-header-label">Cards</div>
+        <button class="new-card-btn" onclick="openCardModal()">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New
+        </button>
+      </div>
+
+      <!-- View toggle: Cards / Calendar -->
+      <div class="sidebar-view-toggle">
+        <button class="svt active" id="svtCards" onclick="setMainView('cards')">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>
+          Cards
+        </button>
+        <button class="svt" id="svtCalendar" onclick="setMainView('calendar')">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Calendar
+        </button>
+      </div>
+
+      <div class="card-filter-tabs">
+        <button class="cft active" onclick="setFilter('all',this)">All</button>
+        <button class="cft" onclick="setFilter('active',this)">Active</button>
+        <button class="cft" onclick="setFilter('dream',this)">Dreams</button>
+        <button class="cft" onclick="setFilter('problem',this)">Problems</button>
+      </div>
+      <div class="card-list" id="cardList"></div>
+    </div>
+
+    <!-- Content area -->
+    <div class="content-area">
+
+      <!-- Content scroll -->
+      <div class="content-scroll" id="contentScroll">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile bottom bar — diary style -->
+<div class="bottom-nav" id="bottomNav">
+  <!-- View toggle left -->
+  <div class="bn-who">
+    <button class="bn-who-btn active" id="bnCards" onclick="setMobileView('cards')">Cards</button>
+    <button class="bn-who-btn" id="bnCalendar" onclick="setMobileView('calendar')">Calendar</button>
+  </div>
+  <div class="bn-spacer"></div>
+  <!-- Calendar btn -->
+  <button class="bn-btn" id="bnCalBtn" onclick="setMobileView('calendar')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Calendar
+  </button>
+  <!-- New card -->
+  <button class="bn-today" id="bnNew" onclick="mobileAdd()">+ New</button>
+</div>
+
+<!-- Card Create/Edit Modal -->
+<div class="modal-backdrop" id="cardModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="cardModalTitle">New card</div>
+      <button class="modal-close" onclick="closeCardModal()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Title</label>
+        <div style="position:relative;">
+          <input type="text" class="form-input" id="cardTitleInput" placeholder="" style="position:relative;z-index:1;background:transparent;" oninput="document.getElementById('cardTitlePlaceholder').style.opacity=this.value?'0':'1'">
+          <span id="cardTitlePlaceholder" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text-dim);font-size:13.5px;font-weight:300;font-family:var(--font);z-index:0;white-space:nowrap;overflow:hidden;max-width:calc(100% - 28px);text-overflow:ellipsis;">e.g. Start my own business</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <div class="type-selector">
+          <button class="type-opt dream selected" id="typeDream" onclick="selectType('dream')">Dream</button>
+          <button class="type-opt problem" id="typeProblem" onclick="selectType('problem')">Problem</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Initial description</label>
+        <textarea class="form-input" id="cardDescInput" rows="3" placeholder="What's on your mind about this?"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeCardModal()">Cancel</button>
+      <button class="btn-primary" id="cardModalSave" onclick="saveCard()">Create card</button>
+    </div>
+  </div>
+</div>
+
+<!-- Event Create Modal -->
+<div class="modal-backdrop" id="eventModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="eventModalTitle">Add event</div>
+      <button class="modal-close" onclick="closeEventModal()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Title</label>
+        <input type="text" class="form-input" id="evTitleInput" placeholder="e.g. Therapy session">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date & time</label>
+        <input type="datetime-local" class="form-input" id="evDateInput">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Duration (minutes)</label>
+        <input type="number" class="form-input" id="evDurInput" value="60" min="15" step="15">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Color</label>
+        <div class="color-picker">
+          <div class="color-opt blue selected" onclick="selectEvColor('blue')"></div>
+          <div class="color-opt green" onclick="selectEvColor('green')"></div>
+          <div class="color-opt yellow" onclick="selectEvColor('yellow')"></div>
+          <div class="color-opt red" onclick="selectEvColor('red')"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Link to card (optional)</label>
+        <select class="form-select" id="evCardLink">
+          <option value="">No card linked</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="form-input" id="evNotesInput" rows="2" placeholder="Optional notes..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeEventModal()">Cancel</button>
+      <button class="btn-primary" id="evModalSave" onclick="saveEvent()">Add event</button>
+    </div>
+  </div>
+</div>
+
+<!-- Evaluate Modal -->
+<div class="modal-backdrop" id="evaluateModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Evaluate</div>
+      <button class="modal-close" onclick="closeEvalModal()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13.5px;color:var(--text-sub);font-family:var(--font-serif);font-weight:300;line-height:1.75;margin-bottom:16px;">How has it been going? Write a reflection — BRIAS will read it and help you update the plan.</p>
+      <div class="form-group">
+        <label class="form-label">Your reflection</label>
+        <textarea class="form-input" id="evalTextInput" rows="5" placeholder="What's changed? What's harder than expected? What's working?"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeEvalModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveEvaluation()">Save reflection</button>
+    </div>
+  </div>
+</div>
+
+<!-- Event popup -->
+<div class="event-popup" id="eventPopup">
+  <div class="event-popup-title" id="epTitle"></div>
+  <div class="event-popup-meta" id="epMeta"></div>
+  <div class="event-popup-actions">
+    <button class="ep-btn jump" id="epJump" onclick="jumpToCardFromPopup()" style="display:none;">→ Card</button>
+    <button class="ep-btn" onclick="editEventFromPopup()">Edit</button>
+    <button class="ep-btn danger" onclick="deleteEventFromPopup()">Delete</button>
+  </div>
+</div>
+
+<!-- Drawer -->
+<div class="drawer" id="drawer" onclick="closeDrawerOutside(event)">
+  <div class="drawer-backdrop"></div>
+  <div class="drawer-panel">
+    <div class="drawer-top">
+      <div class="drawer-logo">BRIAS</div>
+    </div>
+    <div class="drawer-nav">
+      <div class="nav-section-label">Navigate</div>
+      <button class="nav-item" onclick="location.href='/'">
+        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.4)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <div class="nav-texts"><div class="nav-name">Chat</div><div class="nav-sub">Talk with BRIAS</div></div>
+      </button>
+      <button class="nav-item" onclick="location.href='/journal'">
+        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.4)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div class="nav-texts"><div class="nav-name">Journal</div><div class="nav-sub">Daily diary</div></div>
+      </button>
+      <button class="nav-item active">
+        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+        <div class="nav-texts"><div class="nav-name">Planner</div><div class="nav-sub">Goals & calendar</div></div>
+      </button>
+      <button class="nav-item">
+        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.4)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <div class="nav-texts"><div class="nav-name">Mindspace <span class="soon-badge">soon</span></div><div class="nav-sub">BRIAS's observations</div></div>
+      </button>
+    </div>
+    <div class="drawer-divider"></div>
+    <div class="drawer-footer">
+      <div class="footer-av"><span id="drawerInitial">?</span></div>
+      <div class="footer-info">
+        <div class="footer-name" id="drawerName">You</div>
+        <div class="footer-handle">brias.eu</div>
+      </div>
+      <button class="drawer-settings-btn" onclick="openSettings();closeDrawer();" title="Settings">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.35)" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings overlay -->
+<div class="settings-overlay" id="settingsOverlay">
+  <div class="settings-header">
+    <div class="settings-title">Settings</div>
+    <button class="settings-close-btn" onclick="closeSettings()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.5)" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="settings-tabs" id="settingsTabs">
+    <button class="stab active" onclick="switchTab(0)">Profile</button>
+    <button class="stab" onclick="switchTab(1)">Plan</button>
+    <button class="stab" onclick="switchTab(2)">Permissions</button>
+    <button class="stab" onclick="switchTab(3)">Customise</button>
+    <button class="stab" onclick="switchTab(4)">About</button>
+  </div>
+  <div class="settings-content">
+    <div class="settings-body" id="settingsBody"></div>
+  </div>
+</div>
+
+<script>
+// Apply saved theme immediately
+(function(){const t=localStorage.getItem('brias_theme');if(t==='light')document.body.classList.add('light');})();
+// ── Constants & helpers ──
+const TODAY = new Date();
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function ds(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+function fmtDate(d){const nd=new Date(d);return `${MONTHS[nd.getMonth()].slice(0,3)} ${nd.getDate()}, ${nd.getFullYear()}`;}
+function fmtDateShort(d){const nd=new Date(d);return `${nd.getDate()} ${MONTHS[nd.getMonth()].slice(0,3)}`;}
+function fmtTime(d){const nd=new Date(d);const h=nd.getHours(),m=nd.getMinutes();if(clockFormat===12){const ampm=h>=12?'PM':'AM';const h12=h%12||12;return `${h12}:${String(m).padStart(2,'0')} ${ampm}`;}return `${h}:${String(m).padStart(2,'0')}`;}
+function getClockFormat(){return parseInt(localStorage.getItem('brias_clock_format')||'24');}
+let clockFormat=getClockFormat();
+function startOfWeek(d){const r=new Date(d);const day=r.getDay();const diff=r.getDate()-day+(day===0?-6:1);r.setDate(diff);r.setHours(0,0,0,0);return r;}
+function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
+function isToday(d){const nd=new Date(d);return ds(nd)===ds(TODAY);}
+
+// ── Storage ──
+function getWho(){return 'user';} // planner is always user-owned
+const storePfx=()=>`brias_planner_cards_${getWho()}`;
+const evStorePfx=()=>`brias_planner_events_${getWho()}`;
+
+function loadCards(){try{return JSON.parse(localStorage.getItem(storePfx()))||[];}catch{return [];}}
+function saveCards(c){localStorage.setItem(storePfx(),JSON.stringify(c));}
+function loadEvents(){try{return JSON.parse(localStorage.getItem(evStorePfx()))||[];}catch{return [];}}
+function saveEvents(e){localStorage.setItem(evStorePfx(),JSON.stringify(e));}
+
+// ── State ──
+let cards=loadCards();
+let events=loadEvents();
+let activeCardId=null;
+let cardFilter='all';
+let mainView='cards'; // 'cards' or 'calendar'
+let mobileView='cards';
+let currentWeek=startOfWeek(TODAY);
+let editingCardId=null;
+let editingEventId=null;
+let newEventDate=null;
+let selectedEvColor='blue';
+let activeCardType='dream';
+let popupEventId=null;
+let evaluatingCardId=null;
+let planEditingCardId=null;
+
+// ── Glow canvas (same as diary) ──
+(function(){
+  const c=document.getElementById('glow');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  let W,H,pts,t=0;
+  function init(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;pts=[{x:W*.25,y:H*.3,r:W*.38,c:'#e8764a'},{x:W*.75,y:H*.7,r:W*.35,c:'#d44a7a'},{x:W*.6,y:H*.2,r:W*.28,c:'#e8764a'}];}
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach((p,i)=>{
+      const ox=Math.sin(t*.0006+i*1.9)*60,oy=Math.cos(t*.0008+i*2.3)*50;
+      const g=ctx.createRadialGradient(p.x+ox,p.y+oy,0,p.x+ox,p.y+oy,p.r);
+      g.addColorStop(0,p.c+'22');g.addColorStop(1,'transparent');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(p.x+ox,p.y+oy,p.r,0,Math.PI*2);ctx.fill();
+    });
+    t++;requestAnimationFrame(draw);
+  }
+  init();draw();
+  window.addEventListener('resize',init);
+})();
+
+// ── Drawer ──
+function toggleDrawer(){
+  const d=document.getElementById('drawer'),b=document.getElementById('menuBtn');
+  d.classList.toggle('open');b.classList.toggle('open');
+}
+function closeDrawerOutside(e){if(e.target===document.getElementById('drawer')||e.target.classList.contains('drawer-backdrop')){const d=document.getElementById('drawer'),b=document.getElementById('menuBtn');d.classList.remove('open');b.classList.remove('open');}}
+
+// ── View switching ──
+function setMainView(v){
+  mainView=v;
+  const sc=document.getElementById('svtCards'),sk=document.getElementById('svtCalendar');
+  if(sc)sc.classList.toggle('active',v==='cards');
+  if(sk)sk.classList.toggle('active',v==='calendar');
+  renderAll();
+}
+function setMobileView(v){
+  mobileView=v;
+  const bc=document.getElementById('bnCards'),bk=document.getElementById('bnCalendar');
+  if(bc)bc.classList.toggle('active',v==='cards');
+  if(bk)bk.classList.toggle('active',v==='calendar');
+  const calBtn=document.getElementById('bnCalBtn');
+  if(calBtn)calBtn.classList.toggle('active',v==='calendar');
+  renderContent();
+}
+
+// ── Filter ──
+function setFilter(f,el){
+  cardFilter=f;
+  document.querySelectorAll('.cft').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderSidebar();
+}
+
+function filteredCards(){
+  if(cardFilter==='all') return cards.filter(c=>c.status!=='archived');
+  if(cardFilter==='active') return cards.filter(c=>c.status==='active');
+  if(cardFilter==='dream') return cards.filter(c=>c.type==='dream'&&c.status!=='archived');
+  if(cardFilter==='problem') return cards.filter(c=>c.type==='problem'&&c.status!=='archived');
+  return cards;
+}
+
+// ── Sidebar ──
+function renderSidebar(){
+  const list=document.getElementById('cardList');
+  if(!list) return;
+  const fc=filteredCards();
+  if(fc.length===0){
+    list.innerHTML=`<div style="padding:20px 8px;text-align:center;"><p style="font-size:12.5px;color:var(--text-dim);font-style:italic;line-height:1.7;">No cards yet.<br>Create one to get started.</p></div>`;
+    return;
+  }
+  list.innerHTML=fc.map(c=>{
+    const linked=events.filter(e=>e.cardId===c.id);
+    const isActive=c.id===activeCardId;
+    return `<div class="card-item${isActive?' active':''}" onclick="openCard('${c.id}')">
+      <div class="card-item-top">
+        <span class="type-badge ${c.type}">${c.type}</span>
+        <span class="card-item-title">${esc(c.title)}</span>
+        ${c.briasAdded?`<span class="brias-tag">BRIAS</span>`:''}
+      </div>
+      <div class="card-item-meta">
+        <span class="status-dot ${c.status}"></span>
+        <span>${c.status}</span>
+        ${linked.length?`<span>· ${linked.length} event${linked.length!==1?'s':''}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Card detail ──
+function openCard(id){
+  activeCardId=id;
+  if(window.innerWidth<=700) setMobileView('cards');
+  planEditingCardId=null;
+  renderSidebar();
+  renderContent();
+}
+
+function renderCardDetail(card){
+  const linked=events.filter(e=>e.cardId===card.id);
+  const isPlanEditing=planEditingCardId===card.id;
+  const planVal=esc(card.plan||'');
+  const status=card.status;
+
+  const linkedHtml=linked.length?linked.map(e=>`
+    <div class="linked-event-item" onclick="showEventPopup('${e.id}',event)">
+      <div class="ev-color-dot ${e.color}"></div>
+      <span class="ev-label">${esc(e.title)}</span>
+      <span class="ev-date">${fmtDateShort(e.date)}</span>
+    </div>`).join(''):`<div class="no-events-hint">No calendar items linked yet.</div>`;
+
+  const historyHtml=card.history&&card.history.length?[...card.history].reverse().map(h=>`
+    <div class="history-item">
+      <div class="history-item-head">
+        <span class="history-item-type">${esc(h.type||'Note')}</span>
+        <span class="history-item-date">${fmtDate(h.date)}</span>
+      </div>
+      <div class="history-item-text${h.brias?' brias':''}">${esc(h.text)}</div>
+    </div>`).join(''):`<div class="no-events-hint" style="padding:10px 14px 14px;">No history yet.</div>`;
+
+  const pauseBtn=status==='active'?`<button class="card-action-btn pause" onclick="setCardStatus('${card.id}','paused')">
+    <svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Pause</button>`
+    :`<button class="card-action-btn" onclick="setCardStatus('${card.id}','active')">
+    <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Resume</button>`;
+
+  const titleLower = card.title.toLowerCase();
+  const problemPhrase = titleLower.includes('addict') ? `I need help with my ${card.title.toLowerCase()}`
+    : titleLower.includes('anxiet') ? `I struggle with ${card.title.toLowerCase()}`
+    : titleLower.includes('stress') ? `I'm dealing with ${card.title.toLowerCase()}`
+    : titleLower.includes('health') ? `I want to improve my ${card.title.toLowerCase()}`
+    : `I need help with ${titleLower.startsWith('my ')||titleLower.startsWith('the ')?card.title.toLowerCase():'this: '+card.title.toLowerCase()}`;
+
+  const typeContext = card.type==='problem'
+    ? `<div style="font-family:var(--font-serif);font-size:14px;font-style:italic;color:var(--orange);opacity:.75;margin-bottom:8px;">${esc(problemPhrase)}</div>`
+    : `<div style="font-family:var(--font-serif);font-size:14px;font-style:italic;color:rgba(74,140,232,.7);margin-bottom:8px;">This is something I dream of</div>`;
+
+  return `<div class="card-detail">
+    <div class="card-detail-header">
+      <button class="card-detail-back" onclick="activeCardId=null;renderSidebar();renderContent()">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        All cards
+      </button>
+      <div class="card-title-row">
+        <div>
+          ${typeContext}
+          <div class="card-detail-title">${esc(card.title)}</div>
+        </div>
+        <div class="card-title-badges">
+          <span class="type-badge ${card.type}" style="font-size:10px;">${card.type}</span>
+          <span class="status-badge ${status}">${status}</span>
+        </div>
+      </div>
+      <div class="card-detail-meta">
+        <span>Created ${fmtDate(card.created)}</span>
+        ${card.briasAdded?`<span>· Suggested by BRIAS</span>`:''}
+      </div>
+    </div>
+
+    <div class="card-actions">
+      <button class="card-action-btn evaluate" onclick="openEvalModal('${card.id}')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        Evaluate
+      </button>
+      ${pauseBtn}
+      ${status!=='achieved'?`<button class="card-action-btn achieve" onclick="setCardStatus('${card.id}','achieved')">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Mark achieved</button>`:''}
+      <button class="card-action-btn" onclick="openEventModalForCard('${card.id}')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
+        Add event</button>
+      <button class="card-action-btn" onclick="deleteCard('${card.id}')">
+        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+        Delete</button>
+    </div>
+
+    <br>
+
+    <div class="card-section">
+      <div class="card-section-head">
+        <span class="card-section-label">Current plan</span>
+        ${isPlanEditing
+          ?`<button class="card-section-action" onclick="savePlan('${card.id}')">Save</button>`
+          :`<button class="card-section-action" onclick="startPlanEdit('${card.id}')">Edit</button>`}
+      </div>
+      ${isPlanEditing
+        ?`<textarea class="plan-area" id="planTa" placeholder="Write the current plan or approach for this card...">${esc(card.plan||'')}</textarea>`
+        :`<div class="plan-ro${card.plan?'':' empty'}">${card.plan?esc(card.plan):'No plan written yet. Click Edit to add one.'}</div>`}
+    </div>
+
+    <div class="card-section">
+      <div class="card-section-head">
+        <span class="card-section-label">Calendar items</span>
+        <button class="card-section-action" onclick="openEventModalForCard('${card.id}')">+ Add</button>
+      </div>
+      <div class="linked-events">${linkedHtml}</div>
+    </div>
+
+    <div class="card-section">
+      <div class="card-section-head">
+        <span class="card-section-label">History</span>
+      </div>
+      <div class="history-list">${historyHtml}</div>
+    </div>
+  </div>`;
+}
+
+function startPlanEdit(id){planEditingCardId=id;renderContent();}
+function savePlan(id){
+  const ta=document.getElementById('planTa');
+  if(!ta)return;
+  const c=cards.find(x=>x.id===id);
+  if(!c)return;
+  if(c.plan&&c.plan!==ta.value){
+    c.history=c.history||[];
+    c.history.push({type:'Plan update',date:new Date().toISOString(),text:c.plan});
+  }
+  c.plan=ta.value;
+  saveCards(cards);
+  planEditingCardId=null;
+  renderContent();
+  renderSidebar();
+}
+
+function setCardStatus(id,status){
+  const c=cards.find(x=>x.id===id);if(!c)return;
+  c.history=c.history||[];
+  c.history.push({type:'Status change',date:new Date().toISOString(),text:`Status changed to: ${status}`});
+  c.status=status;
+  saveCards(cards);
+  renderSidebar();renderContent();
+}
+function deleteCard(id){
+  if(!confirm('Delete this card?'))return;
+  cards=cards.filter(c=>c.id!==id);
+  if(activeCardId===id)activeCardId=null;
+  saveCards(cards);renderSidebar();renderContent();
+}
+
+// ── Card Modal ──
+const PLACEHOLDERS={
+  dream:'e.g. Start my own business',
+  problem:'e.g. Help with my addiction'
+};
+function openCardModal(editId){
+  editingCardId=editId||null;
+  const modal=document.getElementById('cardModal');
+  const titleEl=document.getElementById('cardModalTitle');
+  const saveBtn=document.getElementById('cardModalSave');
+  if(editId){
+    const c=cards.find(x=>x.id===editId);
+    document.getElementById('cardTitleInput').value=c.title;
+    document.getElementById('cardDescInput').value=c.plan||'';
+    selectType(c.type);
+    titleEl.textContent='Edit card';
+    saveBtn.textContent='Save changes';
+  } else {
+    document.getElementById('cardTitleInput').value='';
+    document.getElementById('cardTitleInput').style.opacity='1';
+    document.getElementById('cardTitleInput').style.transform='';
+    const lbl=document.getElementById('cardTitlePlaceholder');
+    if(lbl){lbl.textContent=PLACEHOLDERS['dream'];lbl.style.opacity='1';}    document.getElementById('cardDescInput').value='';
+    selectType('dream');
+    titleEl.textContent='New card';
+    saveBtn.textContent='Create card';
+  }
+  modal.classList.add('open');
+  setTimeout(()=>document.getElementById('cardTitleInput').focus(),100);
+}
+function closeCardModal(){document.getElementById('cardModal').classList.remove('open');}
+function selectType(t){
+  activeCardType=t;
+  document.getElementById('typeDream').classList.toggle('selected',t==='dream');
+  document.getElementById('typeProblem').classList.toggle('selected',t==='problem');
+
+  // Animate only the placeholder label, not the input itself
+  const lbl=document.getElementById('cardTitlePlaceholder');
+  const inp=document.getElementById('cardTitleInput');
+  if(!lbl||!inp)return;
+  const next=PLACEHOLDERS[t]||'';
+  if(lbl.textContent===next)return;
+
+  lbl.style.transition='opacity .15s ease';
+  lbl.style.opacity='0';
+  setTimeout(()=>{
+    lbl.textContent=next;
+    lbl.style.transition='opacity .2s ease';
+    lbl.style.opacity='1';
+  },150);
+  inp.placeholder='';
+}
+function saveCard(){
+  const title=document.getElementById('cardTitleInput').value.trim();
+  if(!title)return;
+  const desc=document.getElementById('cardDescInput').value.trim();
+  if(editingCardId){
+    const c=cards.find(x=>x.id===editingCardId);
+    c.title=title;c.type=activeCardType;
+    if(desc&&desc!==c.plan){c.history=c.history||[];c.history.push({type:'Plan update',date:new Date().toISOString(),text:c.plan||''});}
+    c.plan=desc;
+    saveCards(cards);
+  } else {
+    const newCard={id:uid(),title,type:activeCardType,plan:desc,status:'active',created:new Date().toISOString(),history:[]};
+    cards.unshift(newCard);
+    saveCards(cards);
+    activeCardId=newCard.id;
+  }
+  closeCardModal();renderSidebar();renderContent();
+}
+
+// ── Evaluate Modal ──
+function openEvalModal(id){
+  evaluatingCardId=id;
+  document.getElementById('evalTextInput').value='';
+  document.getElementById('evaluateModal').classList.add('open');
+  setTimeout(()=>document.getElementById('evalTextInput').focus(),100);
+}
+function closeEvalModal(){document.getElementById('evaluateModal').classList.remove('open');}
+function saveEvaluation(){
+  const text=document.getElementById('evalTextInput').value.trim();
+  if(!text)return;
+  const c=cards.find(x=>x.id===evaluatingCardId);if(!c)return;
+  c.history=c.history||[];
+  c.history.push({type:'Evaluation',date:new Date().toISOString(),text});
+  saveCards(cards);
+  closeEvalModal();renderContent();
+}
+
+// ── Event Modal ──
+function openEventModal(date,cardId){
+  editingEventId=null;
+  newEventDate=date||null;
+  selectedEvColor='blue';
+  document.getElementById('eventModalTitle').textContent='Add event';
+  document.getElementById('evModalSave').textContent='Add event';
+  document.getElementById('evTitleInput').value='';
+  document.getElementById('evNotesInput').value='';
+  document.getElementById('evDurInput').value='60';
+  // Set date
+  const dt=date?new Date(date):new Date();
+  if(!date){dt.setHours(10,0,0,0);}
+  document.getElementById('evDateInput').value=dt.toISOString().slice(0,16);
+  // Color
+  document.querySelectorAll('.color-opt').forEach(el=>el.classList.remove('selected'));
+  document.querySelector('.color-opt.blue').classList.add('selected');
+  // Card link options
+  populateCardSelect(cardId||'');
+  document.getElementById('eventModal').classList.add('open');
+  setTimeout(()=>document.getElementById('evTitleInput').focus(),100);
+}
+function openEventModalForCard(cardId){openEventModal(null,cardId);}
+function closeEventModal(){document.getElementById('eventModal').classList.remove('open');}
+function selectEvColor(c){
+  selectedEvColor=c;
+  document.querySelectorAll('.color-opt').forEach(el=>el.classList.remove('selected'));
+  document.querySelector(`.color-opt.${c}`).classList.add('selected');
+}
+function populateCardSelect(selectedCardId){
+  const sel=document.getElementById('evCardLink');
+  const active=cards.filter(c=>c.status!=='archived');
+  sel.innerHTML=`<option value="">No card linked</option>`+active.map(c=>`<option value="${c.id}"${c.id===selectedCardId?' selected':''}>${esc(c.title)}</option>`).join('');
+}
+function saveEvent(){
+  const title=document.getElementById('evTitleInput').value.trim();
+  if(!title)return;
+  const dateStr=document.getElementById('evDateInput').value;
+  if(!dateStr)return;
+  const dur=parseInt(document.getElementById('evDurInput').value)||60;
+  const notes=document.getElementById('evNotesInput').value.trim();
+  const cardId=document.getElementById('evCardLink').value;
+  if(editingEventId){
+    const ev=events.find(e=>e.id===editingEventId);
+    if(ev){ev.title=title;ev.date=dateStr;ev.duration=dur;ev.notes=notes;ev.cardId=cardId;ev.color=selectedEvColor;}
+  } else {
+    events.push({id:uid(),title,date:dateStr,duration:dur,color:selectedEvColor,notes,cardId,briasAdded:false});
+  }
+  saveEvents(events);
+  closeEventModal();renderCalendar();renderContent();
+}
+
+// ── Event popup ──
+function showEventPopup(id,e){
+  e.stopPropagation();
+  popupEventId=id;
+  const ev=events.find(x=>x.id===id);if(!ev)return;
+  const popup=document.getElementById('eventPopup');
+  document.getElementById('epTitle').textContent=ev.title;
+  document.getElementById('epMeta').textContent=`${fmtDate(ev.date)} · ${fmtTime(ev.date)} · ${ev.duration||60}min`;
+  const jumpBtn=document.getElementById('epJump');
+  if(ev.cardId){jumpBtn.style.display='';} else {jumpBtn.style.display='none';}
+  // Position near click
+  const x=Math.min(e.clientX,window.innerWidth-260);
+  const y=Math.min(e.clientY+10,window.innerHeight-160);
+  popup.style.left=x+'px';popup.style.top=y+'px';
+  popup.classList.add('open');
+  document.addEventListener('click',closeEventPopupOutside,{once:true});
+}
+function closeEventPopupOutside(){document.getElementById('eventPopup').classList.remove('open');}
+function jumpToCardFromPopup(){
+  const ev=events.find(e=>e.id===popupEventId);
+  if(ev&&ev.cardId){activeCardId=ev.cardId;setMobileView('cards');setMainView('cards');renderSidebar();renderContent();}
+  document.getElementById('eventPopup').classList.remove('open');
+}
+function editEventFromPopup(){
+  const ev=events.find(e=>e.id===popupEventId);
+  if(!ev)return;
+  editingEventId=ev.id;
+  selectedEvColor=ev.color||'blue';
+  document.getElementById('eventModalTitle').textContent='Edit event';
+  document.getElementById('evModalSave').textContent='Save changes';
+  document.getElementById('evTitleInput').value=ev.title;
+  const d=new Date(ev.date);
+  document.getElementById('evDateInput').value=d.toISOString().slice(0,16);
+  document.getElementById('evDurInput').value=ev.duration||60;
+  document.getElementById('evNotesInput').value=ev.notes||'';
+  document.querySelectorAll('.color-opt').forEach(el=>el.classList.remove('selected'));
+  const cEl=document.querySelector(`.color-opt.${ev.color||'blue'}`);
+  if(cEl)cEl.classList.add('selected');
+  populateCardSelect(ev.cardId||'');
+  document.getElementById('eventModal').classList.add('open');
+  document.getElementById('eventPopup').classList.remove('open');
+}
+function deleteEventFromPopup(){
+  if(!confirm('Delete this event?'))return;
+  events=events.filter(e=>e.id!==popupEventId);
+  saveEvents(events);
+  document.getElementById('eventPopup').classList.remove('open');
+  renderCalendar();renderContent();
+}
+
+// ── Calendar rendering ──
+function renderCalendar(){
+  const scroll=document.getElementById('contentScroll');
+  if(!scroll)return;
+  const isMobile=window.innerWidth<=700;
+  if(isMobile&&mobileView!=='calendar')return;
+  if(!isMobile&&mainView!=='calendar')return;
+
+  // Days in week
+  const days=[];for(let i=0;i<7;i++)days.push(addDays(currentWeek,i));
+  const todayStr=ds(TODAY);
+  const weekStart=ds(days[0]),weekEnd=ds(days[6]);
+
+  // Check if current week
+  const isCurWeek=ds(currentWeek)===ds(startOfWeek(TODAY));
+
+  // Build week label
+  const wLabel=days[0].getMonth()===days[6].getMonth()
+    ?`${MONTHS[days[0].getMonth()]} ${days[0].getDate()}–${days[6].getDate()}, ${days[0].getFullYear()}`
+    :`${MONTHS[days[0].getMonth()].slice(0,3)} ${days[0].getDate()} – ${MONTHS[days[6].getMonth()].slice(0,3)} ${days[6].getDate()}, ${days[0].getFullYear()}`;
+
+  // Get events for this week
+  const weekEvents=events.filter(e=>{const d=ds(new Date(e.date));return d>=weekStart&&d<=weekEnd;});
+
+  // Hours to show
+  const hours=[];for(let h=6;h<23;h++)hours.push(h);
+
+  // Header row
+  let headerHtml=`<div class="cal-time-col"></div>`;
+  days.forEach(d=>{
+    const dStr=ds(d);
+    const isT=dStr===todayStr;
+    const hasEvs=weekEvents.some(e=>ds(new Date(e.date))===dStr);
+    headerHtml+=`<div class="cal-day-header">
+      <div class="cal-day-name">${DAYS[(d.getDay())]}</div>
+      <div class="cal-day-num${isT?' today':''}${hasEvs&&!isT?' has-dot':''}">${d.getDate()}</div>
+    </div>`;
+  });
+
+  // Time slots
+  let slotsHtml='';
+  hours.forEach(h=>{
+    const hStr=clockFormat===12?(h===12?'12 PM':h<12?`${h} AM`:h===24?'12 AM':`${h-12} PM`):`${String(h).padStart(2,'0')}:00`;
+    slotsHtml+=`<div class="cal-time-slot">${hStr}</div>`;
+    days.forEach(d=>{
+      const dStr=ds(d);
+      const isT=dStr===todayStr;
+      const cellDt=new Date(d);cellDt.setHours(h,0,0,0);
+      const isoStr=cellDt.toISOString().slice(0,16);
+      // Events that start in this hour
+      const cellEvs=weekEvents.filter(e=>{
+        const ed=new Date(e.date);
+        return ds(ed)===dStr&&ed.getHours()===h;
+      });
+      let evsHtml=cellEvs.map(e=>{
+        const isBrias=e.briasAdded;
+        return `<div class="cal-event ${e.color||'blue'}" onclick="showEventPopup('${e.id}',event)">
+          ${isBrias?`<svg class="brias-ev-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`:''}
+          ${esc(e.title)}
+        </div>`;
+      }).join('');
+      slotsHtml+=`<div class="cal-cell${isT?' today-col':''}" onclick="openEventModal('${isoStr}')">
+        ${evsHtml}
+        ${!cellEvs.length?`<div class="cal-cell-add">+</div>`:''}
+      </div>`;
+    });
+  });
+
+  const calHtml=`<div class="calendar-view">
+    <div class="cal-header">
+      <div class="cal-week-nav">
+        <button class="cal-nav-btn" onclick="weekNav(-1)">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="cal-week-label">${wLabel}</div>
+        <button class="cal-nav-btn" onclick="weekNav(1)">
+          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+      <button class="cal-today-btn${isCurWeek?' is-cur-week':''}" onclick="currentWeek=startOfWeek(TODAY);renderCalendar()">Today</button>
+      <div class="cal-legend">
+        <div class="legend-item"><div class="legend-dot blue"></div>Your events</div>
+        <div class="legend-item"><div class="legend-dot green"></div>Plan steps</div>
+        <div class="legend-item"><div class="legend-dot yellow"></div>BRIAS suggestions</div>
+        <div class="legend-item"><div class="legend-dot red"></div>Urgent</div>
+      </div>
+    </div>
+    <div class="cal-grid-wrap">
+      <div class="cal-grid">
+        ${headerHtml}${slotsHtml}
+      </div>
+    </div>
+  </div>`;
+
+  scroll.innerHTML=calHtml;
+  // Scroll to 8am
+  setTimeout(()=>{const w=scroll.querySelector('.cal-grid-wrap');if(w)w.scrollTop=Math.max(0,(8-6)*52);},0);
+}
+
+function weekNav(dir){
+  currentWeek=addDays(currentWeek,dir*7);
+  renderCalendar();
+}
+
+// ── Main content render ──
+function renderContent(){
+  const scroll=document.getElementById('contentScroll');
+  const isMobile=window.innerWidth<=700;
+  const showCards=!isMobile?mainView==='cards':mobileView==='cards';
+  const showCalendar=!isMobile?mainView==='calendar':mobileView==='calendar';
+
+  if(showCalendar){
+    renderCalendar();
+    return;
+  }
+
+  // Cards view
+  if(activeCardId){
+    const card=cards.find(c=>c.id===activeCardId);
+    if(card){
+      scroll.innerHTML=renderCardDetail(card);
+      // Auto-resize plan textarea
+      const ta=document.getElementById('planTa');
+      if(ta){ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=Math.max(120,ta.scrollHeight)+'px';});if(ta.value)ta.style.height=Math.max(120,ta.scrollHeight)+'px';}
+      return;
+    }
+  }
+
+  // Empty state / cards overview
+  const isMobileView = window.innerWidth <= 700;
+  if(cards.length > 0 && isMobileView){
+    // On mobile, show cards grid since there's no sidebar
+    const fc = filteredCards();
+    scroll.innerHTML=`<div style="padding:20px 16px 120px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="font-family:var(--font-display);font-size:20px;font-style:italic;font-weight:300;color:var(--text-sub);">Your cards</div>
+        <button class="new-card-btn" onclick="openCardModal()">
+          <svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New
+        </button>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;">
+        <button class="cft${cardFilter==='all'?' active':''}" style="flex:none;padding:6px 12px;" onclick="setFilter('all',this)">All</button>
+        <button class="cft${cardFilter==='active'?' active':''}" style="flex:none;padding:6px 12px;" onclick="setFilter('active',this)">Active</button>
+        <button class="cft${cardFilter==='dream'?' active':''}" style="flex:none;padding:6px 12px;" onclick="setFilter('dream',this)">Dreams</button>
+        <button class="cft${cardFilter==='problem'?' active':''}" style="flex:none;padding:6px 12px;" onclick="setFilter('problem',this)">Problems</button>
+      </div>
+      ${fc.length===0?`<p style="font-size:13px;color:var(--text-dim);font-style:italic;text-align:center;padding:32px 0;">No cards match this filter.</p>`
+        :fc.map(c=>`<div class="card-item" onclick="openCard('${c.id}')">
+          <div class="card-item-top">
+            <span class="type-badge ${c.type}">${c.type}</span>
+            <span class="card-item-title">${esc(c.title)}</span>
+            ${c.briasAdded?`<span class="brias-tag">BRIAS</span>`:''}
+          </div>
+          <div class="card-item-meta">
+            <span class="status-dot ${c.status}"></span>
+            <span>${c.status}</span>
+          </div>
+        </div>`).join('')}
+    </div>`;
+    return;
+  }
+
+  scroll.innerHTML=`<div class="empty-state">
+    <div class="empty-state-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    </div>
+    <div class="empty-state-title">${cards.length===0?'Start your first card':'Select a card'}</div>
+    <div class="empty-state-sub">${cards.length===0?'Cards are goals, dreams, or problems you\'re working through with BRIAS. Create one to begin.':'Choose a card from the sidebar, or create a new one.'}</div>
+    ${cards.length===0?`<button class="card-action-btn evaluate" style="margin-top:8px;" onclick="openCardModal()">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Create a card</button>`:''}
+  </div>`;
+}
+
+// ── Mobile add button ──
+function mobileAdd(){
+  if(mobileView==='cards') openCardModal();
+  else openEventModal();
+}
+
+// ── Mobile view tabs ──
+function initMobileViewTabs(){
+  // Mobile tabs are now handled by bottom nav - no separate tabs needed
+}
+
+// ── Settings ──
+function openSettings(){document.getElementById('settingsOverlay').classList.add('open');switchTab(0);}
+function closeSettings(){document.getElementById('settingsOverlay').classList.remove('open');}
+function switchTab(i){
+  document.querySelectorAll('.stab').forEach((t,j)=>t.classList.toggle('active',j===i));
+  document.getElementById('settingsBody').innerHTML=tabs[i]();
+  const themeToggle=document.getElementById('themeToggle');
+  if(themeToggle)themeToggle.classList.toggle('pill-right',document.body.classList.contains('light'));
+  const clockToggle=document.getElementById('clockToggle');
+  if(clockToggle)clockToggle.classList.toggle('pill-right',clockFormat===12);
+}
+function setTheme(mode){
+  if(mode==='light')document.body.classList.add('light');
+  else document.body.classList.remove('light');
+  localStorage.setItem('brias_theme',mode);
+  const toggle=document.getElementById('themeToggle');
+  if(toggle)toggle.classList.toggle('pill-right',mode==='light');
+  document.querySelectorAll('.theme-opt').forEach(btn=>{
+    const isDark=btn.getAttribute('onclick').includes('dark');
+    btn.classList.toggle('active',mode==='dark'?isDark:!isDark);
+  });
+}
+function setClockFormat(fmt){
+  clockFormat=fmt;
+  localStorage.setItem('brias_clock_format',String(fmt));
+  const toggle=document.getElementById('clockToggle');
+  if(toggle)toggle.classList.toggle('pill-right',fmt===12);
+  document.querySelectorAll('.clock-opt').forEach(btn=>{
+    const is24=btn.getAttribute('onclick').includes('24');
+    btn.classList.toggle('active',fmt===24?is24:!is24);
+  });
+  if(mainView==='calendar')renderCalendar();
+}
+
+const tabs=[
+  ()=>`
+    <div class="s-section">
+      <div class="s-section-title">Profile</div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Name</div></div><button class="s-btn">${esc(getUsername())}</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Email</div></div><div class="s-row-val">—</div></div>
+    </div>
+    <div class="s-section">
+      <div class="s-section-title">Manage</div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Sign out</div></div><button class="s-btn" onclick="localStorage.removeItem('brias_token');window.location.href='/'">Sign out</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Delete account</div></div><button class="s-btn danger">Delete</button></div>
+    </div>`,
+  ()=>`<p class="sub-intro" style="font-family:var(--font-serif);font-size:14px;font-weight:300;font-style:italic;line-height:1.65;color:var(--text-muted);margin-bottom:20px;">Manage your BRIAS plan.</p>
+    <div class="sub-cards">
+      <div class="sub-card"><div class="sub-card-name">Standard</div><div class="sub-card-price">€— <span>/ month</span></div></div>
+      <div class="sub-card"><div class="sub-card-name">Supportive</div><div class="sub-card-price">€— <span>/ month</span></div></div>
+      <div class="sub-card"><div class="sub-card-name">Advanced</div><div class="sub-card-price">€— <span>/ month</span></div></div>
+    </div>`,
+  ()=>`
+    <div class="s-section">
+      <div class="s-section-title">Device</div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Notifications</div><div class="s-row-sub">Let BRIAS check in on you</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
+    </div>
+    <div class="s-section">
+      <div class="s-section-title">Data</div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Save planner data</div><div class="s-row-sub">Stored locally on your device</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+    </div>`,
+  ()=>`
+    <div class="s-section">
+      <div class="s-section-title">Appearance</div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Theme</div><div class="s-row-sub">Choose what feels right for you</div></div>
+        <div class="theme-toggle" id="themeToggle">
+          <div class="theme-toggle-pill"></div>
+          <button class="theme-opt ${!document.body.classList.contains('light')?'active':''}" onclick="setTheme('dark')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <span>Dark</span>
+          </button>
+          <button class="theme-opt ${document.body.classList.contains('light')?'active':''}" onclick="setTheme('light')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <span>Light</span>
+          </button>
+        </div>
+      </div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Clock format</div><div class="s-row-sub">How time is shown in the calendar</div></div>
+        <div class="clock-toggle" id="clockToggle">
+          <div class="clock-toggle-pill"></div>
+          <button class="clock-opt ${clockFormat===24?'active':''}" onclick="setClockFormat(24)">24h</button>
+          <button class="clock-opt ${clockFormat===12?'active':''}" onclick="setClockFormat(12)">12h</button>
+        </div>
+      </div>
+    </div>`,
+  ()=>`<span class="about-logo">BRIAS</span><p style="font-family:var(--font-serif);font-size:14px;font-weight:300;font-style:italic;line-height:1.65;color:var(--text-muted);margin-top:16px;">Your personal space to plan, reflect, and grow.</p>`
+];
+
+// ── Init ──
+function renderAll(){
+  renderSidebar();
+  renderContent();
+  // Username
+  const uname=getUsername();
+  const di=document.getElementById('drawerInitial');
+  const dn=document.getElementById('drawerName');
+  if(di)di.textContent=uname[0]||'?';
+  if(dn)dn.textContent=uname;
+  initMobileViewTabs();
+}
+
+window.addEventListener('resize',()=>{initMobileViewTabs();renderContent();});
+renderAll();
+
+// ── BRIAS Global API ──
+window.briasPlannerAddEvent=function(ev){
+  // ev: {title, date (ISO string), duration?, color?: 'green'|'yellow', cardId?, notes?}
+  if(!ev||!ev.title||!ev.date)return;
+  const newEv={
+    id:uid(),
+    title:ev.title,
+    date:ev.date,
+    duration:ev.duration||60,
+    color:ev.color||'green',
+    notes:ev.notes||'',
+    cardId:ev.cardId||'',
+    briasAdded:true
+  };
+  events.push(newEv);
+  saveEvents(events);
+  if(mainView==='calendar')renderCalendar();
+  renderContent();
+};
+
+window.briasPlannerSuggestCard=function(card){
+  // card: {title, type: 'dream'|'problem', plan?}
+  if(!card||!card.title)return;
+  const newCard={
+    id:uid(),
+    title:card.title,
+    type:card.type||'dream',
+    plan:card.plan||'',
+    status:'active',
+    created:new Date().toISOString(),
+    history:[{type:'Suggested by BRIAS',date:new Date().toISOString(),text:'This card was suggested by BRIAS.'}],
+    briasAdded:true
+  };
+  cards.unshift(newCard);
+  saveCards(cards);
+  renderSidebar();
+  renderContent();
+};
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>
