@@ -210,16 +210,16 @@ body.light .bn-btn{border-color:rgba(80,40,20,.12);}
 .bn-btn:hover{border-color:rgba(255,255,255,.14);color:var(--text-sub);}
 .bn-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;flex-shrink:0;}
 .bn-btn.active{border-color:rgba(232,118,74,.35);color:var(--orange);}
-.bn-today{
-  padding:7px 14px;border-radius:13px;border:1px solid var(--border);
-  background:transparent;cursor:pointer;font-family:var(--font);
-  font-size:12px;font-weight:300;color:var(--text-muted);
-  transition:border-color .25s,color .25s,box-shadow .25s;flex-shrink:0;margin-left:4px;
+.bn-new-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:8px 16px;border-radius:13px;border:none;
+  background:var(--grad);cursor:pointer;font-family:var(--font);
+  font-size:12px;font-weight:500;color:#fff;
+  transition:opacity .15s,transform .12s;flex-shrink:0;margin-left:4px;
+  box-shadow:0 2px 12px rgba(232,118,74,.3);
 }
-body.light .bn-today{border-color:rgba(80,40,20,.12);}
-.bn-today:hover{border-color:rgba(232,118,74,.3);color:var(--orange);}
-@keyframes todayPulse{0%,100%{box-shadow:0 0 0 0 rgba(232,118,74,.0);}50%{box-shadow:0 0 12px 2px rgba(232,118,74,.22);}}
-.bn-today.is-today{border-color:rgba(232,118,74,.35);color:var(--orange);box-shadow:0 0 10px rgba(232,118,74,.18);animation:todayPulse 2.8s ease-in-out infinite;}
+.bn-new-btn:hover{opacity:.88;transform:translateY(-1px);}
+.bn-new-btn:active{transform:scale(.96);}
 .content-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
 
 /* ── Card Detail View ── */
@@ -368,6 +368,10 @@ body.light .history-item{background:rgba(80,40,20,.04);}
 /* Calendar grid */
 .cal-grid-wrap{flex:1;overflow:auto;padding:0 16px 20px;}
 .cal-grid{display:grid;grid-template-columns:52px repeat(7,1fr);min-width:600px;}
+@media(max-width:700px){
+  .cal-grid-wrap{padding:0 0 100px;overflow:auto;}
+  .cal-grid{grid-template-columns:44px repeat(7,88px);min-width:calc(44px + 616px);}
+}
 .cal-day-header{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:12px 4px 10px;position:sticky;top:0;z-index:5;
@@ -656,7 +660,6 @@ body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}
   .card-detail{padding:20px 16px 120px;}
   .cal-header{padding:12px 14px 10px;flex-wrap:wrap;gap:8px;}
   .cal-legend{display:none;}
-  .cal-grid-wrap{padding:0 4px 20px;}
 }
 @media(min-width:768px){
   :root{--text-sub:rgba(228,224,227,.62);--text-muted:rgba(228,224,227,.40);--text-dim:rgba(228,224,227,.26);}
@@ -732,13 +735,11 @@ body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}
     <button class="bn-who-btn" id="bnCalendar" onclick="setMobileView('calendar')">Calendar</button>
   </div>
   <div class="bn-spacer"></div>
-  <!-- Calendar btn -->
-  <button class="bn-btn" id="bnCalBtn" onclick="setMobileView('calendar')">
-    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    Calendar
+  <!-- New button with BRIAS gradient -->
+  <button class="bn-new-btn" id="bnNew" onclick="mobileAdd()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="width:12px;height:12px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    New
   </button>
-  <!-- New card -->
-  <button class="bn-today" id="bnNew" onclick="mobileAdd()">+ New</button>
 </div>
 
 <!-- Card Create/Edit Modal -->
@@ -798,15 +799,6 @@ body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}
       <div class="form-group">
         <label class="form-label">Duration (minutes)</label>
         <input type="number" class="form-input" id="evDurInput" value="60" min="15" step="15">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Color</label>
-        <div class="color-picker">
-          <div class="color-opt blue selected" onclick="selectEvColor('blue')"></div>
-          <div class="color-opt green" onclick="selectEvColor('green')"></div>
-          <div class="color-opt yellow" onclick="selectEvColor('yellow')"></div>
-          <div class="color-opt red" onclick="selectEvColor('red')"></div>
-        </div>
       </div>
       <div class="form-group">
         <label class="form-label">Link to card (optional)</label>
@@ -869,19 +861,19 @@ body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}
     </div>
     <div class="drawer-nav">
       <div class="nav-section-label">Navigate</div>
-      <button class="nav-item" onclick="location.href='/'">
+      <button class="nav-item" onclick="location.href='/chat'">
         <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.4)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
         <div class="nav-texts"><div class="nav-name">Chat</div><div class="nav-sub">Talk with BRIAS</div></div>
       </button>
-      <button class="nav-item" onclick="location.href='/journal'">
+      <button class="nav-item" onclick="location.href='/diary'">
         <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.4)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-        <div class="nav-texts"><div class="nav-name">Journal</div><div class="nav-sub">Daily diary</div></div>
+        <div class="nav-texts"><div class="nav-name">Diary</div><div class="nav-sub">Daily journal</div></div>
       </button>
-      <button class="nav-item active">
+      <button class="nav-item active" onclick="location.href='/planner'">
         <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
         <div class="nav-texts"><div class="nav-name">Planner</div><div class="nav-sub">Goals & calendar</div></div>
       </button>
-      <button class="nav-item">
+      <button class="nav-item" onclick="location.href='/mindspace'">
         <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.4)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
         <div class="nav-texts"><div class="nav-name">Mindspace <span class="soon-badge">soon</span></div><div class="nav-sub">BRIAS's observations</div></div>
       </button>
@@ -933,7 +925,7 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
 function fmtDate(d){const nd=new Date(d);return `${MONTHS[nd.getMonth()].slice(0,3)} ${nd.getDate()}, ${nd.getFullYear()}`;}
 function fmtDateShort(d){const nd=new Date(d);return `${nd.getDate()} ${MONTHS[nd.getMonth()].slice(0,3)}`;}
-function fmtTime(d){const nd=new Date(d);const h=nd.getHours(),m=nd.getMinutes();if(clockFormat===12){const ampm=h>=12?'PM':'AM';const h12=h%12||12;return `${h12}:${String(m).padStart(2,'0')} ${ampm}`;}return `${h}:${String(m).padStart(2,'0')}`;}
+function fmtTime(d){const nd=new Date(d);const h=nd.getHours(),m=nd.getMinutes();if(clockFormat===12){const ampm=h>=12?'PM':'AM';const h12=h===0?12:h%12;return `${h12}:${String(m).padStart(2,'0')} ${ampm}`;}return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;}
 function getClockFormat(){return parseInt(localStorage.getItem('brias_clock_format')||'24');}
 let clockFormat=getClockFormat();
 function startOfWeek(d){const r=new Date(d);const day=r.getDay();const diff=r.getDate()-day+(day===0?-6:1);r.setDate(diff);r.setHours(0,0,0,0);return r;}
@@ -1308,9 +1300,6 @@ function openEventModal(date,cardId){
   const dt=date?new Date(date):new Date();
   if(!date){dt.setHours(10,0,0,0);}
   document.getElementById('evDateInput').value=dt.toISOString().slice(0,16);
-  // Color
-  document.querySelectorAll('.color-opt').forEach(el=>el.classList.remove('selected'));
-  document.querySelector('.color-opt.blue').classList.add('selected');
   // Card link options
   populateCardSelect(cardId||'');
   document.getElementById('eventModal').classList.add('open');
@@ -1338,9 +1327,9 @@ function saveEvent(){
   const cardId=document.getElementById('evCardLink').value;
   if(editingEventId){
     const ev=events.find(e=>e.id===editingEventId);
-    if(ev){ev.title=title;ev.date=dateStr;ev.duration=dur;ev.notes=notes;ev.cardId=cardId;ev.color=selectedEvColor;}
+    if(ev){ev.title=title;ev.date=dateStr;ev.duration=dur;ev.notes=notes;ev.cardId=cardId;ev.color=ev.briasAdded?ev.color:'blue';}
   } else {
-    events.push({id:uid(),title,date:dateStr,duration:dur,color:selectedEvColor,notes,cardId,briasAdded:false});
+    events.push({id:uid(),title,date:dateStr,duration:dur,color:'blue',notes,cardId,briasAdded:false});
   }
   saveEvents(events);
   closeEventModal();renderCalendar();renderContent();
@@ -1381,9 +1370,6 @@ function editEventFromPopup(){
   document.getElementById('evDateInput').value=d.toISOString().slice(0,16);
   document.getElementById('evDurInput').value=ev.duration||60;
   document.getElementById('evNotesInput').value=ev.notes||'';
-  document.querySelectorAll('.color-opt').forEach(el=>el.classList.remove('selected'));
-  const cEl=document.querySelector(`.color-opt.${ev.color||'blue'}`);
-  if(cEl)cEl.classList.add('selected');
   populateCardSelect(ev.cardId||'');
   document.getElementById('eventModal').classList.add('open');
   document.getElementById('eventPopup').classList.remove('open');
@@ -1420,8 +1406,8 @@ function renderCalendar(){
   // Get events for this week
   const weekEvents=events.filter(e=>{const d=ds(new Date(e.date));return d>=weekStart&&d<=weekEnd;});
 
-  // Hours to show
-  const hours=[];for(let h=6;h<23;h++)hours.push(h);
+  // Hours to show — full 24h clock 00:00 to 23:00
+  const hours=[];for(let h=0;h<24;h++)hours.push(h);
 
   // Header row
   let headerHtml=`<div class="cal-time-col"></div>`;
@@ -1438,7 +1424,7 @@ function renderCalendar(){
   // Time slots
   let slotsHtml='';
   hours.forEach(h=>{
-    const hStr=clockFormat===12?(h===12?'12 PM':h<12?`${h} AM`:h===24?'12 AM':`${h-12} PM`):`${String(h).padStart(2,'0')}:00`;
+    const hStr=clockFormat===12?(h===0?'12 AM':h<12?`${h} AM`:h===12?'12 PM':`${h-12} PM`):`${String(h).padStart(2,'0')}:00`;
     slotsHtml+=`<div class="cal-time-slot">${hStr}</div>`;
     days.forEach(d=>{
       const dStr=ds(d);
@@ -1491,8 +1477,24 @@ function renderCalendar(){
   </div>`;
 
   scroll.innerHTML=calHtml;
-  // Scroll to 8am
-  setTimeout(()=>{const w=scroll.querySelector('.cal-grid-wrap');if(w)w.scrollTop=Math.max(0,(8-6)*52);},0);
+  // Scroll to 8am (hour 8, 52px per row)
+  setTimeout(()=>{
+    const w=scroll.querySelector('.cal-grid-wrap');
+    if(w){
+      w.scrollTop=8*52;
+      // On mobile: center today's column horizontally
+      if(window.innerWidth<=700){
+        const todayIdx=days.findIndex(d=>ds(d)===todayStr);
+        if(todayIdx>=0){
+          const timeColW=44;
+          const dayColW=88;
+          // Center todayIdx column in the viewport
+          const targetScroll=timeColW+todayIdx*dayColW-(w.offsetWidth/2)+(dayColW/2);
+          w.scrollLeft=Math.max(0,targetScroll);
+        }
+      }
+    }
+  },50);
 }
 
 function weekNav(dir){
