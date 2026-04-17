@@ -610,46 +610,175 @@ body.light .sub-card{background:rgba(80,40,20,.05);border-color:rgba(80,40,20,.1
 .sub-card-price{font-size:20px;font-weight:500;color:var(--text-sub);margin-bottom:8px;font-family:var(--font-display);font-style:italic;}
 .sub-card-price span{font-size:12px;font-weight:300;color:var(--text-dim);font-family:var(--font);font-style:normal;}
 
-/* ── Drawer ── */
 .drawer{position:fixed;inset:0;z-index:40;pointer-events:none;}
 .drawer-backdrop{position:absolute;inset:0;background:rgba(8,6,8,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);opacity:0;transition:opacity .38s ease;}
-.drawer-panel{position:absolute;top:0;left:0;bottom:0;width:280px;background:var(--sidebar);border-radius:0 28px 28px 0;transform:translateX(-100%);transition:transform .42s cubic-bezier(.16,1,.3,1),background .45s ease;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid rgba(255,255,255,.04);}
+.drawer-panel{position:absolute;top:0;left:0;bottom:0;width:280px;background:var(--sidebar);border-radius:0 28px 28px 0;transform:translateX(-100%);transition:transform .42s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column;overflow:hidden;border-right:1px solid rgba(255,255,255,.04);}
 .drawer.open{pointer-events:all;}
 .drawer.open .drawer-backdrop{opacity:1;}
 .drawer.open .drawer-panel{transform:translateX(0);}
-body.light .drawer-panel{background:var(--sidebar);}
-body.light .drawer-backdrop{background:rgba(30,12,0,.38);backdrop-filter:blur(10px);}
 .drawer-top{padding:28px 20px 18px;flex-shrink:0;}
 .drawer-logo{font-family:var(--font-display);font-size:30px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .drawer-nav{flex:1;padding:0 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
 .nav-section-label{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--text-dim);padding:4px 12px 6px;font-weight:500;}
 .nav-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:16px;transition:background .15s;width:100%;text-align:left;}
 .nav-item:hover{background:rgba(255,255,255,.05);}
-body.light .nav-item:hover{background:rgba(80,40,20,.06);}
 .nav-item.active{background:linear-gradient(135deg,rgba(232,118,74,.1),rgba(212,74,122,.08));}
-body.light .nav-item.active{background:linear-gradient(135deg,rgba(232,118,74,.12),rgba(212,74,122,.09));}
 .nav-icon{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .nav-item:not(.active) .nav-icon{background:rgba(255,255,255,.04);}
-body.light .nav-item:not(.active) .nav-icon{background:rgba(80,40,20,.06);}
-body.light .nav-item:not(.active) .nav-icon svg{stroke:rgba(80,40,20,.4)!important;}
 .nav-item.active .nav-icon{background:linear-gradient(135deg,rgba(232,118,74,.18),rgba(212,74,122,.16));}
 .nav-texts{flex:1;min-width:0;}
 .nav-name{font-size:13px;font-weight:400;color:var(--text-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .nav-item.active .nav-name{font-weight:500;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .nav-sub{font-size:11px;color:var(--text-dim);margin-top:2px;}
 .soon-badge{font-size:9px;padding:2px 7px;border-radius:20px;background:rgba(255,255,255,.05);color:var(--text-dim);letter-spacing:.03em;margin-left:4px;vertical-align:middle;-webkit-text-fill-color:var(--text-dim);}
-body.light .soon-badge{background:rgba(80,40,20,.07);color:var(--text-dim);-webkit-text-fill-color:var(--text-dim);}
 .drawer-divider{height:1px;background:rgba(255,255,255,.05);margin:8px 10px 10px;}
-body.light .drawer-divider{background:rgba(80,40,20,.1);}
 .drawer-footer{padding:10px 14px 22px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .footer-av{width:32px;height:32px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .footer-av span{font-family:var(--font-display);font-size:13px;color:#fff;font-style:italic;font-weight:600;}
 .footer-info{flex:1;min-width:0;}
 .footer-name{font-size:13px;font-weight:400;color:var(--text-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .footer-handle{font-size:11px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.drawer-settings-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:middle;flex-shrink:0;transition:background .18s;}
+.drawer-settings-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .18s;}
 .drawer-settings-btn:hover{background:rgba(255,255,255,.08);}
-body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}
+
+/* ── Settings ── */
+.settings-overlay{
+  position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;
+  background:rgba(10,7,9,.96);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  opacity:0;pointer-events:none;
+  transform:translateY(12px) scale(.99);
+  transition:opacity .32s ease, transform .38s cubic-bezier(.16,1,.3,1), background .45s ease;
+}
+.settings-overlay.open{opacity:1;pointer-events:all;transform:translateY(0) scale(1);}
+body.light .settings-overlay{background:rgba(228,214,199,.97);}
+.settings-header{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0;border-bottom:1px solid var(--border);}
+.settings-title{font-family:var(--font-display);font-size:22px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.settings-close-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:background .15s;}
+.settings-close-btn:hover{background:rgba(255,255,255,.1);}
+.settings-tabs{display:flex;gap:0;padding:0 24px;flex-shrink:0;border-bottom:1px solid var(--border);overflow-x:auto;}
+.settings-tabs::-webkit-scrollbar{display:none;}
+.stab{
+  flex:1;padding:14px 6px 13px;min-width:0;
+  border-radius:0;font-size:11px;font-weight:400;
+  color:var(--text-muted);
+  transition:color .2s;
+  white-space:nowrap;text-align:center;
+  background:transparent;
+  position:relative;
+  border-bottom:2px solid transparent;
+  margin-bottom:-1px;
+}
+.stab:hover{color:var(--text-sub);}
+.stab.active{
+  color:var(--orange);
+  font-weight:500;
+  border-bottom:2px solid var(--orange);
+}
+.settings-content{flex:1;overflow-y:auto;display:flex;justify-content:center;padding:28px 20px;}
+.settings-body{width:100%;max-width:560px;}
+.s-section{margin-bottom:24px;}
+.s-section-title{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;font-weight:500;}
+.s-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;background:rgba(255,255,255,.03);border-radius:14px;margin-bottom:5px;gap:16px;}
+.s-row-left{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;}
+.s-row-label{font-size:13.5px;color:var(--text-sub);font-weight:400;letter-spacing:.01em;}
+.s-row-sub{font-size:11.5px;color:var(--text-dim);margin-top:2px;line-height:1.4;}
+.s-row-val{font-size:13px;color:var(--text-muted);flex-shrink:0;}
+.s-btn{
+  padding:7px 15px;border-radius:10px;font-size:12.5px;font-weight:400;
+  color:var(--text-sub);
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.07);
+  transition:background .18s,color .18s,border-color .18s;
+  white-space:nowrap;flex-shrink:0;
+  letter-spacing:.01em;
+}
+.s-btn:hover{background:rgba(255,255,255,.09);color:var(--text);border-color:rgba(255,255,255,.11);}
+.s-btn.danger{color:rgba(220,90,90,.65);background:transparent;border-color:rgba(220,90,90,.15);}
+.s-btn.danger:hover{background:rgba(220,70,70,.07);color:rgba(220,90,90,.85);border-color:rgba(220,90,90,.25);}
+.toggle{width:42px;height:23px;border-radius:12px;background:rgba(255,255,255,.1);position:relative;transition:background .28s;flex-shrink:0;}
+.toggle.on{background:var(--grad);}
+.toggle::after{content:'';position:absolute;width:17px;height:17px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .26s cubic-bezier(.34,1.4,.6,1),background .28s,box-shadow .28s;box-shadow:0 1px 4px rgba(0,0,0,.3);}
+.toggle.on::after{left:22px;background:#1a161a;box-shadow:none;}
+body.light .toggle.on::after{left:22px;background:#ddc9b3;box-shadow:none;}
+.theme-toggle{
+  display:flex;position:relative;
+  background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:12px;padding:3px;gap:0;
+  transition:background .45s ease,border-color .45s ease;
+}
+body.light .theme-toggle{background:rgba(80,40,20,.06);border-color:rgba(80,40,20,.1);}
+.theme-toggle-pill{
+  position:absolute;top:3px;bottom:3px;
+  width:calc(50% - 3px);
+  background:var(--grad);
+  border-radius:9px;
+  transition:left .35s cubic-bezier(.34,1.2,.6,1);
+  pointer-events:none;
+}
+body:not(.light) .theme-toggle-pill{left:3px;}
+.theme-toggle.pill-right .theme-toggle-pill{left:calc(50%);}
+.theme-opt{
+  flex:1;padding:8px 14px;border-radius:9px;font-size:12.5px;font-weight:400;
+  color:var(--text-muted);background:transparent;
+  transition:color .3s ease;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  position:relative;z-index:1;
+}
+.theme-opt.active{color:#fff;font-weight:500;}
+body.light .theme-opt:not(.active){color:var(--text-sub);}
+/* Clock toggle — identiek aan theme-toggle */
+.clock-toggle{
+  display:flex;position:relative;
+  background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:12px;padding:3px;gap:0;
+  transition:background .45s ease,border-color .45s ease;
+}
+body.light .clock-toggle{background:rgba(80,40,20,.06);border-color:rgba(80,40,20,.1);}
+.clock-toggle-pill{
+  position:absolute;top:3px;bottom:3px;
+  width:calc(50% - 3px);
+  background:var(--grad);
+  border-radius:9px;
+  transition:left .35s cubic-bezier(.34,1.2,.6,1);
+  pointer-events:none;
+  left:3px;
+}
+.clock-toggle.pill-right .clock-toggle-pill{left:calc(50%);}
+.clock-opt{
+  flex:1;padding:8px 14px;border-radius:9px;font-size:12.5px;font-weight:400;
+  color:var(--text-muted);background:transparent;
+  transition:color .3s ease;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;z-index:1;
+}
+.clock-opt.active{color:#fff;font-weight:500;}
+body.light .clock-opt:not(.active){color:var(--text-sub);}
+.about-logo{font-family:var(--font-display);font-size:42px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:block;}
+.sub-intro{font-family:var(--font-serif);font-size:14px;font-weight:300;font-style:italic;line-height:1.65;color:var(--text-muted);margin-bottom:20px;}
+.sub-cards{display:flex;flex-direction:column;gap:10px;}
+.sub-card{border:1px solid var(--border);border-radius:18px;padding:18px 20px;background:rgba(255,255,255,.03);}
+body.light .sub-card{background:rgba(80,40,20,.05);border-color:rgba(80,40,20,.1);}
+.sub-card-name{font-family:var(--font-display);font-size:17px;font-weight:600;font-style:italic;color:var(--text-sub);margin-bottom:4px;}
+.sub-card-price{font-size:20px;font-weight:500;color:var(--text-sub);margin-bottom:8px;font-family:var(--font-display);font-style:italic;}
+.sub-card-price span{font-size:12px;font-weight:300;color:var(--text-dim);font-family:var(--font);font-style:normal;}
+.sub-card-perks{list-style:none;display:flex;flex-direction:column;gap:5px;margin-top:8px;padding-top:10px;border-top:1px solid var(--border);}
+.sub-card-perks li{font-family:var(--font-serif);font-size:12.5px;font-weight:300;font-style:italic;color:var(--text-muted);line-height:1.45;padding-left:14px;position:relative;}
+.sub-card-perks li::before{content:'–';position:absolute;left:0;color:var(--text-dim);}
+body.light .drawer-panel{background:var(--sidebar);}
+body.light .s-row{background:rgba(80,40,20,.05);}
+body.light .s-btn{color:var(--text-sub);background:rgba(80,40,20,.07);border-color:rgba(80,40,20,.1);}
+body.light .s-btn:hover{background:rgba(80,40,20,.13);color:var(--text);border-color:rgba(80,40,20,.16);}
+body.light .s-btn.danger{color:rgba(160,40,40,.8);background:transparent;border-color:rgba(160,40,40,.18);}
+body.light .s-btn.danger:hover{background:rgba(160,40,40,.07);}
+body.light .settings-close-btn{background:rgba(80,40,20,.07);}
+body.light .settings-close-btn:hover{background:rgba(80,40,20,.13);}
+body.light .drawer-divider{background:rgba(80,40,20,.1);}
+body.light .nav-item:hover{background:rgba(80,40,20,.06);}
+body.light .nav-item.active{background:linear-gradient(135deg,rgba(232,118,74,.12),rgba(212,74,122,.09));}
+body.light .nav-item:not(.active) .nav-icon{background:rgba(80,40,20,.06);}
+body.light .toggle{background:rgba(80,40,20,.16);}
+body.light .toggle.on{background:var(--grad);}
 
 /* ── Responsive ── */
 @media(max-width:700px){
@@ -858,14 +987,18 @@ body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}
   <div class="drawer-panel">
     <div class="drawer-top"><div class="drawer-logo">BRIAS</div></div>
     <div class="drawer-nav">
-      <div class="nav-section-label">Navigate</div>
+      <div class="nav-section-label">Spaces</div>
       <button class="nav-item" onclick="window.location.href='/chat'">
-        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-        <div class="nav-texts"><div class="nav-name">Chat</div><div class="nav-sub">Talk with BRIAS</div></div>
+        <div class="nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <div class="nav-texts"><div class="nav-name">Chat</div><div class="nav-sub">Your conversation with BRIAS</div></div>
       </button>
       <button class="nav-item" onclick="window.location.href='/diary'">
-        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-        <div class="nav-texts"><div class="nav-name">Diary</div><div class="nav-sub">Daily journal</div></div>
+        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+        <div class="nav-texts"><div class="nav-name">Journal</div><div class="nav-sub">You and BRIAS write here together</div></div>
       </button>
       <button class="nav-item active">
         <div class="nav-icon">
@@ -877,8 +1010,8 @@ body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}
         <div class="nav-texts"><div class="nav-name">Planner</div><div class="nav-sub">Goals & calendar</div></div>
       </button>
       <button class="nav-item">
-        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-        <div class="nav-texts"><div class="nav-name">Mindspace <span class="soon-badge">soon</span></div><div class="nav-sub">BRIAS's observations</div></div>
+        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+        <div class="nav-texts"><div class="nav-name">Mindspace <span class="soon-badge">soon</span></div><div class="nav-sub">Dump it here, sort later</div></div>
       </button>
     </div>
     <div class="drawer-divider"></div>
@@ -886,7 +1019,7 @@ body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}
       <div class="footer-av"><span id="drawerInitial">—</span></div>
       <div class="footer-info">
         <div class="footer-name" id="drawerName">—</div>
-        <div class="footer-handle" id="drawerHandle">brias.eu</div>
+        <div class="footer-handle" id="drawerHandle">—</div>
       </div>
       <button class="drawer-settings-btn" onclick="openSettings();closeDrawer();" title="Settings">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.3)" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -895,7 +1028,7 @@ body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}
   </div>
 </div>
 
-<!-- Settings overlay -->
+<!-- Settings -->
 <div class="settings-overlay" id="settingsOverlay">
   <div class="settings-header">
     <div class="settings-title">Settings</div>
@@ -914,6 +1047,7 @@ body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}
     <div class="settings-body" id="settingsBody"></div>
   </div>
 </div>
+
 
 <script>
 // Apply saved theme immediately
@@ -984,612 +1118,72 @@ let planEditingCardId=null;
 })();
 
 // ── Drawer ──
-function toggleDrawer() { document.getElementById('drawer').classList.contains('open') ? closeDrawer() : openDrawer(); }
+function toggleDrawer() { document.getElementById('drawer').classList.contains('open')?closeDrawer():openDrawer(); }
 function openDrawer() { document.getElementById('drawer').classList.add('open'); document.getElementById('menuBtn').classList.add('open'); }
 function closeDrawer() { document.getElementById('drawer').classList.remove('open'); document.getElementById('menuBtn').classList.remove('open'); }
 
-// ── View switching ──
-function setMainView(v){
-  mainView=v;
-  const sc=document.getElementById('svtCards'),sk=document.getElementById('svtCalendar');
-  if(sc)sc.classList.toggle('active',v==='cards');
-  if(sk)sk.classList.toggle('active',v==='calendar');
-  renderAll();
-}
-function setMobileView(v){
-  mobileView=v;
-  const bc=document.getElementById('bnCards'),bk=document.getElementById('bnCalendar');
-  if(bc)bc.classList.toggle('active',v==='cards');
-  if(bk)bk.classList.toggle('active',v==='calendar');
-  const calBtn=document.getElementById('bnCalBtn');
-  if(calBtn)calBtn.classList.toggle('active',v==='calendar');
-  renderContent();
-}
-
-// ── Filter ──
-function setFilter(f,el){
-  cardFilter=f;
-  document.querySelectorAll('.cft').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  renderSidebar();
-}
-
-function filteredCards(){
-  if(cardFilter==='all') return cards.filter(c=>c.status!=='archived');
-  if(cardFilter==='active') return cards.filter(c=>c.status==='active');
-  if(cardFilter==='dream') return cards.filter(c=>c.type==='dream'&&c.status!=='archived');
-  if(cardFilter==='problem') return cards.filter(c=>c.type==='problem'&&c.status!=='archived');
-  return cards;
-}
-
-// ── Sidebar ──
-function renderSidebar(){
-  const list=document.getElementById('cardList');
-  if(!list) return;
-  const fc=filteredCards();
-  if(fc.length===0){
-    list.innerHTML=`<div style="padding:20px 8px;text-align:center;"><p style="font-size:12.5px;color:var(--text-dim);font-style:italic;line-height:1.7;">No cards yet.<br>Create one to get started.</p></div>`;
-    return;
-  }
-  list.innerHTML=fc.map(c=>{
-    const linked=events.filter(e=>e.cardId===c.id);
-    const isActive=c.id===activeCardId;
-    return `<div class="card-item${isActive?' active':''}" onclick="openCard('${c.id}')">
-      <div class="card-item-top">
-        <span class="type-badge ${c.type}">${c.type}</span>
-        <span class="card-item-title">${esc(c.title)}</span>
-        ${c.briasAdded?`<span class="brias-tag">BRIAS</span>`:''}
-      </div>
-      <div class="card-item-meta">
-        <span class="status-dot ${c.status}"></span>
-        <span>${c.status}</span>
-        ${linked.length?`<span>· ${linked.length} event${linked.length!==1?'s':''}</span>`:''}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ── Card detail ──
-function openCard(id){
-  activeCardId=id;
-  if(window.innerWidth<=700) setMobileView('cards');
-  planEditingCardId=null;
-  renderSidebar();
-  renderContent();
-}
-
-function renderCardDetail(card){
-  const linked=events.filter(e=>e.cardId===card.id);
-  const isPlanEditing=planEditingCardId===card.id;
-  const planVal=esc(card.plan||'');
-  const status=card.status;
-
-  const linkedHtml=linked.length?linked.map(e=>`
-    <div class="linked-event-item" onclick="showEventPopup('${e.id}',event)">
-      <div class="ev-color-dot ${e.color}"></div>
-      <span class="ev-label">${esc(e.title)}</span>
-      <span class="ev-date">${fmtDateShort(e.date)}</span>
-    </div>`).join(''):`<div class="no-events-hint">No calendar items linked yet.</div>`;
-
-  const historyHtml=card.history&&card.history.length?[...card.history].reverse().map(h=>`
-    <div class="history-item">
-      <div class="history-item-head">
-        <span class="history-item-type">${esc(h.type||'Note')}</span>
-        <span class="history-item-date">${fmtDate(h.date)}</span>
-      </div>
-      <div class="history-item-text${h.brias?' brias':''}">${esc(h.text)}</div>
-    </div>`).join(''):`<div class="no-events-hint" style="padding:10px 14px 14px;">No history yet.</div>`;
-
-  const pauseBtn=status==='active'?`<button class="card-action-btn pause" onclick="setCardStatus('${card.id}','paused')">
-    <svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Pause</button>`
-    :`<button class="card-action-btn" onclick="setCardStatus('${card.id}','active')">
-    <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Resume</button>`;
-
-  const titleLower = card.title.toLowerCase();
-  const problemPhrase = titleLower.includes('addict') ? `I need help with my ${card.title.toLowerCase()}`
-    : titleLower.includes('anxiet') ? `I struggle with ${card.title.toLowerCase()}`
-    : titleLower.includes('stress') ? `I'm dealing with ${card.title.toLowerCase()}`
-    : titleLower.includes('health') ? `I want to improve my ${card.title.toLowerCase()}`
-    : `I need help with ${titleLower.startsWith('my ')||titleLower.startsWith('the ')?card.title.toLowerCase():'this: '+card.title.toLowerCase()}`;
-
-  const typeContext = card.type==='problem'
-    ? `<div style="font-family:var(--font-serif);font-size:14px;font-style:italic;color:var(--orange);opacity:.75;margin-bottom:8px;">${esc(problemPhrase)}</div>`
-    : `<div style="font-family:var(--font-serif);font-size:14px;font-style:italic;color:rgba(74,140,232,.7);margin-bottom:8px;">This is something I dream of</div>`;
-
-  return `<div class="card-detail">
-    <div class="card-detail-header">
-      <button class="card-detail-back" onclick="activeCardId=null;renderSidebar();renderContent()">
-        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        All cards
-      </button>
-      <div class="card-title-row">
-        <div>
-          ${typeContext}
-          <div class="card-detail-title">${esc(card.title)}</div>
-        </div>
-        <div class="card-title-badges">
-          <span class="type-badge ${card.type}" style="font-size:10px;">${card.type}</span>
-          <span class="status-badge ${status}">${status}</span>
+const tabs = [
+  ()=>`
+    <div class="s-section">
+      <div class="s-section-title">Profile</div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Name</div></div><button class="s-btn">${esc(getUsername())}</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Email</div></div><div class="s-row-val">—</div></div>
+    </div>
+    <div class="s-section">
+      <div class="s-section-title">Manage</div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Password</div></div><button class="s-btn">Change</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Sign out</div></div><button class="s-btn" onclick="localStorage.removeItem('brias_token');window.location.href='/'">Sign out</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Delete account</div></div><button class="s-btn danger">Delete</button></div>
+    </div>`,
+  ()=>`
+    <p class="sub-intro"></p>
+    <div class="sub-cards">
+      <div class="sub-card"><div class="sub-card-name">Standard</div><div class="sub-card-price">€— <span>/ month</span></div><ul class="sub-card-perks"><li></li><li></li><li></li></ul></div>
+      <div class="sub-card"><div class="sub-card-name">Supportive</div><div class="sub-card-price">€— <span>/ month</span></div><ul class="sub-card-perks"><li></li><li></li><li></li></ul></div>
+      <div class="sub-card"><div class="sub-card-name">Advanced</div><div class="sub-card-price">€— <span>/ month</span></div><ul class="sub-card-perks"><li></li><li></li><li></li></ul></div>
+    </div>`,
+  ()=>`
+    <div class="s-section">
+      <div class="s-section-title">Device</div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Notifications</div><div class="s-row-sub">Let BRIAS check in on you</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Microphone</div><div class="s-row-sub">For voice messages</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
+    </div>
+    <div class="s-section">
+      <div class="s-section-title">Data</div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Save conversations</div><div class="s-row-sub">Keep your chat history</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Save planner data</div><div class="s-row-sub">Stored locally on your device</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+    </div>`,
+  ()=>`
+    <div class="s-section">
+      <div class="s-section-title">Appearance</div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Theme</div><div class="s-row-sub">Choose what feels right for you</div></div>
+        <div class="theme-toggle" id="themeToggle">
+          <div class="theme-toggle-pill"></div>
+          <button class="theme-opt ${!document.body.classList.contains('light')?'active':''}" onclick="setTheme('dark')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <span>Dark</span>
+          </button>
+          <button class="theme-opt ${document.body.classList.contains('light')?'active':''}" onclick="setTheme('light')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <span>Light</span>
+          </button>
         </div>
       </div>
-      <div class="card-detail-meta">
-        <span>Created ${fmtDate(card.created)}</span>
-        ${card.briasAdded?`<span>· Suggested by BRIAS</span>`:''}
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Clock format</div><div class="s-row-sub">How time is shown in the calendar</div></div>
+        <div class="clock-toggle" id="clockToggle">
+          <div class="clock-toggle-pill"></div>
+          <button class="clock-opt ${clockFormat===24?'active':''}" onclick="setClockFormat(24)">24h</button>
+          <button class="clock-opt ${clockFormat===12?'active':''}" onclick="setClockFormat(12)">12h</button>
+        </div>
       </div>
-    </div>
+    </div>`,
+  ()=>`<span class="about-logo">BRIAS</span>`
+];
 
-    <div class="card-actions">
-      <button class="card-action-btn evaluate" onclick="openEvalModal('${card.id}')">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-        Evaluate
-      </button>
-      ${pauseBtn}
-      ${status!=='achieved'?`<button class="card-action-btn achieve" onclick="setCardStatus('${card.id}','achieved')">
-        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-        Mark achieved</button>`:''}
-      <button class="card-action-btn" onclick="openEventModalForCard('${card.id}')">
-        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
-        Add event</button>
-      <button class="card-action-btn" onclick="deleteCard('${card.id}')">
-        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
-        Delete</button>
-    </div>
-
-    <br>
-
-    <div class="card-section">
-      <div class="card-section-head">
-        <span class="card-section-label">Current plan</span>
-        ${isPlanEditing
-          ?`<button class="card-section-action" onclick="savePlan('${card.id}')">Save</button>`
-          :`<button class="card-section-action" onclick="startPlanEdit('${card.id}')">Edit</button>`}
-      </div>
-      ${isPlanEditing
-        ?`<textarea class="plan-area" id="planTa" placeholder="Write the current plan or approach for this card...">${esc(card.plan||'')}</textarea>`
-        :`<div class="plan-ro${card.plan?'':' empty'}">${card.plan?esc(card.plan):'No plan written yet. Click Edit to add one.'}</div>`}
-    </div>
-
-    <div class="card-section">
-      <div class="card-section-head">
-        <span class="card-section-label">Calendar items</span>
-        <button class="card-section-action" onclick="openEventModalForCard('${card.id}')">+ Add</button>
-      </div>
-      <div class="linked-events">${linkedHtml}</div>
-    </div>
-
-    <div class="card-section">
-      <div class="card-section-head">
-        <span class="card-section-label">History</span>
-      </div>
-      <div class="history-list">${historyHtml}</div>
-    </div>
-  </div>`;
-}
-
-function startPlanEdit(id){planEditingCardId=id;renderContent();}
-function savePlan(id){
-  const ta=document.getElementById('planTa');
-  if(!ta)return;
-  const c=cards.find(x=>x.id===id);
-  if(!c)return;
-  if(c.plan&&c.plan!==ta.value){
-    c.history=c.history||[];
-    c.history.push({type:'Plan update',date:new Date().toISOString(),text:c.plan});
-  }
-  c.plan=ta.value;
-  saveCards(cards);
-  planEditingCardId=null;
-  renderContent();
-  renderSidebar();
-}
-
-function setCardStatus(id,status){
-  const c=cards.find(x=>x.id===id);if(!c)return;
-  c.history=c.history||[];
-  c.history.push({type:'Status change',date:new Date().toISOString(),text:`Status changed to: ${status}`});
-  c.status=status;
-  saveCards(cards);
-  renderSidebar();renderContent();
-}
-function deleteCard(id){
-  if(!confirm('Delete this card?'))return;
-  cards=cards.filter(c=>c.id!==id);
-  if(activeCardId===id)activeCardId=null;
-  saveCards(cards);renderSidebar();renderContent();
-}
-
-// ── Card Modal ──
-const PLACEHOLDERS={
-  dream:'e.g. Start my own business',
-  problem:'e.g. Help with my addiction'
-};
-function openCardModal(editId){
-  editingCardId=editId||null;
-  const modal=document.getElementById('cardModal');
-  const titleEl=document.getElementById('cardModalTitle');
-  const saveBtn=document.getElementById('cardModalSave');
-  if(editId){
-    const c=cards.find(x=>x.id===editId);
-    document.getElementById('cardTitleInput').value=c.title;
-    document.getElementById('cardDescInput').value=c.plan||'';
-    selectType(c.type);
-    titleEl.textContent='Edit card';
-    saveBtn.textContent='Save changes';
-  } else {
-    document.getElementById('cardTitleInput').value='';
-    document.getElementById('cardTitleInput').style.opacity='1';
-    document.getElementById('cardTitleInput').style.transform='';
-    const lbl=document.getElementById('cardTitlePlaceholder');
-    if(lbl){lbl.textContent=PLACEHOLDERS['dream'];lbl.style.opacity='1';}    document.getElementById('cardDescInput').value='';
-    selectType('dream');
-    titleEl.textContent='New card';
-    saveBtn.textContent='Create card';
-  }
-  modal.classList.add('open');
-  setTimeout(()=>document.getElementById('cardTitleInput').focus(),100);
-}
-function closeCardModal(){document.getElementById('cardModal').classList.remove('open');}
-function selectType(t){
-  activeCardType=t;
-  document.getElementById('typeDream').classList.toggle('selected',t==='dream');
-  document.getElementById('typeProblem').classList.toggle('selected',t==='problem');
-
-  // Animate only the placeholder label, not the input itself
-  const lbl=document.getElementById('cardTitlePlaceholder');
-  const inp=document.getElementById('cardTitleInput');
-  if(!lbl||!inp)return;
-  const next=PLACEHOLDERS[t]||'';
-  if(lbl.textContent===next)return;
-
-  lbl.style.transition='opacity .15s ease';
-  lbl.style.opacity='0';
-  setTimeout(()=>{
-    lbl.textContent=next;
-    lbl.style.transition='opacity .2s ease';
-    lbl.style.opacity='1';
-  },150);
-  inp.placeholder='';
-}
-function saveCard(){
-  const title=document.getElementById('cardTitleInput').value.trim();
-  if(!title)return;
-  const desc=document.getElementById('cardDescInput').value.trim();
-  if(editingCardId){
-    const c=cards.find(x=>x.id===editingCardId);
-    c.title=title;c.type=activeCardType;
-    if(desc&&desc!==c.plan){c.history=c.history||[];c.history.push({type:'Plan update',date:new Date().toISOString(),text:c.plan||''});}
-    c.plan=desc;
-    saveCards(cards);
-  } else {
-    const newCard={id:uid(),title,type:activeCardType,plan:desc,status:'active',created:new Date().toISOString(),history:[]};
-    cards.unshift(newCard);
-    saveCards(cards);
-    activeCardId=newCard.id;
-  }
-  closeCardModal();renderSidebar();renderContent();
-}
-
-// ── Evaluate Modal ──
-function openEvalModal(id){
-  evaluatingCardId=id;
-  document.getElementById('evalTextInput').value='';
-  document.getElementById('evaluateModal').classList.add('open');
-  setTimeout(()=>document.getElementById('evalTextInput').focus(),100);
-}
-function closeEvalModal(){document.getElementById('evaluateModal').classList.remove('open');}
-function saveEvaluation(){
-  const text=document.getElementById('evalTextInput').value.trim();
-  if(!text)return;
-  const c=cards.find(x=>x.id===evaluatingCardId);if(!c)return;
-  c.history=c.history||[];
-  c.history.push({type:'Evaluation',date:new Date().toISOString(),text});
-  saveCards(cards);
-  closeEvalModal();renderContent();
-}
-
-// ── Event Modal ──
-function openEventModal(date,cardId){
-  editingEventId=null;
-  newEventDate=date||null;
-  selectedEvColor='blue';
-  document.getElementById('eventModalTitle').textContent='Add event';
-  document.getElementById('evModalSave').textContent='Add event';
-  document.getElementById('evTitleInput').value='';
-  document.getElementById('evNotesInput').value='';
-  document.getElementById('evDurInput').value='60';
-  // Set date
-  const dt=date?new Date(date):new Date();
-  if(!date){dt.setHours(10,0,0,0);}
-  document.getElementById('evDateInput').value=dt.toISOString().slice(0,16);
-  // Card link options
-  populateCardSelect(cardId||'');
-  document.getElementById('eventModal').classList.add('open');
-  setTimeout(()=>document.getElementById('evTitleInput').focus(),100);
-}
-function openEventModalForCard(cardId){openEventModal(null,cardId);}
-function closeEventModal(){document.getElementById('eventModal').classList.remove('open');}
-function selectEvColor(c){
-  selectedEvColor=c;
-  document.querySelectorAll('.color-opt').forEach(el=>el.classList.remove('selected'));
-  document.querySelector(`.color-opt.${c}`).classList.add('selected');
-}
-function populateCardSelect(selectedCardId){
-  const sel=document.getElementById('evCardLink');
-  const active=cards.filter(c=>c.status!=='archived');
-  sel.innerHTML=`<option value="">No card linked</option>`+active.map(c=>`<option value="${c.id}"${c.id===selectedCardId?' selected':''}>${esc(c.title)}</option>`).join('');
-}
-function saveEvent(){
-  const title=document.getElementById('evTitleInput').value.trim();
-  if(!title)return;
-  const dateStr=document.getElementById('evDateInput').value;
-  if(!dateStr)return;
-  const dur=parseInt(document.getElementById('evDurInput').value)||60;
-  const notes=document.getElementById('evNotesInput').value.trim();
-  const cardId=document.getElementById('evCardLink').value;
-  if(editingEventId){
-    const ev=events.find(e=>e.id===editingEventId);
-    if(ev){ev.title=title;ev.date=dateStr;ev.duration=dur;ev.notes=notes;ev.cardId=cardId;ev.color=ev.briasAdded?ev.color:'blue';}
-  } else {
-    events.push({id:uid(),title,date:dateStr,duration:dur,color:'blue',notes,cardId,briasAdded:false});
-  }
-  saveEvents(events);
-  closeEventModal();renderCalendar();renderContent();
-}
-
-// ── Event popup ──
-function showEventPopup(id,e){
-  e.stopPropagation();
-  popupEventId=id;
-  const ev=events.find(x=>x.id===id);if(!ev)return;
-  const popup=document.getElementById('eventPopup');
-  document.getElementById('epTitle').textContent=ev.title;
-  document.getElementById('epMeta').textContent=`${fmtDate(ev.date)} · ${fmtTime(ev.date)} · ${ev.duration||60}min`;
-  const jumpBtn=document.getElementById('epJump');
-  if(ev.cardId){jumpBtn.style.display='';} else {jumpBtn.style.display='none';}
-  // Position near click
-  const x=Math.min(e.clientX,window.innerWidth-260);
-  const y=Math.min(e.clientY+10,window.innerHeight-160);
-  popup.style.left=x+'px';popup.style.top=y+'px';
-  popup.classList.add('open');
-  document.addEventListener('click',closeEventPopupOutside,{once:true});
-}
-function closeEventPopupOutside(){document.getElementById('eventPopup').classList.remove('open');}
-function jumpToCardFromPopup(){
-  const ev=events.find(e=>e.id===popupEventId);
-  if(ev&&ev.cardId){activeCardId=ev.cardId;setMobileView('cards');setMainView('cards');renderSidebar();renderContent();}
-  document.getElementById('eventPopup').classList.remove('open');
-}
-function editEventFromPopup(){
-  const ev=events.find(e=>e.id===popupEventId);
-  if(!ev)return;
-  editingEventId=ev.id;
-  selectedEvColor=ev.color||'blue';
-  document.getElementById('eventModalTitle').textContent='Edit event';
-  document.getElementById('evModalSave').textContent='Save changes';
-  document.getElementById('evTitleInput').value=ev.title;
-  const d=new Date(ev.date);
-  document.getElementById('evDateInput').value=d.toISOString().slice(0,16);
-  document.getElementById('evDurInput').value=ev.duration||60;
-  document.getElementById('evNotesInput').value=ev.notes||'';
-  populateCardSelect(ev.cardId||'');
-  document.getElementById('eventModal').classList.add('open');
-  document.getElementById('eventPopup').classList.remove('open');
-}
-function deleteEventFromPopup(){
-  if(!confirm('Delete this event?'))return;
-  events=events.filter(e=>e.id!==popupEventId);
-  saveEvents(events);
-  document.getElementById('eventPopup').classList.remove('open');
-  renderCalendar();renderContent();
-}
-
-// ── Calendar rendering ──
-function renderCalendar(){
-  const scroll=document.getElementById('contentScroll');
-  if(!scroll)return;
-  const isMobile=window.innerWidth<=700;
-  if(isMobile&&mobileView!=='calendar')return;
-  if(!isMobile&&mainView!=='calendar')return;
-
-  // Days in week
-  const days=[];for(let i=0;i<7;i++)days.push(addDays(currentWeek,i));
-  const todayStr=ds(TODAY);
-  const weekStart=ds(days[0]),weekEnd=ds(days[6]);
-
-  // Check if current week
-  const isCurWeek=ds(currentWeek)===ds(startOfWeek(TODAY));
-
-  // Build week label
-  const wLabel=days[0].getMonth()===days[6].getMonth()
-    ?`${MONTHS[days[0].getMonth()]} ${days[0].getDate()}–${days[6].getDate()}, ${days[0].getFullYear()}`
-    :`${MONTHS[days[0].getMonth()].slice(0,3)} ${days[0].getDate()} – ${MONTHS[days[6].getMonth()].slice(0,3)} ${days[6].getDate()}, ${days[0].getFullYear()}`;
-
-  // Get events for this week
-  const weekEvents=events.filter(e=>{const d=ds(new Date(e.date));return d>=weekStart&&d<=weekEnd;});
-
-  // Hours to show — full 24h clock 00:00 to 23:00
-  const hours=[];for(let h=0;h<24;h++)hours.push(h);
-
-  // Header row
-  let headerHtml=`<div class="cal-time-col"></div>`;
-  days.forEach(d=>{
-    const dStr=ds(d);
-    const isT=dStr===todayStr;
-    const hasEvs=weekEvents.some(e=>ds(new Date(e.date))===dStr);
-    headerHtml+=`<div class="cal-day-header">
-      <div class="cal-day-name">${DAYS[(d.getDay())]}</div>
-      <div class="cal-day-num${isT?' today':''}${hasEvs&&!isT?' has-dot':''}">${d.getDate()}</div>
-    </div>`;
-  });
-
-  // Time slots
-  let slotsHtml='';
-  hours.forEach(h=>{
-    const hStr=clockFormat===12?(h===0?'12 AM':h<12?`${h} AM`:h===12?'12 PM':`${h-12} PM`):`${String(h).padStart(2,'0')}:00`;
-    slotsHtml+=`<div class="cal-time-slot">${hStr}</div>`;
-    days.forEach(d=>{
-      const dStr=ds(d);
-      const isT=dStr===todayStr;
-      const cellDt=new Date(d);cellDt.setHours(h,0,0,0);
-      const isoStr=cellDt.toISOString().slice(0,16);
-      // Events that start in this hour
-      const cellEvs=weekEvents.filter(e=>{
-        const ed=new Date(e.date);
-        return ds(ed)===dStr&&ed.getHours()===h;
-      });
-      let evsHtml=cellEvs.map(e=>{
-        const isBrias=e.briasAdded;
-        return `<div class="cal-event ${e.color||'blue'}" onclick="showEventPopup('${e.id}',event)">
-          ${isBrias?`<svg class="brias-ev-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`:''}
-          ${esc(e.title)}
-        </div>`;
-      }).join('');
-      slotsHtml+=`<div class="cal-cell${isT?' today-col':''}" onclick="openEventModal('${isoStr}')">
-        ${evsHtml}
-        ${!cellEvs.length?`<div class="cal-cell-add">+</div>`:''}
-      </div>`;
-    });
-  });
-
-  const calHtml=`<div class="calendar-view">
-    <div class="cal-header">
-      <div class="cal-week-nav">
-        <button class="cal-nav-btn" onclick="weekNav(-1)">
-          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <div class="cal-week-label">${wLabel}</div>
-        <button class="cal-nav-btn" onclick="weekNav(1)">
-          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-      </div>
-      <button class="cal-today-btn${isCurWeek?' is-cur-week':''}" onclick="currentWeek=startOfWeek(TODAY);renderCalendar()">Today</button>
-      <div class="cal-legend">
-        <div class="legend-item"><div class="legend-dot blue"></div>Your events</div>
-        <div class="legend-item"><div class="legend-dot green"></div>Plan steps</div>
-        <div class="legend-item"><div class="legend-dot yellow"></div>BRIAS suggestions</div>
-        <div class="legend-item"><div class="legend-dot red"></div>Urgent</div>
-      </div>
-    </div>
-    <div class="cal-grid-wrap">
-      <div class="cal-grid">
-        ${headerHtml}${slotsHtml}
-      </div>
-    </div>
-  </div>`;
-
-  scroll.innerHTML=calHtml;
-  // Scroll to 8am (hour 8, 52px per row)
-  setTimeout(()=>{
-    const w=scroll.querySelector('.cal-grid-wrap');
-    if(w){
-      w.scrollTop=8*52;
-      // On mobile: center today's column horizontally
-      if(window.innerWidth<=700){
-        const todayIdx=days.findIndex(d=>ds(d)===todayStr);
-        if(todayIdx>=0){
-          const timeColW=44;
-          const dayColW=88;
-          // Center todayIdx column in the viewport
-          const targetScroll=timeColW+todayIdx*dayColW-(w.offsetWidth/2)+(dayColW/2);
-          w.scrollLeft=Math.max(0,targetScroll);
-        }
-      }
-    }
-  },50);
-}
-
-function weekNav(dir){
-  currentWeek=addDays(currentWeek,dir*7);
-  renderCalendar();
-}
-
-// ── Main content render ──
-function renderContent(){
-  const scroll=document.getElementById('contentScroll');
-  const isMobile=window.innerWidth<=700;
-  const showCards=!isMobile?mainView==='cards':mobileView==='cards';
-  const showCalendar=!isMobile?mainView==='calendar':mobileView==='calendar';
-
-  if(showCalendar){
-    renderCalendar();
-    return;
-  }
-
-  // Cards view
-  if(activeCardId){
-    const card=cards.find(c=>c.id===activeCardId);
-    if(card){
-      scroll.innerHTML=renderCardDetail(card);
-      // Auto-resize plan textarea
-      const ta=document.getElementById('planTa');
-      if(ta){ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=Math.max(120,ta.scrollHeight)+'px';});if(ta.value)ta.style.height=Math.max(120,ta.scrollHeight)+'px';}
-      return;
-    }
-  }
-
-  // Empty state / cards overview
-  const isMobileView = window.innerWidth <= 700;
-  if(cards.length > 0 && isMobileView){
-    // On mobile, show cards grid since there's no sidebar
-    const fc = filteredCards();
-    scroll.innerHTML=`<div style="padding:20px 16px 120px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <div style="font-family:var(--font-display);font-size:20px;font-style:italic;font-weight:300;color:var(--text-sub);">Your cards</div>
-        <button class="new-card-btn" onclick="openCardModal()">
-          <svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          New
-        </button>
-      </div>
-      <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;">
-        <button class="cft${cardFilter==='all'?' active':''}" style="flex:none;padding:6px 12px;" onclick="setFilter('all',this)">All</button>
-        <button class="cft${cardFilter==='active'?' active':''}" style="flex:none;padding:6px 12px;" onclick="setFilter('active',this)">Active</button>
-        <button class="cft${cardFilter==='dream'?' active':''}" style="flex:none;padding:6px 12px;" onclick="setFilter('dream',this)">Dreams</button>
-        <button class="cft${cardFilter==='problem'?' active':''}" style="flex:none;padding:6px 12px;" onclick="setFilter('problem',this)">Problems</button>
-      </div>
-      ${fc.length===0?`<p style="font-size:13px;color:var(--text-dim);font-style:italic;text-align:center;padding:32px 0;">No cards match this filter.</p>`
-        :fc.map(c=>`<div class="card-item" onclick="openCard('${c.id}')">
-          <div class="card-item-top">
-            <span class="type-badge ${c.type}">${c.type}</span>
-            <span class="card-item-title">${esc(c.title)}</span>
-            ${c.briasAdded?`<span class="brias-tag">BRIAS</span>`:''}
-          </div>
-          <div class="card-item-meta">
-            <span class="status-dot ${c.status}"></span>
-            <span>${c.status}</span>
-          </div>
-        </div>`).join('')}
-    </div>`;
-    return;
-  }
-
-  scroll.innerHTML=`<div class="empty-state">
-    <div class="empty-state-icon">
-      <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-    </div>
-    <div class="empty-state-title">${cards.length===0?'Start your first card':'Select a card'}</div>
-    <div class="empty-state-sub">${cards.length===0?'Cards are goals, dreams, or problems you\'re working through with BRIAS. Create one to begin.':'Choose a card from the sidebar, or create a new one.'}</div>
-    ${cards.length===0?`<button class="card-action-btn evaluate" style="margin-top:8px;" onclick="openCardModal()">
-      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Create a card</button>`:''}
-  </div>`;
-}
-
-// ── Mobile add button ──
-function mobileAdd(){
-  if(mobileView==='cards') openCardModal();
-  else openEventModal();
-}
-
-// ── Mobile view tabs ──
-function initMobileViewTabs(){
-  // Mobile tabs are now handled by bottom nav - no separate tabs needed
-}
-
-// ── Settings ──
 function openSettings() { document.getElementById('settingsOverlay').classList.add('open'); switchTab(0); }
 function closeSettings() { document.getElementById('settingsOverlay').classList.remove('open'); }
 function switchTab(i) {
-  document.querySelectorAll('.stab').forEach((t,j) => t.classList.toggle('active', j===i));
+  document.querySelectorAll('.stab').forEach((t,j)=>t.classList.toggle('active',j===i));
   document.getElementById('settingsBody').innerHTML = tabs[i]();
   const toggle = document.getElementById('themeToggle');
   if (toggle) toggle.classList.toggle('pill-right', document.body.classList.contains('light'));
@@ -1618,61 +1212,6 @@ function setClockFormat(fmt) {
   });
   if (mainView==='calendar') renderCalendar();
 }
-
-const tabs = [
-  () => `
-    <div class="s-section">
-      <div class="s-section-title">Profile</div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Name</div></div><button class="s-btn">${esc(getUsername())}</button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Email</div></div><div class="s-row-val">—</div></div>
-    </div>
-    <div class="s-section">
-      <div class="s-section-title">Manage</div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Sign out</div></div><button class="s-btn" onclick="localStorage.removeItem('brias_token');window.location.href='/'">Sign out</button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Delete account</div></div><button class="s-btn danger">Delete</button></div>
-    </div>`,
-  () => `
-    <p class="sub-intro" style="font-family:var(--font-serif);font-size:14px;font-weight:300;font-style:italic;line-height:1.65;color:var(--text-muted);margin-bottom:20px;">Manage your BRIAS plan.</p>
-    <div class="sub-cards">
-      <div class="sub-card"><div class="sub-card-name">Standard</div><div class="sub-card-price">€— <span>/ month</span></div></div>
-      <div class="sub-card"><div class="sub-card-name">Supportive</div><div class="sub-card-price">€— <span>/ month</span></div></div>
-      <div class="sub-card"><div class="sub-card-name">Advanced</div><div class="sub-card-price">€— <span>/ month</span></div></div>
-    </div>`,
-  () => `
-    <div class="s-section">
-      <div class="s-section-title">Device</div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Notifications</div><div class="s-row-sub">Let BRIAS check in on you</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
-    </div>
-    <div class="s-section">
-      <div class="s-section-title">Data</div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Save planner data</div><div class="s-row-sub">Stored locally on your device</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
-    </div>`,
-  () => `
-    <div class="s-section">
-      <div class="s-section-title">Appearance</div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Theme</div><div class="s-row-sub">Choose what feels right for you</div></div>
-        <div class="theme-toggle" id="themeToggle">
-          <div class="theme-toggle-pill"></div>
-          <button class="theme-opt ${!document.body.classList.contains('light') ? 'active' : ''}" onclick="setTheme('dark')">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-            <span>Dark</span>
-          </button>
-          <button class="theme-opt ${document.body.classList.contains('light') ? 'active' : ''}" onclick="setTheme('light')">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-            <span>Light</span>
-          </button>
-        </div>
-      </div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Clock format</div><div class="s-row-sub">How time is shown in the calendar</div></div>
-        <div class="clock-toggle" id="clockToggle">
-          <div class="clock-toggle-pill"></div>
-          <button class="clock-opt ${clockFormat===24 ? 'active' : ''}" onclick="setClockFormat(24)">24h</button>
-          <button class="clock-opt ${clockFormat===12 ? 'active' : ''}" onclick="setClockFormat(12)">12h</button>
-        </div>
-      </div>
-    </div>`,
-  () => `<span class="about-logo">BRIAS</span><p style="font-family:var(--font-serif);font-size:14px;font-weight:300;font-style:italic;line-height:1.65;color:var(--text-muted);margin-top:16px;">Your personal space to plan, reflect, and grow.</p>`
-];
 
 // ── Init ──
 function renderAll(){
