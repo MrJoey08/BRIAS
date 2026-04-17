@@ -853,40 +853,43 @@ body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}
 </div>
 
 <!-- Drawer -->
-<div class="drawer" id="drawer" onclick="closeDrawerOutside(event)">
-  <div class="drawer-backdrop"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-backdrop" onclick="closeDrawer()"></div>
   <div class="drawer-panel">
-    <div class="drawer-top">
-      <div class="drawer-logo">BRIAS</div>
-    </div>
+    <div class="drawer-top"><div class="drawer-logo">BRIAS</div></div>
     <div class="drawer-nav">
       <div class="nav-section-label">Navigate</div>
-      <button class="nav-item" onclick="location.href='/chat'">
-        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.4)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+      <button class="nav-item" onclick="window.location.href='/chat'">
+        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
         <div class="nav-texts"><div class="nav-name">Chat</div><div class="nav-sub">Talk with BRIAS</div></div>
       </button>
-      <button class="nav-item" onclick="location.href='/diary'">
-        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.4)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+      <button class="nav-item" onclick="window.location.href='/diary'">
+        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
         <div class="nav-texts"><div class="nav-name">Diary</div><div class="nav-sub">Daily journal</div></div>
       </button>
-      <button class="nav-item active" onclick="location.href='/planner'">
-        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+      <button class="nav-item active">
+        <div class="nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
+            <defs><linearGradient id="pg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e8764a"/><stop offset="100%" stop-color="#d44a7a"/></linearGradient></defs>
+            <path d="M12 20h9" stroke="url(#pg1)"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" stroke="url(#pg1)"/>
+          </svg>
+        </div>
         <div class="nav-texts"><div class="nav-name">Planner</div><div class="nav-sub">Goals & calendar</div></div>
       </button>
-      <button class="nav-item" onclick="location.href='/mindspace'">
-        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.4)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+      <button class="nav-item">
+        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
         <div class="nav-texts"><div class="nav-name">Mindspace <span class="soon-badge">soon</span></div><div class="nav-sub">BRIAS's observations</div></div>
       </button>
     </div>
     <div class="drawer-divider"></div>
     <div class="drawer-footer">
-      <div class="footer-av"><span id="drawerInitial">?</span></div>
+      <div class="footer-av"><span id="drawerInitial">—</span></div>
       <div class="footer-info">
-        <div class="footer-name" id="drawerName">You</div>
-        <div class="footer-handle">brias.eu</div>
+        <div class="footer-name" id="drawerName">—</div>
+        <div class="footer-handle" id="drawerHandle">brias.eu</div>
       </div>
       <button class="drawer-settings-btn" onclick="openSettings();closeDrawer();" title="Settings">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.35)" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.3)" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
     </div>
   </div>
@@ -981,11 +984,9 @@ let planEditingCardId=null;
 })();
 
 // ── Drawer ──
-function toggleDrawer(){
-  const d=document.getElementById('drawer'),b=document.getElementById('menuBtn');
-  d.classList.toggle('open');b.classList.toggle('open');
-}
-function closeDrawerOutside(e){if(e.target===document.getElementById('drawer')||e.target.classList.contains('drawer-backdrop')){const d=document.getElementById('drawer'),b=document.getElementById('menuBtn');d.classList.remove('open');b.classList.remove('open');}}
+function toggleDrawer() { document.getElementById('drawer').classList.contains('open') ? closeDrawer() : openDrawer(); }
+function openDrawer() { document.getElementById('drawer').classList.add('open'); document.getElementById('menuBtn').classList.add('open'); }
+function closeDrawer() { document.getElementById('drawer').classList.remove('open'); document.getElementById('menuBtn').classList.remove('open'); }
 
 // ── View switching ──
 function setMainView(v){
@@ -1585,41 +1586,41 @@ function initMobileViewTabs(){
 }
 
 // ── Settings ──
-function openSettings(){document.getElementById('settingsOverlay').classList.add('open');switchTab(0);}
-function closeSettings(){document.getElementById('settingsOverlay').classList.remove('open');}
-function switchTab(i){
-  document.querySelectorAll('.stab').forEach((t,j)=>t.classList.toggle('active',j===i));
-  document.getElementById('settingsBody').innerHTML=tabs[i]();
-  const themeToggle=document.getElementById('themeToggle');
-  if(themeToggle)themeToggle.classList.toggle('pill-right',document.body.classList.contains('light'));
-  const clockToggle=document.getElementById('clockToggle');
-  if(clockToggle)clockToggle.classList.toggle('pill-right',clockFormat===12);
+function openSettings() { document.getElementById('settingsOverlay').classList.add('open'); switchTab(0); }
+function closeSettings() { document.getElementById('settingsOverlay').classList.remove('open'); }
+function switchTab(i) {
+  document.querySelectorAll('.stab').forEach((t,j) => t.classList.toggle('active', j===i));
+  document.getElementById('settingsBody').innerHTML = tabs[i]();
+  const toggle = document.getElementById('themeToggle');
+  if (toggle) toggle.classList.toggle('pill-right', document.body.classList.contains('light'));
+  const clockToggle = document.getElementById('clockToggle');
+  if (clockToggle) clockToggle.classList.toggle('pill-right', clockFormat===12);
 }
-function setTheme(mode){
-  if(mode==='light')document.body.classList.add('light');
+function setTheme(mode) {
+  if (mode==='light') document.body.classList.add('light');
   else document.body.classList.remove('light');
-  localStorage.setItem('brias_theme',mode);
-  const toggle=document.getElementById('themeToggle');
-  if(toggle)toggle.classList.toggle('pill-right',mode==='light');
-  document.querySelectorAll('.theme-opt').forEach(btn=>{
-    const isDark=btn.getAttribute('onclick').includes('dark');
-    btn.classList.toggle('active',mode==='dark'?isDark:!isDark);
+  localStorage.setItem('brias_theme', mode);
+  const toggle = document.getElementById('themeToggle');
+  if (toggle) toggle.classList.toggle('pill-right', mode==='light');
+  document.querySelectorAll('.theme-opt').forEach(btn => {
+    const isDark = btn.getAttribute('onclick').includes('dark');
+    btn.classList.toggle('active', mode==='dark' ? isDark : !isDark);
   });
 }
-function setClockFormat(fmt){
-  clockFormat=fmt;
-  localStorage.setItem('brias_clock_format',String(fmt));
-  const toggle=document.getElementById('clockToggle');
-  if(toggle)toggle.classList.toggle('pill-right',fmt===12);
-  document.querySelectorAll('.clock-opt').forEach(btn=>{
-    const is24=btn.getAttribute('onclick').includes('24');
-    btn.classList.toggle('active',fmt===24?is24:!is24);
+function setClockFormat(fmt) {
+  clockFormat = fmt;
+  localStorage.setItem('brias_clock_format', String(fmt));
+  const toggle = document.getElementById('clockToggle');
+  if (toggle) toggle.classList.toggle('pill-right', fmt===12);
+  document.querySelectorAll('.clock-opt').forEach(btn => {
+    const is24 = btn.getAttribute('onclick').includes('24');
+    btn.classList.toggle('active', fmt===24 ? is24 : !is24);
   });
-  if(mainView==='calendar')renderCalendar();
+  if (mainView==='calendar') renderCalendar();
 }
 
-const tabs=[
-  ()=>`
+const tabs = [
+  () => `
     <div class="s-section">
       <div class="s-section-title">Profile</div>
       <div class="s-row"><div class="s-row-left"><div class="s-row-label">Name</div></div><button class="s-btn">${esc(getUsername())}</button></div>
@@ -1630,13 +1631,14 @@ const tabs=[
       <div class="s-row"><div class="s-row-left"><div class="s-row-label">Sign out</div></div><button class="s-btn" onclick="localStorage.removeItem('brias_token');window.location.href='/'">Sign out</button></div>
       <div class="s-row"><div class="s-row-left"><div class="s-row-label">Delete account</div></div><button class="s-btn danger">Delete</button></div>
     </div>`,
-  ()=>`<p class="sub-intro" style="font-family:var(--font-serif);font-size:14px;font-weight:300;font-style:italic;line-height:1.65;color:var(--text-muted);margin-bottom:20px;">Manage your BRIAS plan.</p>
+  () => `
+    <p class="sub-intro" style="font-family:var(--font-serif);font-size:14px;font-weight:300;font-style:italic;line-height:1.65;color:var(--text-muted);margin-bottom:20px;">Manage your BRIAS plan.</p>
     <div class="sub-cards">
       <div class="sub-card"><div class="sub-card-name">Standard</div><div class="sub-card-price">€— <span>/ month</span></div></div>
       <div class="sub-card"><div class="sub-card-name">Supportive</div><div class="sub-card-price">€— <span>/ month</span></div></div>
       <div class="sub-card"><div class="sub-card-name">Advanced</div><div class="sub-card-price">€— <span>/ month</span></div></div>
     </div>`,
-  ()=>`
+  () => `
     <div class="s-section">
       <div class="s-section-title">Device</div>
       <div class="s-row"><div class="s-row-left"><div class="s-row-label">Notifications</div><div class="s-row-sub">Let BRIAS check in on you</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
@@ -1645,17 +1647,17 @@ const tabs=[
       <div class="s-section-title">Data</div>
       <div class="s-row"><div class="s-row-left"><div class="s-row-label">Save planner data</div><div class="s-row-sub">Stored locally on your device</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
     </div>`,
-  ()=>`
+  () => `
     <div class="s-section">
       <div class="s-section-title">Appearance</div>
       <div class="s-row"><div class="s-row-left"><div class="s-row-label">Theme</div><div class="s-row-sub">Choose what feels right for you</div></div>
         <div class="theme-toggle" id="themeToggle">
           <div class="theme-toggle-pill"></div>
-          <button class="theme-opt ${!document.body.classList.contains('light')?'active':''}" onclick="setTheme('dark')">
+          <button class="theme-opt ${!document.body.classList.contains('light') ? 'active' : ''}" onclick="setTheme('dark')">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
             <span>Dark</span>
           </button>
-          <button class="theme-opt ${document.body.classList.contains('light')?'active':''}" onclick="setTheme('light')">
+          <button class="theme-opt ${document.body.classList.contains('light') ? 'active' : ''}" onclick="setTheme('light')">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
             <span>Light</span>
           </button>
@@ -1664,12 +1666,12 @@ const tabs=[
       <div class="s-row"><div class="s-row-left"><div class="s-row-label">Clock format</div><div class="s-row-sub">How time is shown in the calendar</div></div>
         <div class="clock-toggle" id="clockToggle">
           <div class="clock-toggle-pill"></div>
-          <button class="clock-opt ${clockFormat===24?'active':''}" onclick="setClockFormat(24)">24h</button>
-          <button class="clock-opt ${clockFormat===12?'active':''}" onclick="setClockFormat(12)">12h</button>
+          <button class="clock-opt ${clockFormat===24 ? 'active' : ''}" onclick="setClockFormat(24)">24h</button>
+          <button class="clock-opt ${clockFormat===12 ? 'active' : ''}" onclick="setClockFormat(12)">12h</button>
         </div>
       </div>
     </div>`,
-  ()=>`<span class="about-logo">BRIAS</span><p style="font-family:var(--font-serif);font-size:14px;font-weight:300;font-style:italic;line-height:1.65;color:var(--text-muted);margin-top:16px;">Your personal space to plan, reflect, and grow.</p>`
+  () => `<span class="about-logo">BRIAS</span><p style="font-family:var(--font-serif);font-size:14px;font-weight:300;font-style:italic;line-height:1.65;color:var(--text-muted);margin-top:16px;">Your personal space to plan, reflect, and grow.</p>`
 ];
 
 // ── Init ──
@@ -1677,11 +1679,13 @@ function renderAll(){
   renderSidebar();
   renderContent();
   // Username
-  const uname=getUsername();
-  const di=document.getElementById('drawerInitial');
-  const dn=document.getElementById('drawerName');
-  if(di)di.textContent=uname[0]||'?';
-  if(dn)dn.textContent=uname;
+  const uname = getUsername();
+  const di = document.getElementById('drawerInitial');
+  const dn = document.getElementById('drawerName');
+  const dh = document.getElementById('drawerHandle');
+  if (di) di.textContent = uname.charAt(0).toUpperCase() || '?';
+  if (dn) dn.textContent = uname;
+  if (dh) dh.textContent = 'brias.eu';
   initMobileViewTabs();
 }
 
