@@ -72,7 +72,7 @@ body.light canvas{opacity:0;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 @keyframes contentSwap{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 @keyframes modalIn{from{opacity:0;transform:translateY(16px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(232,118,74,0);}50%{box-shadow:0 0 14px 2px rgba(232,118,74,.18);}}
+
 
 /* ── App shell ── */
 .app{position:relative;z-index:10;display:flex;flex-direction:column;height:100vh;animation:fadeIn .4s ease both;}
@@ -218,8 +218,7 @@ body.light .bn-btn{border-color:rgba(80,40,20,.12);}
 }
 body.light .bn-today{border-color:rgba(80,40,20,.12);}
 .bn-today:hover{border-color:rgba(232,118,74,.3);color:var(--orange);}
-@keyframes todayPulse{0%,100%{box-shadow:0 0 0 0 rgba(232,118,74,.0);}50%{box-shadow:0 0 12px 2px rgba(232,118,74,.22);}}
-.bn-today.is-today{border-color:rgba(232,118,74,.35);color:var(--orange);box-shadow:0 0 10px rgba(232,118,74,.18);animation:todayPulse 2.8s ease-in-out infinite;}
+.bn-today.is-today{border-color:rgba(232,118,74,.35);color:var(--orange);}
 .bn-new-btn{
   display:flex;align-items:center;gap:6px;
   padding:8px 18px;border-radius:13px;border:none;
@@ -364,7 +363,7 @@ body.light .history-item{background:rgba(80,40,20,.04);}
   transition:all .15s;
 }
 .cal-today-btn:hover{border-color:rgba(232,118,74,.3);color:var(--orange);}
-.cal-today-btn.is-cur-week{border-color:rgba(232,118,74,.3);color:var(--orange);animation:pulse 2.8s ease-in-out infinite;}
+.cal-today-btn.is-cur-week{border-color:rgba(232,118,74,.4);color:var(--orange);background:rgba(232,118,74,.06);}
 
 /* Cal legend */
 .cal-legend{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
@@ -376,16 +375,18 @@ body.light .history-item{background:rgba(80,40,20,.04);}
 .legend-dot.red{background:var(--cal-red);}
 
 /* Calendar grid */
-.cal-grid-wrap{flex:1;overflow:auto;padding:0 16px 20px;}
+.cal-grid-wrap{flex:1;overflow:auto;padding:0 16px 20px;background:rgba(255,255,255,.012);}
+body.light .cal-grid-wrap{background:rgba(80,40,20,.018);}
 .cal-grid{display:grid;grid-template-columns:52px repeat(7,1fr);min-width:600px;}
 .cal-day-header{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:12px 4px 10px;position:sticky;top:0;z-index:5;
-  background:var(--bg);border-bottom:1px solid var(--border);
+  background:rgba(19,16,19,.98);border-bottom:1px solid rgba(255,255,255,.1);
   transition:background .45s ease;
 }
-body.light .cal-day-header{background:var(--bg);}
-.cal-time-col{border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5;background:var(--bg);}
+body.light .cal-day-header{background:rgba(240,230,220,.98);border-bottom-color:rgba(80,40,20,.14);}
+.cal-time-col{border-bottom:1px solid rgba(255,255,255,.1);position:sticky;top:0;z-index:5;background:rgba(19,16,19,.98);}
+body.light .cal-time-col{background:rgba(240,230,220,.98);border-bottom-color:rgba(80,40,20,.14);}
 .cal-day-name{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--text-dim);font-weight:500;margin-bottom:4px;}
 .cal-day-num{
   width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
@@ -401,21 +402,23 @@ body.light .cal-day-header{background:var(--bg);}
 /* All-day row */
 .cal-allday-row{display:contents;}
 .cal-allday-cell{
-  border-bottom:1px solid var(--border);border-right:1px solid var(--border);
+  border-bottom:1px solid rgba(255,255,255,.08);border-right:1px solid rgba(255,255,255,.08);
   padding:6px 4px;min-height:32px;
 }
-.cal-allday-label{padding:6px 8px 6px 4px;font-size:10px;color:var(--text-dim);border-bottom:1px solid var(--border);display:flex;align-items:center;}
+.cal-allday-label{padding:6px 8px 6px 4px;font-size:10px;color:var(--text-dim);border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;}
 
 /* Time slots */
-.cal-time-slot{font-size:10px;color:var(--text-dim);text-align:right;padding:0 8px 0 0;height:52px;display:flex;align-items:flex-start;justify-content:flex-end;padding-top:4px;border-right:1px solid var(--border);}
+.cal-time-slot{font-size:10px;color:var(--text-dim);text-align:right;padding:0 8px 0 0;height:56px;display:flex;align-items:flex-start;justify-content:flex-end;padding-top:5px;border-right:1px solid rgba(255,255,255,.08);}
+body.light .cal-time-slot{border-right-color:rgba(80,40,20,.1);}
 .cal-cell{
-  border-right:1px solid var(--border);border-bottom:1px solid rgba(255,255,255,.03);
-  height:52px;position:relative;cursor:pointer;transition:background .1s;
+  border-right:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);
+  height:56px;position:relative;cursor:pointer;transition:background .1s;
 }
-body.light .cal-cell{border-bottom-color:rgba(80,40,20,.05);}
-.cal-cell:hover{background:rgba(255,255,255,.025);}
-body.light .cal-cell:hover{background:rgba(80,40,20,.03);}
-.cal-cell.today-col{background:rgba(232,118,74,.025);}
+body.light .cal-cell{border-right-color:rgba(80,40,20,.08);border-bottom-color:rgba(80,40,20,.08);}
+.cal-cell:hover{background:rgba(255,255,255,.04);}
+body.light .cal-cell:hover{background:rgba(80,40,20,.04);}
+.cal-cell.today-col{background:rgba(232,118,74,.04);}
+body.light .cal-cell.today-col{background:rgba(232,118,74,.06);}
 
 /* Events in cells */
 .cal-event{
@@ -1432,6 +1435,107 @@ function renderCalendar(){
   if(isMobile&&mobileView!=='calendar')return;
   if(!isMobile&&mainView!=='calendar')return;
 
+  if(isMobile){
+    renderMobileCalendar(scroll);
+  } else {
+    renderWeekCalendar(scroll);
+  }
+}
+
+// ── Mobile: 3-day view (yesterday, today, tomorrow) ──
+function renderMobileCalendar(scroll){
+  const todayStr=ds(TODAY);
+
+  // currentDay tracks the "center" day on mobile
+  if(!window.mobileCalCenter) window.mobileCalCenter=new Date(TODAY);
+  const center=window.mobileCalCenter;
+  const days=[addDays(center,-1),new Date(center),addDays(center,1)];
+  const rangeStart=ds(days[0]),rangeEnd=ds(days[2]);
+
+  const isCenterToday=ds(center)===todayStr;
+
+  // Build label
+  const mo=center.getMonth();const yr=center.getFullYear();
+  const label=`${MONTHS[mo]} ${yr}`;
+
+  // Events in range
+  const rangeEvents=events.filter(e=>{const d=ds(new Date(e.date));return d>=rangeStart&&d<=rangeEnd;});
+
+  // Hours
+  const hours=[];for(let h=0;h<24;h++)hours.push(h);
+
+  // Grid: 48px time col + 3 day cols
+  let headerHtml=`<div class="cal-time-col"></div>`;
+  days.forEach(d=>{
+    const dStr=ds(d);
+    const isT=dStr===todayStr;
+    const hasEvs=rangeEvents.some(e=>ds(new Date(e.date))===dStr);
+    headerHtml+=`<div class="cal-day-header">
+      <div class="cal-day-name">${DAYS[d.getDay()]}</div>
+      <div class="cal-day-num${isT?' today':''}${hasEvs&&!isT?' has-dot':''}">${d.getDate()}</div>
+    </div>`;
+  });
+
+  let slotsHtml='';
+  hours.forEach(h=>{
+    const hStr=clockFormat===12?(h===0?'12 AM':h<12?`${h} AM`:h===12?'12 PM':`${h-12} PM`):`${String(h).padStart(2,'0')}:00`;
+    slotsHtml+=`<div class="cal-time-slot">${hStr}</div>`;
+    days.forEach(d=>{
+      const dStr=ds(d);
+      const isT=dStr===todayStr;
+      const cellDt=new Date(d);cellDt.setHours(h,0,0,0);
+      const isoStr=cellDt.toISOString().slice(0,16);
+      const cellEvs=rangeEvents.filter(e=>{const ed=new Date(e.date);return ds(ed)===dStr&&ed.getHours()===h;});
+      let evsHtml=cellEvs.map(e=>`<div class="cal-event ${e.color||'blue'}" onclick="showEventPopup('${e.id}',event)">
+        ${e.briasAdded?`<svg class="brias-ev-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`:''}
+        ${esc(e.title)}
+      </div>`).join('');
+      slotsHtml+=`<div class="cal-cell${isT?' today-col':''}" onclick="openEventModal('${isoStr}')">
+        ${evsHtml}
+        ${!cellEvs.length?`<div class="cal-cell-add">+</div>`:''}
+      </div>`;
+    });
+  });
+
+  const calHtml=`<div class="calendar-view">
+    <div class="cal-header">
+      <div class="cal-week-nav">
+        <button class="cal-nav-btn" onclick="mobileDayNav(-1)">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="cal-week-label" style="min-width:120px;">${label}</div>
+        <button class="cal-nav-btn" onclick="mobileDayNav(1)">
+          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+      <button class="cal-today-btn${isCenterToday?' is-cur-week':''}" onclick="window.mobileCalCenter=new Date(TODAY);renderCalendar()">Today</button>
+    </div>
+    <div class="cal-grid-wrap" style="padding:0 0 100px;">
+      <div class="cal-grid" style="grid-template-columns:48px repeat(3,1fr);min-width:0;">
+        ${headerHtml}${slotsHtml}
+      </div>
+    </div>
+  </div>`;
+
+  scroll.innerHTML=calHtml;
+  // Scroll to current hour centered
+  setTimeout(()=>{
+    const w=scroll.querySelector('.cal-grid-wrap');
+    if(!w)return;
+    const slotH=56;
+    const curH=isCenterToday?TODAY.getHours():8;
+    w.scrollTop=Math.max(0,curH*slotH-(w.clientHeight/2)+slotH/2);
+  },0);
+}
+
+function mobileDayNav(dir){
+  if(!window.mobileCalCenter) window.mobileCalCenter=new Date(TODAY);
+  window.mobileCalCenter=addDays(window.mobileCalCenter,dir);
+  renderCalendar();
+}
+
+// ── Desktop: week view ──
+function renderWeekCalendar(scroll){
   // Days in week
   const days=[];for(let i=0;i<7;i++)days.push(addDays(currentWeek,i));
   const todayStr=ds(TODAY);
@@ -1473,7 +1577,6 @@ function renderCalendar(){
       const isT=dStr===todayStr;
       const cellDt=new Date(d);cellDt.setHours(h,0,0,0);
       const isoStr=cellDt.toISOString().slice(0,16);
-      // Events that start in this hour
       const cellEvs=weekEvents.filter(e=>{
         const ed=new Date(e.date);
         return ds(ed)===dStr&&ed.getHours()===h;
@@ -1519,29 +1622,13 @@ function renderCalendar(){
   </div>`;
 
   scroll.innerHTML=calHtml;
-  // Scroll to current hour (centered in viewport)
+  // Scroll to current hour centered
   setTimeout(()=>{
     const w=scroll.querySelector('.cal-grid-wrap');
     if(!w)return;
-    const slotH=52;
+    const slotH=56;
     const curH=isCurWeek?TODAY.getHours():8;
-    const targetTop=curH*slotH;
-    const visible=w.clientHeight;
-    w.scrollTop=Math.max(0,targetTop-(visible/2)+slotH/2);
-    // On mobile: horizontally center today column
-    if(isMobile&&isCurWeek){
-      const todayIdx=days.findIndex(d=>ds(d)===todayStr);
-      if(todayIdx>=0){
-        const grid=w.querySelector('.cal-grid');
-        if(grid){
-          const timeColW=48;
-          const totalW=grid.scrollWidth-timeColW;
-          const colW=totalW/7;
-          const colCenter=timeColW+todayIdx*colW+colW/2;
-          w.scrollLeft=Math.max(0,colCenter-w.clientWidth/2);
-        }
-      }
-    }
+    w.scrollTop=Math.max(0,curH*slotH-(w.clientHeight/2)+slotH/2);
   },0);
 }
 
