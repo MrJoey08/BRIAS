@@ -2398,7 +2398,7 @@ function renderWeekCalendar(scroll){
           <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
       </div>
-      <button class="cal-today-btn${isCurWeek?' is-cur-week':''}" onclick="currentWeek=startOfWeek(TODAY);renderCalendar()">Today</button>
+      <button class="cal-today-btn${isCurWeek?' is-cur-week':''}" style="display:none;" onclick="currentWeek=startOfWeek(TODAY);renderCalendar()">Today</button>
       <div class="cal-legend">
         <div class="legend-item"><div class="legend-dot blue"></div>Your events</div>
         <div class="legend-item"><div class="legend-dot green"></div>Plan steps</div>
