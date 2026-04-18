@@ -229,15 +229,13 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
 .bn-new-btn:hover{opacity:.88;transform:translateY(-1px);}
 .bn-new-btn:active{transform:scale(.97);}
 .bn-cal-btn{
-  display:flex;align-items:center;gap:7px;
-  padding:7px 13px;border-radius:13px;border:1px solid var(--border);
-  background:transparent;cursor:pointer;font-family:var(--font);
-  font-size:12px;font-weight:300;color:var(--text-muted);
-  transition:border-color .25s,color .25s,background .15s;flex-shrink:0;
+  width:38px;height:38px;border-radius:12px;border:1px solid var(--border);
+  background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--text-muted);transition:border-color .25s,color .25s,background .15s;flex-shrink:0;
 }
 body.light .bn-cal-btn{border-color:rgba(80,40,20,.12);}
 .bn-cal-btn:hover{border-color:rgba(255,255,255,.14);color:var(--text-sub);}
-.bn-cal-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;flex-shrink:0;}
+.bn-cal-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;}
 .bn-cal-btn.active{border-color:rgba(232,118,74,.35);color:var(--orange);background:rgba(232,118,74,.05);}
 
 .content-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
@@ -399,9 +397,9 @@ body.light .history-item{background:rgba(80,40,20,.04);}
 .legend-dot.red{background:var(--cal-red);}
 
 /* Calendar grid */
-.cal-grid-wrap{flex:1;overflow:auto;padding:0 0 20px;background:rgba(255,255,255,.012);}
+.cal-grid-wrap{flex:1;overflow:auto;padding:0 0 20px;background:rgba(255,255,255,.012);position:relative;}
 body.light .cal-grid-wrap{background:rgba(80,40,20,.018);}
-.cal-grid{display:grid;grid-template-columns:52px repeat(7,1fr);min-width:600px;}
+.cal-grid{display:grid;grid-template-columns:52px repeat(7,1fr);min-width:600px;position:relative;}
 .cal-day-header{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:14px 4px 14px;position:sticky;top:0;z-index:10;
@@ -451,20 +449,30 @@ body.light .cal-cell:hover{background:rgba(80,40,20,.04);}
 .cal-cell.today-col{background:rgba(232,118,74,.04);}
 body.light .cal-cell.today-col{background:rgba(232,118,74,.06);}
 
-/* Events in cells */
-.cal-event{
-  position:absolute;left:3px;right:3px;top:3px;
-  border-radius:7px;padding:3px 7px;
-  font-size:11px;font-weight:400;line-height:1.35;
-  cursor:pointer;z-index:2;transition:opacity .12s,transform .1s;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  display:flex;align-items:center;gap:5px;
+/* Events overlay — positioned absolutely over the grid */
+.cal-events-overlay{
+  position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;
 }
-.cal-event:hover{opacity:.8;transform:translateY(-1px);}
-.cal-event.blue{background:var(--cal-blue-bg);border-left:2px solid var(--cal-blue);color:rgba(74,140,232,.95);}
-.cal-event.green{background:var(--cal-green-bg);border-left:2px solid var(--cal-green);color:rgba(74,192,128,.95);}
-.cal-event.yellow{background:var(--cal-yellow-bg);border-left:2px solid var(--cal-yellow);color:rgba(232,190,74,.95);}
-.cal-event.red{background:var(--cal-red-bg);border-left:2px solid var(--cal-red);color:rgba(232,74,74,.95);}
+.cal-col-overlay{
+  position:absolute;top:0;bottom:0;pointer-events:none;
+}
+.cal-event{
+  position:absolute;left:4px;right:4px;
+  border-radius:8px;padding:4px 8px;
+  font-size:11px;font-weight:400;line-height:1.4;
+  cursor:pointer;z-index:2;
+  overflow:hidden;pointer-events:all;
+  transition:opacity .12s,filter .12s;
+  display:flex;flex-direction:column;justify-content:flex-start;gap:1px;
+  border-left:3px solid;
+}
+.cal-event:hover{opacity:.85;filter:brightness(1.1);}
+.cal-event-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:400;}
+.cal-event-time{font-size:10px;opacity:.7;white-space:nowrap;}
+.cal-event.blue{background:var(--cal-blue-bg);border-left-color:var(--cal-blue);color:rgba(74,140,232,.95);}
+.cal-event.green{background:var(--cal-green-bg);border-left-color:var(--cal-green);color:rgba(74,192,128,.95);}
+.cal-event.yellow{background:var(--cal-yellow-bg);border-left-color:var(--cal-yellow);color:rgba(232,190,74,.95);}
+.cal-event.red{background:var(--cal-red-bg);border-left-color:var(--cal-red);color:rgba(232,74,74,.95);}
 .brias-ev-icon{width:10px;height:10px;flex-shrink:0;opacity:.7;}
 
 /* Add event btn on cell hover */
@@ -521,7 +529,124 @@ textarea.form-input{resize:none;line-height:1.7;font-family:var(--font-serif);}
 }
 .form-select:focus{border-color:var(--input-focus);}
 
-/* Type selector */
+/* Custom date/time picker */
+.dt-row{display:flex;gap:8px;}
+.dt-btn{
+  flex:1;display:flex;align-items:center;gap:8px;
+  background:var(--input-bg);border:1px solid var(--input-border);
+  border-radius:11px;padding:10px 14px;
+  color:var(--text-sub);font-family:var(--font);font-size:13px;font-weight:300;
+  cursor:pointer;transition:border-color .2s;text-align:left;
+}
+.dt-btn:hover{border-color:rgba(255,255,255,.14);}
+.dt-btn.active{border-color:var(--input-focus);}
+.dt-btn svg{flex-shrink:0;stroke:var(--text-dim);}
+.dt-picker{
+  margin-top:8px;background:var(--input-bg);border:1px solid var(--border2);
+  border-radius:13px;padding:14px;animation:fadeUp .15s ease;
+}
+.dt-picker-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.dt-picker-label{font-family:var(--font-display);font-size:15px;font-style:italic;font-weight:500;color:var(--text-sub);}
+.dt-picker-arr{
+  width:28px;height:28px;border-radius:8px;background:transparent;border:none;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-muted);
+  transition:background .12s,color .12s;
+}
+.dt-picker-arr:hover{background:var(--surface);color:var(--text-sub);}
+.dt-picker-arr svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;}
+.dt-picker-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.dp-lbl{font-size:9px;color:var(--text-dim);text-align:center;padding-bottom:6px;letter-spacing:.06em;text-transform:uppercase;}
+.dp-d{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:300;color:var(--text-muted);border-radius:7px;
+  cursor:pointer;transition:background .1s,color .1s;
+}
+.dp-d:hover:not(.e){background:var(--surface);color:var(--text-sub);}
+.dp-d.e{cursor:default;color:rgba(228,224,227,.08);}
+.dp-d.tod{color:var(--orange);font-weight:500;}
+.dp-d.sel{background:var(--grad)!important;color:#fff!important;font-weight:500;}
+/* Time picker */
+.time-picker-inner{display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:14px;}
+.time-col{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.time-arr{
+  width:32px;height:28px;border-radius:8px;background:transparent;border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-muted);
+  transition:background .12s,color .12s;
+}
+.time-arr:hover{background:var(--surface);color:var(--text-sub);}
+.time-arr svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;}
+.time-val{
+  font-family:var(--font-display);font-size:28px;font-weight:400;font-style:italic;
+  color:var(--text-sub);min-width:44px;text-align:center;line-height:1;
+}
+.time-sep{font-family:var(--font-display);font-size:28px;font-weight:300;color:var(--text-dim);line-height:1;margin-bottom:2px;}
+.time-presets{display:flex;flex-wrap:wrap;gap:5px;}
+.time-preset{
+  padding:5px 9px;border-radius:8px;border:1px solid var(--border);
+  background:transparent;cursor:pointer;font-family:var(--font);font-size:11px;
+  font-weight:300;color:var(--text-muted);transition:background .12s,border-color .15s,color .12s;
+}
+.time-preset:hover{background:var(--surface);color:var(--text-sub);border-color:var(--border2);}
+.time-preset.active{background:rgba(232,118,74,.08);border-color:rgba(232,118,74,.3);color:var(--orange);}
+/* Duration picker */
+.dur-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.dur-adj{
+  width:34px;height:34px;border-radius:10px;border:1px solid var(--border);
+  background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--text-muted);font-size:20px;font-weight:200;line-height:1;
+  transition:background .12s,border-color .15s,color .12s;flex-shrink:0;
+  font-family:var(--font);
+}
+.dur-adj:hover{background:var(--surface);color:var(--orange);border-color:rgba(232,118,74,.3);}
+.dur-val{
+  flex:1;text-align:center;
+  font-family:var(--font-display);font-size:22px;
+  font-style:italic;font-weight:400;
+  background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.dur-presets{display:flex;gap:5px;}
+.dur-preset{
+  flex:1;padding:6px 4px;border-radius:9px;border:1px solid var(--border);
+  background:transparent;cursor:pointer;font-family:var(--font);font-size:11px;
+  font-weight:300;color:var(--text-muted);text-align:center;
+  transition:background .12s,border-color .15s,color .12s;
+}
+.dur-preset:hover{background:var(--surface);color:var(--text-sub);}
+.dur-preset.active{background:rgba(232,118,74,.08);border-color:rgba(232,118,74,.3);color:var(--orange);}
+
+/* Custom card link picker in modal */
+.card-link-picker{position:relative;}
+.card-link-trigger{
+  width:100%;background:var(--input-bg);border:1px solid var(--input-border);
+  border-radius:11px;padding:10px 14px;
+  color:var(--text-muted);font-family:var(--font);font-size:13px;font-weight:300;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  cursor:pointer;transition:border-color .2s;text-align:left;
+}
+.card-link-trigger:hover{border-color:rgba(255,255,255,.14);}
+.card-link-trigger.has-value{color:var(--text-sub);}
+.card-link-trigger.open{border-color:var(--input-focus);}
+.card-link-trigger svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0;transition:transform .2s;}
+.card-link-trigger.open svg{transform:rotate(180deg);}
+.card-link-dropdown{
+  position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:10;
+  background:var(--sidebar);border:1px solid var(--border2);border-radius:12px;
+  padding:6px;box-shadow:0 8px 32px rgba(0,0,0,.35);
+  display:none;animation:fadeUp .15s ease;max-height:200px;overflow-y:auto;
+}
+.card-link-dropdown.open{display:block;}
+.card-link-option{
+  display:flex;align-items:center;gap:9px;
+  padding:9px 11px;border-radius:8px;cursor:pointer;
+  transition:background .1s;width:100%;text-align:left;
+}
+.card-link-option:hover{background:var(--surface);}
+.card-link-option.selected{background:rgba(232,118,74,.07);}
+.card-link-option-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--cal-blue);}
+.card-link-option.none .card-link-option-dot{background:var(--text-dim);}
+.card-link-option-name{font-size:12.5px;font-weight:300;color:var(--text-sub);flex:1;}
+.card-link-option.selected .card-link-option-name{color:var(--orange);}
+body.light .card-link-dropdown{background:var(--sidebar);}
 .type-selector{display:flex;gap:8px;}
 .type-opt{
   flex:1;padding:9px;border-radius:11px;border:1px solid var(--border);
@@ -961,9 +1086,8 @@ body.light .sheet-d.e{color:rgba(46,31,24,.1);}
   </div>
   <div class="bn-spacer"></div>
   <!-- Calendar sheet btn (only shown in calendar view) -->
-  <button class="bn-cal-btn" id="bnCalSheet" onclick="toggleMobileCalSheet()" style="display:none;">
+  <button class="bn-cal-btn" id="bnCalSheet" onclick="toggleMobileCalSheet()" style="display:none;margin-right:8px;">
     <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    Jump to
   </button>
   <!-- New btn with BRIAS gradient -->
   <button class="bn-new-btn" id="bnNew" onclick="mobileAdd()">
@@ -1024,17 +1148,79 @@ body.light .sheet-d.e{color:rgba(46,31,24,.1);}
       </div>
       <div class="form-group">
         <label class="form-label">Date & time</label>
-        <input type="datetime-local" class="form-input" id="evDateInput">
+        <div class="dt-row">
+          <button type="button" class="dt-btn" id="dtDateBtn" onclick="openDatePicker()">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span id="dtDateLabel">Today</span>
+          </button>
+          <button type="button" class="dt-btn" id="dtTimeBtn" onclick="openTimePicker()">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span id="dtTimeLabel">10:00</span>
+          </button>
+        </div>
+        <!-- Hidden date picker -->
+        <div class="dt-picker" id="datePicker" style="display:none;">
+          <div class="dt-picker-header">
+            <button type="button" class="dt-picker-arr" onclick="dpNav(-1)"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <span class="dt-picker-label" id="dpLabel"></span>
+            <button type="button" class="dt-picker-arr" onclick="dpNav(1)"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+          </div>
+          <div class="dt-picker-grid" id="dpGrid"></div>
+        </div>
+        <!-- Time picker -->
+        <div class="dt-picker" id="timePicker" style="display:none;">
+          <div class="time-picker-inner">
+            <div class="time-col">
+              <button type="button" class="time-arr" onclick="adjustHour(1)"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg></button>
+              <span class="time-val" id="tpHour">10</span>
+              <button type="button" class="time-arr" onclick="adjustHour(-1)"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>
+            </div>
+            <div class="time-sep">:</div>
+            <div class="time-col">
+              <button type="button" class="time-arr" onclick="adjustMin(1)"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg></button>
+              <span class="time-val" id="tpMin">00</span>
+              <button type="button" class="time-arr" onclick="adjustMin(-1)"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>
+            </div>
+          </div>
+          <div class="time-presets">
+            <button type="button" class="time-preset" onclick="setTimePreset(8,0)">8:00</button>
+            <button type="button" class="time-preset" onclick="setTimePreset(9,0)">9:00</button>
+            <button type="button" class="time-preset" onclick="setTimePreset(10,0)">10:00</button>
+            <button type="button" class="time-preset" onclick="setTimePreset(12,0)">12:00</button>
+            <button type="button" class="time-preset" onclick="setTimePreset(14,0)">14:00</button>
+            <button type="button" class="time-preset" onclick="setTimePreset(17,0)">17:00</button>
+            <button type="button" class="time-preset" onclick="setTimePreset(19,0)">19:00</button>
+            <button type="button" class="time-preset" onclick="setTimePreset(21,0)">21:00</button>
+          </div>
+        </div>
+        <input type="hidden" id="evDateInput">
       </div>
       <div class="form-group">
-        <label class="form-label">Duration (minutes)</label>
-        <input type="number" class="form-input" id="evDurInput" value="60" min="15" step="15">
+        <label class="form-label">Duration</label>
+        <div class="dur-row">
+          <button type="button" class="dur-adj" onclick="adjustDur(-1)">−</button>
+          <span class="dur-val" id="durDisplay">60 min</span>
+          <button type="button" class="dur-adj" onclick="adjustDur(1)">+</button>
+        </div>
+        <div class="dur-presets">
+          <button type="button" class="dur-preset" onclick="setDur(15)">15m</button>
+          <button type="button" class="dur-preset" onclick="setDur(30)">30m</button>
+          <button type="button" class="dur-preset active" onclick="setDur(60)">1h</button>
+          <button type="button" class="dur-preset" onclick="setDur(90)">1h30</button>
+          <button type="button" class="dur-preset" onclick="setDur(120)">2h</button>
+        </div>
+        <input type="hidden" id="evDurInput" value="60">
       </div>
       <div class="form-group">
-        <label class="form-label">Link to card (optional)</label>
-        <select class="form-select" id="evCardLink">
-          <option value="">No card linked</option>
-        </select>
+        <label class="form-label">Link to card</label>
+        <div class="card-link-picker">
+          <button type="button" class="card-link-trigger" id="cardLinkTrigger" onclick="toggleCardLinkDropdown()">
+            <span id="cardLinkLabel">No card linked</span>
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="card-link-dropdown" id="cardLinkDropdown"></div>
+        </div>
+        <input type="hidden" id="evCardLink" value="">
       </div>
       <div class="form-group">
         <label class="form-label">Notes</label>
@@ -1585,10 +1771,10 @@ function openEventModal(date,cardId){
   document.getElementById('evTitleInput').value='';
   document.getElementById('evNotesInput').value='';
   document.getElementById('evDurInput').value='60';
-  // Set date
+  // Init pickers
   const dt=date?new Date(date):new Date();
   if(!date){dt.setHours(10,0,0,0);}
-  document.getElementById('evDateInput').value=dt.toISOString().slice(0,16);
+  initPickers(dt.toISOString().slice(0,16));
   // Card link options
   populateCardSelect(cardId||'');
   document.getElementById('eventModal').classList.add('open');
@@ -1601,12 +1787,218 @@ function selectEvColor(c){
   document.querySelectorAll('.color-opt').forEach(el=>el.classList.remove('selected'));
   document.querySelector(`.color-opt.${c}`).classList.add('selected');
 }
-function populateCardSelect(selectedCardId){
-  const sel=document.getElementById('evCardLink');
-  const active=cards.filter(c=>c.status!=='archived');
-  sel.innerHTML=`<option value="">No card linked</option>`+active.map(c=>`<option value="${c.id}"${c.id===selectedCardId?' selected':''}>${esc(c.title)}</option>`).join('');
+// ── Custom date/time/duration pickers ──
+let dpMonth=new Date(TODAY.getFullYear(),TODAY.getMonth(),1);
+let pickerDate=new Date(TODAY);
+let pickerHour=10,pickerMin=0;
+let pickerDur=60;
+let activePicker=null; // 'date' | 'time' | null
+
+function openDatePicker(){
+  if(activePicker==='date'){closePickers();return;}
+  closePickers();
+  activePicker='date';
+  dpMonth=new Date(pickerDate.getFullYear(),pickerDate.getMonth(),1);
+  document.getElementById('datePicker').style.display='block';
+  document.getElementById('timePicker').style.display='none';
+  document.getElementById('dtDateBtn').classList.add('active');
+  renderDp();
 }
+function openTimePicker(){
+  if(activePicker==='time'){closePickers();return;}
+  closePickers();
+  activePicker='time';
+  document.getElementById('timePicker').style.display='block';
+  document.getElementById('datePicker').style.display='none';
+  document.getElementById('dtTimeBtn').classList.add('active');
+  renderTp();
+}
+function closePickers(){
+  activePicker=null;
+  document.getElementById('datePicker').style.display='none';
+  document.getElementById('timePicker').style.display='none';
+  document.getElementById('dtDateBtn').classList.remove('active');
+  document.getElementById('dtTimeBtn').classList.remove('active');
+  syncHiddenDateTime();
+}
+function dpNav(dir){
+  dpMonth=new Date(dpMonth.getFullYear(),dpMonth.getMonth()+dir,1);
+  renderDp();
+}
+function renderDp(){
+  const lbl=document.getElementById('dpLabel');
+  const grid=document.getElementById('dpGrid');
+  if(!lbl||!grid)return;
+  lbl.textContent=`${MONTHS[dpMonth.getMonth()]} ${dpMonth.getFullYear()}`;
+  const days=['M','T','W','T','F','S','S'];
+  let h=days.map(d=>`<div class="dp-lbl">${d}</div>`).join('');
+  const first=new Date(dpMonth.getFullYear(),dpMonth.getMonth(),1);
+  const dow=(first.getDay()+6)%7;
+  for(let i=0;i<dow;i++)h+=`<div class="dp-d e"></div>`;
+  const dim=new Date(dpMonth.getFullYear(),dpMonth.getMonth()+1,0).getDate();
+  for(let d=1;d<=dim;d++){
+    const dd=new Date(dpMonth.getFullYear(),dpMonth.getMonth(),d);
+    const isT=ds(dd)===ds(TODAY);
+    const isSel=ds(dd)===ds(pickerDate);
+    let cls='dp-d';
+    if(isT)cls+=' tod';
+    if(isSel)cls+=' sel';
+    h+=`<div class="${cls}" onclick="pickDate('${ds(dd)}')">${d}</div>`;
+  }
+  grid.innerHTML=h;
+}
+function pickDate(dstr){
+  pickerDate=new Date(dstr);
+  updateDateLabel();
+  closePickers();
+}
+function updateDateLabel(){
+  const lbl=document.getElementById('dtDateLabel');
+  if(!lbl)return;
+  const todStr=ds(TODAY);
+  const tmrStr=ds(addDays(TODAY,1));
+  const dStr=ds(pickerDate);
+  if(dStr===todStr)lbl.textContent='Today';
+  else if(dStr===tmrStr)lbl.textContent='Tomorrow';
+  else lbl.textContent=`${pickerDate.getDate()} ${MONTHS[pickerDate.getMonth()].slice(0,3)} ${pickerDate.getFullYear()}`;
+}
+function renderTp(){
+  document.getElementById('tpHour').textContent=String(pickerHour).padStart(2,'0');
+  document.getElementById('tpMin').textContent=String(pickerMin).padStart(2,'0');
+  updateTimeLabel();
+  // Highlight matching preset
+  document.querySelectorAll('.time-preset').forEach(b=>{
+    const [h,m]=(b.getAttribute('onclick').match(/\d+/g)||[]).map(Number);
+    b.classList.toggle('active',h===pickerHour&&m===pickerMin);
+  });
+}
+function adjustHour(dir){pickerHour=(pickerHour+dir+24)%24;renderTp();}
+function adjustMin(dir){pickerMin=(pickerMin+dir+60)%60;renderTp();}
+function setTimePreset(h,m){pickerHour=h;pickerMin=m;renderTp();}
+function updateTimeLabel(){
+  const lbl=document.getElementById('dtTimeLabel');
+  if(!lbl)return;
+  if(clockFormat===12){
+    const ampm=pickerHour>=12?'PM':'AM';
+    const h12=pickerHour%12||12;
+    lbl.textContent=`${h12}:${String(pickerMin).padStart(2,'0')} ${ampm}`;
+  } else {
+    lbl.textContent=`${String(pickerHour).padStart(2,'0')}:${String(pickerMin).padStart(2,'0')}`;
+  }
+}
+function syncHiddenDateTime(){
+  const hidden=document.getElementById('evDateInput');
+  if(!hidden)return;
+  const d=pickerDate;
+  const str=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T${String(pickerHour).padStart(2,'0')}:${String(pickerMin).padStart(2,'0')}`;
+  hidden.value=str;
+}
+// Duration
+function adjustDur(dir){
+  pickerDur=Math.max(15,pickerDur+(dir*15));
+  updateDurDisplay();
+}
+function setDur(min){
+  pickerDur=min;
+  updateDurDisplay();
+}
+function updateDurDisplay(){
+  const disp=document.getElementById('durDisplay');
+  const hidden=document.getElementById('evDurInput');
+  if(disp){
+    if(pickerDur<60)disp.textContent=`${pickerDur} min`;
+    else if(pickerDur%60===0)disp.textContent=`${pickerDur/60}h`;
+    else disp.textContent=`${Math.floor(pickerDur/60)}h ${pickerDur%60}m`;
+  }
+  if(hidden)hidden.value=pickerDur;
+  // Update preset active state
+  document.querySelectorAll('.dur-preset').forEach(b=>{
+    const min=parseInt(b.getAttribute('onclick').match(/\d+/)[0]);
+    b.classList.toggle('active',min===pickerDur);
+  });
+}
+function initPickers(dateStr){
+  // Parse existing datetime string or default
+  if(dateStr){
+    const d=new Date(dateStr);
+    pickerDate=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+    pickerHour=d.getHours();pickerMin=d.getMinutes();
+  } else {
+    pickerDate=new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate());
+    pickerHour=10;pickerMin=0;
+  }
+  closePickers();
+  updateDateLabel();
+  updateTimeLabel();
+  syncHiddenDateTime();
+  pickerDur=parseInt(document.getElementById('evDurInput').value)||60;
+  updateDurDisplay();
+}
+
+let cardLinkOpen=false;
+let selectedCardLinkId='';
+
+function toggleCardLinkDropdown(){
+  cardLinkOpen=!cardLinkOpen;
+  const trigger=document.getElementById('cardLinkTrigger');
+  const dropdown=document.getElementById('cardLinkDropdown');
+  if(!trigger||!dropdown)return;
+  trigger.classList.toggle('open',cardLinkOpen);
+  dropdown.classList.toggle('open',cardLinkOpen);
+  if(cardLinkOpen) renderCardLinkDropdown();
+}
+function closeCardLinkDropdown(){
+  cardLinkOpen=false;
+  const trigger=document.getElementById('cardLinkTrigger');
+  const dropdown=document.getElementById('cardLinkDropdown');
+  if(trigger)trigger.classList.remove('open');
+  if(dropdown)dropdown.classList.remove('open');
+}
+function renderCardLinkDropdown(){
+  const dropdown=document.getElementById('cardLinkDropdown');
+  if(!dropdown)return;
+  const active=cards.filter(c=>c.status!=='archived');
+  let h=`<div class="card-link-option none${selectedCardLinkId===''?' selected':''}" onclick="pickCardLink('','')">
+    <div class="card-link-option-dot"></div>
+    <span class="card-link-option-name">No card linked</span>
+  </div>`;
+  h+=active.map(c=>`<div class="card-link-option${selectedCardLinkId===c.id?' selected':''}" onclick="pickCardLink('${c.id}','${esc(c.title)}')">
+    <div class="card-link-option-dot"></div>
+    <span class="card-link-option-name">${esc(c.title)}</span>
+  </div>`).join('');
+  dropdown.innerHTML=h;
+}
+function pickCardLink(id,name){
+  selectedCardLinkId=id;
+  const hidden=document.getElementById('evCardLink');
+  const label=document.getElementById('cardLinkLabel');
+  const trigger=document.getElementById('cardLinkTrigger');
+  if(hidden)hidden.value=id;
+  if(label)label.textContent=id?name:'No card linked';
+  if(trigger)trigger.classList.toggle('has-value',!!id);
+  closeCardLinkDropdown();
+}
+function populateCardSelect(selectedCardId){
+  selectedCardLinkId=selectedCardId||'';
+  const hidden=document.getElementById('evCardLink');
+  const label=document.getElementById('cardLinkLabel');
+  const trigger=document.getElementById('cardLinkTrigger');
+  if(hidden)hidden.value=selectedCardLinkId;
+  if(selectedCardLinkId){
+    const c=cards.find(x=>x.id===selectedCardLinkId);
+    if(label)label.textContent=c?c.title:'No card linked';
+    if(trigger)trigger.classList.toggle('has-value',!!selectedCardLinkId);
+  } else {
+    if(label)label.textContent='No card linked';
+    if(trigger)trigger.classList.remove('has-value');
+  }
+}
+// Close dropdown when clicking outside
+document.addEventListener('click',e=>{
+  if(cardLinkOpen&&!e.target.closest('.card-link-picker'))closeCardLinkDropdown();
+});
 function saveEvent(){
+  syncHiddenDateTime();
   const title=document.getElementById('evTitleInput').value.trim();
   if(!title)return;
   const dateStr=document.getElementById('evDateInput').value;
@@ -1636,12 +2028,12 @@ function showEventPopup(id,e){
   document.getElementById('epMeta').textContent=`${fmtDate(ev.date)} · ${fmtTime(ev.date)} · ${ev.duration||60}min`;
   const jumpBtn=document.getElementById('epJump');
   if(ev.cardId){jumpBtn.style.display='';} else {jumpBtn.style.display='none';}
-  // Position near click
   const x=Math.min(e.clientX,window.innerWidth-260);
   const y=Math.min(e.clientY+10,window.innerHeight-160);
   popup.style.left=x+'px';popup.style.top=y+'px';
   popup.classList.add('open');
-  document.addEventListener('click',closeEventPopupOutside,{once:true});
+  // Delay so this click doesn't immediately close the popup
+  setTimeout(()=>document.addEventListener('click',closeEventPopupOutside,{once:true}),50);
 }
 function closeEventPopupOutside(){document.getElementById('eventPopup').classList.remove('open');}
 function jumpToCardFromPopup(){
@@ -1658,7 +2050,7 @@ function editEventFromPopup(){
   document.getElementById('evModalSave').textContent='Save changes';
   document.getElementById('evTitleInput').value=ev.title;
   const d=new Date(ev.date);
-  document.getElementById('evDateInput').value=d.toISOString().slice(0,16);
+  initPickers(d.toISOString().slice(0,16));
   document.getElementById('evDurInput').value=ev.duration||60;
   document.getElementById('evNotesInput').value=ev.notes||'';
   populateCardSelect(ev.cardId||'');
@@ -1724,6 +2116,8 @@ function renderMobileCalendar(scroll){
   });
 
   let slotsHtml='';
+  const SLOT_H_M=56;
+  const TOTAL_H_M=24*SLOT_H_M;
   hours.forEach(h=>{
     const hStr=clockFormat===12?(h===0?'12 AM':h<12?`${h} AM`:h===12?'12 PM':`${h-12} PM`):`${String(h).padStart(2,'0')}:00`;
     slotsHtml+=`<div class="cal-time-slot">${hStr}</div>`;
@@ -1732,17 +2126,52 @@ function renderMobileCalendar(scroll){
       const isT=dStr===todayStr;
       const cellDt=new Date(d);cellDt.setHours(h,0,0,0);
       const isoStr=cellDt.toISOString().slice(0,16);
-      const cellEvs=rangeEvents.filter(e=>{const ed=new Date(e.date);return ds(ed)===dStr&&ed.getHours()===h;});
-      let evsHtml=cellEvs.map(e=>`<div class="cal-event ${e.color||'blue'}" onclick="showEventPopup('${e.id}',event)">
-        ${e.briasAdded?`<svg class="brias-ev-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`:''}
-        ${esc(e.title)}
-      </div>`).join('');
-      slotsHtml+=`<div class="cal-cell${isT?' today-col':''}" onclick="openEventModal('${isoStr}')">
-        ${evsHtml}
-        ${!cellEvs.length?`<div class="cal-cell-add">+</div>`:''}
-      </div>`;
+      slotsHtml+=`<div class="cal-cell${isT?' today-col':''}" onclick="openEventModal('${isoStr}')"><div class="cal-cell-add">+</div></div>`;
     });
   });
+
+  // Event overlays per column
+  const mDayEventsHtml=days.map((d,dayIdx)=>{
+    const dStr=ds(d);
+    const dayEvs=rangeEvents.filter(e=>ds(new Date(e.date))===dStr);
+    dayEvs.sort((a,b)=>new Date(a.date)-new Date(b.date));
+    const cols=[];
+    dayEvs.forEach(e=>{
+      const ed=new Date(e.date);
+      const startH=ed.getHours()+ed.getMinutes()/60;
+      const endH=startH+(e.duration||60)/60;
+      let placed=false;
+      for(let c=0;c<cols.length;c++){
+        const last=cols[c][cols[c].length-1];
+        const le=new Date(last.date);
+        const lastEnd=le.getHours()+le.getMinutes()/60+(last.duration||60)/60;
+        if(startH>=lastEnd-0.01){cols[c].push(e);placed=true;break;}
+      }
+      if(!placed)cols.push([e]);
+    });
+    const numCols=cols.length||1;
+    let html='';
+    cols.forEach((col,ci)=>{
+      col.forEach(e=>{
+        const ed=new Date(e.date);
+        const startH=ed.getHours()+ed.getMinutes()/60;
+        const dur=(e.duration||60)/60;
+        const top=startH*SLOT_H_M;
+        const height=Math.max(22,dur*SLOT_H_M-3);
+        const colW=100/numCols;
+        const timeStr=clockFormat===12
+          ?(ed.getHours()>=12?`${ed.getHours()%12||12}:${String(ed.getMinutes()).padStart(2,'0')} PM`:`${ed.getHours()||12}:${String(ed.getMinutes()).padStart(2,'0')} AM`)
+          :`${String(ed.getHours()).padStart(2,'0')}:${String(ed.getMinutes()).padStart(2,'0')}`;
+        html+=`<div class="cal-event ${e.color||'blue'}"
+          style="top:${top}px;height:${height}px;left:${ci*colW}%;width:calc(${colW}% - 6px);"
+          onclick="showEventPopup('${e.id}',event)">
+          <div class="cal-event-title">${esc(e.title)}</div>
+          ${height>=32?`<div class="cal-event-time">${timeStr}</div>`:''}
+        </div>`;
+      });
+    });
+    return `<div class="cal-day-overlay" data-day="${dayIdx}">${html}</div>`;
+  }).join('');
 
   const calHtml=`<div class="calendar-view">
     <div class="cal-header">
@@ -1760,21 +2189,31 @@ function renderMobileCalendar(scroll){
       </div>
       <button class="cal-today-btn${isCenterToday?' is-cur-week':''}" onclick="window.mobileCalCenter=new Date(TODAY);renderCalendar()">Today</button>
     </div>
-    <div class="cal-grid-wrap" style="padding:0 0 100px;">
-      <div class="cal-grid" style="grid-template-columns:48px repeat(3,1fr);min-width:0;">
+    <div class="cal-grid-wrap" id="calGridWrap" style="padding:0 0 100px;">
+      <div class="cal-grid" id="calGrid" style="grid-template-columns:48px repeat(3,1fr);min-width:0;">
         ${headerHtml}${slotsHtml}
       </div>
+      <div id="calOverlayWrap" style="display:none;position:absolute;pointer-events:none;">${mDayEventsHtml}</div>
     </div>
   </div>`;
 
   scroll.innerHTML=calHtml;
-  // Scroll to current hour centered
   setTimeout(()=>{
     const w=scroll.querySelector('.cal-grid-wrap');
     if(!w)return;
-    const slotH=56;
-    const curH=isCenterToday?TODAY.getHours():8;
-    w.scrollTop=Math.max(0,curH*slotH-(w.clientHeight/2)+slotH/2);
+    w.scrollTop=Math.max(0,(isCenterToday?TODAY.getHours():8)*SLOT_H_M-(w.clientHeight/2)+SLOT_H_M/2);
+    const grid=scroll.querySelector('#calGrid');
+    const ow=scroll.querySelector('#calOverlayWrap');
+    if(!grid||!ow)return;
+    const headerH=grid.querySelector('.cal-day-header')?.offsetHeight||56;
+    const timeColW=grid.querySelector('.cal-time-col')?.offsetWidth||48;
+    const gridW=grid.offsetWidth-timeColW;
+    const colW=gridW/3;
+    ow.style.cssText=`position:absolute;top:${headerH}px;left:${timeColW}px;width:${gridW}px;height:${TOTAL_H_M}px;pointer-events:none;`;
+    ow.style.display='block';
+    ow.querySelectorAll('.cal-day-overlay').forEach((ov,i)=>{
+      ov.style.cssText=`position:absolute;top:0;left:${i*colW}px;width:${colW}px;height:${TOTAL_H_M}px;pointer-events:none;`;
+    });
   },0);
 }
 
@@ -1815,47 +2254,76 @@ function renderWeekCalendar(scroll){
 
   // Hours to show — full day 00:00 to 23:00
   const hours=[];for(let h=0;h<24;h++)hours.push(h);
+  const SLOT_H=56;
+  const TOTAL_H=24*SLOT_H;
+  const dayShort=['Su','Mo','Tu','We','Th','Fr','Sa'];
 
   // Header row
   let headerHtml=`<div class="cal-time-col"></div>`;
   days.forEach(d=>{
-    const dStr=ds(d);
-    const isT=dStr===todayStr;
-    const hasEvs=weekEvents.some(e=>ds(new Date(e.date))===dStr);
-    const dayShort=['Su','Mo','Tu','We','Th','Fr','Sa'];
+    const dStr=ds(d);const isT=dStr===todayStr;
     headerHtml+=`<div class="cal-day-header${isT?' today':''}">
       <div class="cal-day-name">${dayShort[d.getDay()]}</div>
       <div class="cal-day-num${isT?' today':''}">${d.getDate()}</div>
     </div>`;
   });
 
-  // Time slots
+  // Grid lines only — empty cells as click targets
   let slotsHtml='';
   hours.forEach(h=>{
     const hStr=clockFormat===12?(h===0?'12 AM':h<12?`${h} AM`:h===12?'12 PM':`${h-12} PM`):`${String(h).padStart(2,'0')}:00`;
     slotsHtml+=`<div class="cal-time-slot">${hStr}</div>`;
     days.forEach(d=>{
-      const dStr=ds(d);
-      const isT=dStr===todayStr;
+      const isT=ds(d)===todayStr;
       const cellDt=new Date(d);cellDt.setHours(h,0,0,0);
       const isoStr=cellDt.toISOString().slice(0,16);
-      const cellEvs=weekEvents.filter(e=>{
-        const ed=new Date(e.date);
-        return ds(ed)===dStr&&ed.getHours()===h;
-      });
-      let evsHtml=cellEvs.map(e=>{
-        const isBrias=e.briasAdded;
-        return `<div class="cal-event ${e.color||'blue'}" onclick="showEventPopup('${e.id}',event)">
-          ${isBrias?`<svg class="brias-ev-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`:''}
-          ${esc(e.title)}
-        </div>`;
-      }).join('');
-      slotsHtml+=`<div class="cal-cell${isT?' today-col':''}" onclick="openEventModal('${isoStr}')">
-        ${evsHtml}
-        ${!cellEvs.length?`<div class="cal-cell-add">+</div>`:''}
-      </div>`;
+      slotsHtml+=`<div class="cal-cell${isT?' today-col':''}" onclick="openEventModal('${isoStr}')"><div class="cal-cell-add">+</div></div>`;
     });
   });
+
+  // Event overlays per column
+  const dayEventsHtml=days.map((d,dayIdx)=>{
+    const dStr=ds(d);
+    const dayEvs=weekEvents.filter(e=>ds(new Date(e.date))===dStr);
+    dayEvs.sort((a,b)=>new Date(a.date)-new Date(b.date));
+    // Overlap columns
+    const cols=[];
+    dayEvs.forEach(e=>{
+      const ed=new Date(e.date);
+      const startH=ed.getHours()+ed.getMinutes()/60;
+      const endH=startH+(e.duration||60)/60;
+      let placed=false;
+      for(let c=0;c<cols.length;c++){
+        const last=cols[c][cols[c].length-1];
+        const le=new Date(last.date);
+        const lastEnd=le.getHours()+le.getMinutes()/60+(last.duration||60)/60;
+        if(startH>=lastEnd-0.01){cols[c].push(e);placed=true;break;}
+      }
+      if(!placed)cols.push([e]);
+    });
+    const numCols=cols.length||1;
+    let html='';
+    cols.forEach((col,ci)=>{
+      col.forEach(e=>{
+        const ed=new Date(e.date);
+        const startH=ed.getHours()+ed.getMinutes()/60;
+        const dur=(e.duration||60)/60;
+        const top=startH*SLOT_H;
+        const height=Math.max(22,dur*SLOT_H-3);
+        const colW=100/numCols;
+        const timeStr=clockFormat===12
+          ?(ed.getHours()>=12?`${ed.getHours()%12||12}:${String(ed.getMinutes()).padStart(2,'0')} PM`:`${ed.getHours()||12}:${String(ed.getMinutes()).padStart(2,'0')} AM`)
+          :`${String(ed.getHours()).padStart(2,'0')}:${String(ed.getMinutes()).padStart(2,'0')}`;
+        html+=`<div class="cal-event ${e.color||'blue'}"
+          style="top:${top}px;height:${height}px;left:${ci*colW}%;width:calc(${colW}% - 6px);"
+          onclick="showEventPopup('${e.id}',event)">
+          <div class="cal-event-title">${esc(e.title)}</div>
+          ${height>=32?`<div class="cal-event-time">${timeStr}</div>`:''}
+        </div>`;
+      });
+    });
+    return `<div class="cal-day-overlay" data-day="${dayIdx}">${html}</div>`;
+  }).join('');
 
   const calHtml=`<div class="calendar-view">
     <div class="cal-header">
@@ -1879,25 +2347,36 @@ function renderWeekCalendar(scroll){
         <div class="legend-item"><div class="legend-dot red"></div>Urgent</div>
       </div>
     </div>
-    <div class="cal-grid-wrap">
-      <div class="cal-grid">
+    <div class="cal-grid-wrap" id="calGridWrap">
+      <div class="cal-grid" id="calGrid">
         ${headerHtml}${slotsHtml}
       </div>
+      <div id="calOverlayWrap" style="display:none;position:absolute;pointer-events:none;">${dayEventsHtml}</div>
     </div>
   </div>`;
 
   scroll.innerHTML=calHtml;
-  // Scroll to current hour centered
   setTimeout(()=>{
     const w=scroll.querySelector('.cal-grid-wrap');
     if(!w)return;
-    const slotH=56;
-    const curH=isCurWeek?TODAY.getHours():8;
-    w.scrollTop=Math.max(0,curH*slotH-(w.clientHeight/2)+slotH/2);
+    w.scrollTop=Math.max(0,(isCurWeek?TODAY.getHours():8)*SLOT_H-(w.clientHeight/2)+SLOT_H/2);
+    // Position overlays
+    const grid=scroll.querySelector('#calGrid');
+    const ow=scroll.querySelector('#calOverlayWrap');
+    if(!grid||!ow)return;
+    const headerH=grid.querySelector('.cal-day-header')?.offsetHeight||56;
+    const timeColW=grid.querySelector('.cal-time-col')?.offsetWidth||52;
+    const gridW=grid.offsetWidth-timeColW;
+    const colW=gridW/7;
+    ow.style.cssText=`position:absolute;top:${headerH}px;left:${timeColW}px;width:${gridW}px;height:${TOTAL_H}px;pointer-events:none;`;
+    ow.style.display='block';
+    ow.querySelectorAll('.cal-day-overlay').forEach((ov,i)=>{
+      ov.style.cssText=`position:absolute;top:0;left:${i*colW}px;width:${colW}px;height:${TOTAL_H}px;pointer-events:none;`;
+    });
   },0);
 }
 
-// ── Main content render ──
+
 function renderContent(){
   const scroll=document.getElementById('contentScroll');
   const isMobile=window.innerWidth<=700;
