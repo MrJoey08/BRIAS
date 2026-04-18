@@ -384,20 +384,21 @@ body.light .cal-grid-wrap{background:rgba(80,40,20,.018);}
   background:rgba(19,16,19,.98);border-bottom:1px solid rgba(255,255,255,.1);
   transition:background .45s ease;
 }
+.cal-day-header.today{
+  background:linear-gradient(180deg,rgba(232,118,74,.11),rgba(212,74,122,.07));
+  border-bottom-color:rgba(255,255,255,.1);
+}
 body.light .cal-day-header{background:rgba(240,230,220,.98);border-bottom-color:rgba(80,40,20,.14);}
+body.light .cal-day-header.today{background:linear-gradient(180deg,rgba(232,118,74,.1),rgba(212,74,122,.06));border-bottom-color:rgba(80,40,20,.14);}
 .cal-time-col{border-bottom:1px solid rgba(255,255,255,.1);position:sticky;top:0;z-index:5;background:rgba(19,16,19,.98);}
 body.light .cal-time-col{background:rgba(240,230,220,.98);border-bottom-color:rgba(80,40,20,.14);}
 .cal-day-name{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--text-dim);font-weight:500;margin-bottom:4px;}
+.cal-day-header.today .cal-day-name{color:rgba(232,118,74,.8);}
 .cal-day-num{
   width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
   font-size:13px;font-weight:300;color:var(--text-muted);
 }
 .cal-day-num.today{background:var(--grad);color:#fff;font-weight:500;}
-.cal-day-num.has-dot{position:relative;}
-.cal-day-num.has-dot::after{
-  content:'';position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);
-  width:4px;height:4px;border-radius:50%;background:rgba(232,118,74,.5);
-}
 
 /* All-day row */
 .cal-allday-row{display:contents;}
@@ -1470,9 +1471,9 @@ function renderMobileCalendar(scroll){
     const dStr=ds(d);
     const isT=dStr===todayStr;
     const hasEvs=rangeEvents.some(e=>ds(new Date(e.date))===dStr);
-    headerHtml+=`<div class="cal-day-header">
+    headerHtml+=`<div class="cal-day-header${isT?' today':''}">
       <div class="cal-day-name">${DAYS[d.getDay()]}</div>
-      <div class="cal-day-num${isT?' today':''}${hasEvs&&!isT?' has-dot':''}">${d.getDate()}</div>
+      <div class="cal-day-num${isT?' today':''}">${d.getDate()}</div>
     </div>`;
   });
 
@@ -1561,9 +1562,9 @@ function renderWeekCalendar(scroll){
     const dStr=ds(d);
     const isT=dStr===todayStr;
     const hasEvs=weekEvents.some(e=>ds(new Date(e.date))===dStr);
-    headerHtml+=`<div class="cal-day-header">
+    headerHtml+=`<div class="cal-day-header${isT?' today':''}">
       <div class="cal-day-name">${DAYS[(d.getDay())]}</div>
-      <div class="cal-day-num${isT?' today':''}${hasEvs&&!isT?' has-dot':''}">${d.getDate()}</div>
+      <div class="cal-day-num${isT?' today':''}">${d.getDate()}</div>
     </div>`;
   });
 
