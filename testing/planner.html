@@ -229,14 +229,14 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
 .bn-new-btn:hover{opacity:.88;transform:translateY(-1px);}
 .bn-new-btn:active{transform:scale(.97);}
 .bn-cal-btn{
-  width:38px;height:38px;border-radius:12px;border:1px solid var(--border);
-  background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  color:var(--text-muted);transition:border-color .25s,color .25s,background .15s;flex-shrink:0;
+  width:38px;height:38px;border-radius:12px;border:1px solid rgba(232,118,74,.3);
+  background:rgba(232,118,74,.08);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--orange);transition:border-color .25s,color .25s,background .15s;flex-shrink:0;
 }
-body.light .bn-cal-btn{border-color:rgba(80,40,20,.12);}
-.bn-cal-btn:hover{border-color:rgba(255,255,255,.14);color:var(--text-sub);}
+body.light .bn-cal-btn{border-color:rgba(232,118,74,.25);background:rgba(232,118,74,.07);}
+.bn-cal-btn:hover{background:rgba(232,118,74,.14);border-color:rgba(232,118,74,.45);}
 .bn-cal-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;}
-.bn-cal-btn.active{border-color:rgba(232,118,74,.35);color:var(--orange);background:rgba(232,118,74,.05);}
+.bn-cal-btn.active{border-color:rgba(232,118,74,.5);background:rgba(232,118,74,.15);}
 
 .content-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
 
@@ -673,6 +673,13 @@ body.light .card-link-dropdown{background:var(--sidebar);}
 }
 .btn-primary:hover{opacity:.85;transform:translateY(-1px);}
 .btn-primary:disabled{opacity:.3;cursor:default;transform:none;}
+.btn-danger{
+  padding:8px 20px;border-radius:11px;border:1px solid rgba(220,70,70,.3);
+  background:rgba(220,70,70,.1);color:rgba(220,90,90,.9);
+  font-family:var(--font);font-size:12.5px;font-weight:500;cursor:pointer;
+  transition:background .15s,border-color .15s;
+}
+.btn-danger:hover{background:rgba(220,70,70,.18);border-color:rgba(220,70,70,.45);}
 
 /* Event detail popup */
 .event-popup{
@@ -1094,6 +1101,25 @@ body.light .sheet-d.e{color:rgba(46,31,24,.1);}
     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     New
   </button>
+</div>
+
+<!-- BRIAS Confirm Modal -->
+<div class="modal-backdrop" id="confirmModal">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-header" style="border-bottom:none;padding-bottom:8px;">
+      <div class="modal-title" id="confirmTitle">Are you sure?</div>
+      <button class="modal-close" onclick="confirmCancel()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="padding-top:0;">
+      <p id="confirmMessage" style="font-family:var(--font-serif);font-size:14px;font-weight:300;line-height:1.7;color:var(--text-muted);font-style:italic;"></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="confirmCancel()">Cancel</button>
+      <button class="btn-danger" id="confirmOkBtn" onclick="confirmOk()">Delete</button>
+    </div>
+  </div>
 </div>
 
 <!-- Card Create/Edit Modal -->
@@ -1666,10 +1692,17 @@ function setCardStatus(id,status){
   renderSidebar();renderContent();
 }
 function deleteCard(id){
-  if(!confirm('Delete this card?'))return;
-  cards=cards.filter(c=>c.id!==id);
-  if(activeCardId===id)activeCardId=null;
-  saveCards(cards);renderSidebar();renderContent();
+  const c=cards.find(x=>x.id===id);if(!c)return;
+  briasConfirm(
+    'Delete this card?',
+    `"${c.title}" and all its history will be permanently removed.`,
+    'Delete',
+    ()=>{
+      cards=cards.filter(c=>c.id!==id);
+      if(activeCardId===id)activeCardId=null;
+      saveCards(cards);renderSidebar();renderContent();
+    }
+  );
 }
 
 // ── Card Modal ──
@@ -1935,6 +1968,25 @@ function initPickers(dateStr){
   updateDurDisplay();
 }
 
+// ── Custom confirm modal ──
+let confirmCallback=null;
+function briasConfirm(title, message, okLabel, cb){
+  confirmCallback=cb;
+  document.getElementById('confirmTitle').textContent=title;
+  document.getElementById('confirmMessage').textContent=message;
+  document.getElementById('confirmOkBtn').textContent=okLabel||'Delete';
+  document.getElementById('confirmModal').classList.add('open');
+}
+function confirmOk(){
+  document.getElementById('confirmModal').classList.remove('open');
+  if(confirmCallback)confirmCallback();
+  confirmCallback=null;
+}
+function confirmCancel(){
+  document.getElementById('confirmModal').classList.remove('open');
+  confirmCallback=null;
+}
+
 let cardLinkOpen=false;
 let selectedCardLinkId='';
 
@@ -2058,11 +2110,18 @@ function editEventFromPopup(){
   document.getElementById('eventPopup').classList.remove('open');
 }
 function deleteEventFromPopup(){
-  if(!confirm('Delete this event?'))return;
-  events=events.filter(e=>e.id!==popupEventId);
-  saveEvents(events);
+  const ev=events.find(e=>e.id===popupEventId);if(!ev)return;
   document.getElementById('eventPopup').classList.remove('open');
-  renderCalendar();renderContent();
+  briasConfirm(
+    `Delete "${ev.title}"?`,
+    `This event on ${fmtDate(ev.date)} will be permanently removed.`,
+    'Delete',
+    ()=>{
+      events=events.filter(e=>e.id!==popupEventId);
+      saveEvents(events);
+      renderCalendar();renderContent();
+    }
+  );
 }
 
 // ── Calendar rendering ──
