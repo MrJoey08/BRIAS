@@ -4,100 +4,176 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BRIAS · Journal</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500;1,600&family=DM+Sans:wght@300;400;500&family=Bitter:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=DM+Sans:wght@300;400;500&family=Bitter:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
+button{outline:none!important;border:none;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 :root{
-  --bg:#0f0c0e;
-  --surface:rgba(255,255,255,.035);
+  --bg:#131013;
+  --sidebar:#151215;
   --border:rgba(255,255,255,.07);
   --border2:rgba(255,255,255,.13);
+  --surface:rgba(255,255,255,.05);
   --text:#e4e0e3;
-  --text-sub:rgba(228,224,227,.5);
-  --text-muted:rgba(228,224,227,.3);
+  --text-sub:rgba(228,224,227,.44);
+  --text-muted:rgba(228,224,227,.26);
   --text-dim:rgba(228,224,227,.14);
+  --input-bg:rgba(255,255,255,.04);
+  --input-border:rgba(255,255,255,.08);
+  --input-focus:rgba(232,118,74,.28);
   --orange:#e8764a;
   --pink:#d44a7a;
   --grad:linear-gradient(135deg,#e8764a,#d44a7a);
-  --font:'DM Sans',sans-serif;
+  --font:'DM Sans',-apple-system,sans-serif;
   --font-display:'Cormorant Garamond',Georgia,serif;
   --font-serif:'Bitter',Georgia,serif;
 }
-html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);}
-
-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.48;}
-.noise{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:200px;}
-.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 0%,transparent 40%,rgba(8,5,7,.7) 100%);}
-
-@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-@keyframes slideDown{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
-@keyframes contentSwap{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
-
-.hidden{display:none!important;}
-
-/* ── Layout ── */
-.app{position:relative;z-index:10;height:100vh;display:grid;grid-template-columns:260px 1fr;overflow:hidden;}
-
-/* ── SIDEBAR ── */
-.sidebar{
-  border-right:1px solid var(--border);
-  display:flex;flex-direction:column;
-  overflow:hidden;
-  background:rgba(14,11,13,.6);
+/* Light mode */
+body.light{
+  --bg:#f0e6dc;
+  --sidebar:#ede0d5;
+  --border:rgba(80,40,20,.1);
+  --border2:rgba(80,40,20,.18);
+  --surface:rgba(80,40,20,.06);
+  --text:#2e1f18;
+  --text-sub:rgba(46,31,24,.6);
+  --text-muted:rgba(46,31,24,.4);
+  --text-dim:rgba(46,31,24,.22);
+  --input-bg:rgba(80,40,20,.05);
+  --input-border:rgba(80,40,20,.1);
+  --input-focus:rgba(232,118,74,.35);
 }
 
+html,body{height:100%;overflow:hidden;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);transition:background .5s ease,color .4s ease;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:4px;}
+body.light ::-webkit-scrollbar-thumb{background:rgba(80,40,20,.12);}
+
+/* Noise + glow */
+canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.38;transition:opacity .5s ease;}
+body.light canvas{opacity:0;}
+.noise{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.028;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:200px;}
+
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes contentSwap{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+@keyframes logoReveal{from{opacity:0;transform:translateY(12px) scale(.96);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+/* ── App shell ── */
+.app{position:relative;z-index:10;display:flex;flex-direction:column;height:100vh;animation:fadeIn .4s ease both;}
+
+/* ── Topbar ── */
+.topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;transition:border-color .45s ease;}
+.topbar-logo{font-family:var(--font-display);font-size:22px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.03em;}
+
+/* Hamburger */
+.menu-btn{position:absolute;left:16px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;}
+.lns{display:flex;flex-direction:column;gap:4px;align-items:center;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
+.ln{display:block;width:26px;height:5px;border-radius:100px;background:var(--grad);flex-shrink:0;transition:transform .52s cubic-bezier(.22,1.35,.5,1),opacity .38s ease;}
+.menu-btn.open .ln:nth-child(1){transform:translateY(9px) rotate(45deg);}
+.menu-btn.open .ln:nth-child(2){opacity:0;transform:scaleX(0);}
+.menu-btn.open .ln:nth-child(3){transform:translateY(-9px) rotate(-45deg);}
+
+/* Topbar right area */
+.topbar-right{position:absolute;right:16px;display:flex;align-items:center;gap:6px;}
+.today-btn{
+  padding:6px 14px;border-radius:10px;border:1px solid var(--border);
+  background:transparent;cursor:pointer;font-family:var(--font);
+  font-size:12px;font-weight:300;color:var(--text-muted);transition:all .15s;
+}
+.today-btn:hover{border-color:rgba(232,118,74,.3);color:var(--orange);}
+
+/* ── Main layout ── */
+.main-body{flex:1;display:flex;overflow:hidden;}
+
+/* ── Left sidebar (desktop) ── */
+.diary-sidebar{
+  width:248px;flex-shrink:0;border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+  background:rgba(14,11,13,.5);
+  transition:background .45s ease,border-color .45s ease;
+}
+body.light .diary-sidebar{background:var(--sidebar);}
+
 .sidebar-top{
-  padding:20px 16px 16px;
+  padding:18px 16px 14px;
   border-bottom:1px solid var(--border);
   flex-shrink:0;
 }
-.sidebar-logo{
-  font-family:var(--font-display);font-size:28px;font-weight:600;font-style:italic;
-  background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  letter-spacing:.04em;display:block;margin-bottom:4px;
+.sidebar-top-label{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;font-weight:500;}
+
+/* Who toggle */
+.who-toggle{
+  display:flex;border-radius:10px;border:1px solid var(--border);
+  background:rgba(255,255,255,.02);overflow:hidden;
 }
-.sidebar-sub{font-size:11px;font-weight:300;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;}
+body.light .who-toggle{background:rgba(80,40,20,.04);border-color:rgba(80,40,20,.1);}
+.who-btn{
+  flex:1;padding:7px 0;border:none;background:transparent;cursor:pointer;
+  font-family:var(--font);font-size:12px;font-weight:300;color:var(--text-muted);
+  transition:background .15s,color .15s;
+}
+.who-btn.active{background:rgba(255,255,255,.06);color:var(--text);}
+body.light .who-btn.active{background:rgba(80,40,20,.08);color:var(--text);}
+.who-btn.active.brias-active{background:rgba(232,118,74,.08);color:var(--orange);}
 
 /* Month nav */
 .month-nav{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:16px 20px 12px;flex-shrink:0;
+  display:grid;grid-template-columns:28px 1fr 28px;align-items:center;gap:4px;
+  padding:14px 12px 10px;flex-shrink:0;
 }
-.month-label{font-family:var(--font-display);font-size:15px;font-weight:500;font-style:italic;color:var(--text-sub);}
-.month-arrows{display:flex;gap:4px;}
+.month-label{font-family:var(--font-display);font-size:16px;font-weight:500;font-style:italic;color:var(--text-sub);text-align:center;cursor:default;letter-spacing:.01em;}
+.month-arrows{display:contents;}
 .arr-btn{
-  width:26px;height:26px;border-radius:8px;border:none;background:transparent;
+  width:28px;height:28px;border-radius:8px;border:none;background:transparent;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   color:var(--text-muted);transition:background .12s,color .12s;
 }
 .arr-btn:hover:not(:disabled){background:var(--surface);color:var(--text-sub);}
 .arr-btn:disabled{opacity:.2;cursor:default;}
 
+/* Sidebar Today button */
+.sidebar-today{
+  display:flex;align-items:center;justify-content:center;
+  margin:0 12px 12px;padding:7px 0;
+  border-radius:10px;border:1px solid var(--border);
+  background:transparent;cursor:pointer;font-family:var(--font);
+  font-size:11.5px;font-weight:300;color:var(--text-muted);
+  transition:border-color .25s,color .25s,box-shadow .25s;width:calc(100% - 24px);
+}
+body.light .sidebar-today{border-color:rgba(80,40,20,.1);}
+.sidebar-today:hover{border-color:rgba(232,118,74,.3);color:var(--orange);}
+@keyframes sidebarTodayPulse{0%,100%{box-shadow:0 0 0 0 rgba(232,118,74,.0);}50%{box-shadow:0 0 14px 2px rgba(232,118,74,.18);}}
+.sidebar-today.is-today{
+  border-color:rgba(232,118,74,.3);color:var(--orange);
+  box-shadow:0 0 10px rgba(232,118,74,.14);
+  animation:sidebarTodayPulse 2.8s ease-in-out infinite;
+}
+
 /* Mini calendar */
-.mini-cal{padding:0 14px 16px;flex-shrink:0;}
+.mini-cal{padding:0 12px 14px;flex-shrink:0;}
 .mini-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
 .mini-lbl{font-size:9px;color:var(--text-dim);text-align:center;padding-bottom:6px;letter-spacing:.06em;text-transform:uppercase;}
 .mini-d{
   aspect-ratio:1;display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:300;color:var(--text-muted);border-radius:7px;
+  font-size:11px;font-weight:300;color:var(--text-muted);border-radius:7px;
   cursor:pointer;transition:background .1s,color .1s;position:relative;
 }
 .mini-d:hover:not(.e):not(.f){background:var(--surface);color:var(--text-sub);}
 .mini-d.e,.mini-d.f{cursor:default;color:rgba(228,224,227,.08);}
+body.light .mini-d.e,body.light .mini-d.f{color:rgba(46,31,24,.1);}
 .mini-d.has::after{
   content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);
   width:3px;height:3px;border-radius:50%;background:rgba(232,118,74,.45);
 }
-.mini-d.tod{
-  background:rgba(232,118,74,.1);color:var(--orange);font-weight:500;
-  border:1px solid rgba(232,118,74,.2);
-}
+.mini-d.tod{background:rgba(232,118,74,.1);color:var(--orange);font-weight:500;border:1px solid rgba(232,118,74,.2);}
 .mini-d.sel{background:var(--grad)!important;color:#fff!important;font-weight:500;}
 
 /* Year list */
-.year-section{flex:1;overflow-y:auto;padding:0 14px 20px;}
-.year-group{margin-bottom:20px;}
+.year-section{flex:1;overflow-y:auto;padding:0 12px 20px;}
+.year-group{margin-bottom:18px;}
 .year-label-btn{
   display:flex;align-items:center;justify-content:space-between;
   font-size:10px;font-weight:500;color:var(--text-dim);letter-spacing:.1em;
@@ -110,81 +186,17 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:no
 .month-chip{
   display:flex;align-items:center;justify-content:space-between;
   padding:7px 10px;border-radius:9px;cursor:pointer;
-  font-size:13px;font-weight:300;color:var(--text-muted);
+  font-size:12.5px;font-weight:300;color:var(--text-muted);
   transition:background .1s,color .1s;margin-bottom:1px;
 }
 .month-chip:hover{background:var(--surface);color:var(--text-sub);}
 .month-chip.active{background:rgba(232,118,74,.08);color:var(--orange);}
-.month-chip-dot{
-  width:5px;height:5px;border-radius:50%;
-  background:rgba(232,118,74,.4);display:none;
-}
+.month-chip-dot{width:5px;height:5px;border-radius:50%;background:rgba(232,118,74,.4);display:none;}
 .month-chip.has-entries .month-chip-dot{display:block;}
 
-/* ── MAIN ── */
-.main{display:flex;flex-direction:column;overflow:hidden;}
-
-/* Topbar */
-.topbar{
-  height:52px;flex-shrink:0;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;padding:0 28px;
-  position:relative;
-}
-.topbar .page-switch{
-  position:absolute;left:50%;transform:translateX(-50%);
-}
-.date-display{
-  font-family:var(--font-display);font-size:16px;font-weight:400;font-style:italic;
-  color:var(--text-muted);user-select:none;
-}
-.date-display.tod{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-
-.desktop-only{display:flex;}
-
-/* Today btn */
-.today-btn{
-  padding:6px 14px;border-radius:10px;border:1px solid var(--border);
-  background:transparent;cursor:pointer;font-family:var(--font);
-  font-size:12px;font-weight:300;color:var(--text-muted);transition:all .15s;
-}
-.today-btn:hover{border-color:rgba(232,118,74,.3);color:var(--orange);}
-
-/* Page switch */
-.page-switch{
-  display:flex;align-items:center;gap:2px;
-  border-radius:12px;border:1px solid rgba(255,255,255,.08);
-  background:rgba(255,255,255,.03);padding:3px;
-}
-.page-btn{
-  display:flex;align-items:center;justify-content:center;gap:7px;
-  padding:6px 20px;border:none;border-radius:9px;background:transparent;cursor:pointer;
-  font-family:var(--font);font-size:13px;font-weight:300;color:var(--text-muted);
-  transition:background .18s,color .18s;white-space:nowrap;
-}
-.page-btn:hover{color:var(--text-sub);}
-.page-btn.active{
-  background:rgba(255,255,255,.07);color:var(--text);
-  box-shadow:0 1px 6px rgba(0,0,0,.25);
-}
-.page-btn svg{opacity:.5;transition:opacity .18s;}
-.page-btn.active svg{opacity:1;}
-.page-btn:hover svg{opacity:.7;}
-
-/* Who toggle */
-.who-toggle{
-  display:flex;border-radius:10px;border:1px solid var(--border);
-  background:rgba(255,255,255,.02);overflow:hidden;
-}
-.who-btn{
-  flex:1;padding:7px 0;border:none;background:transparent;cursor:pointer;
-  font-family:var(--font);font-size:12px;font-weight:300;color:var(--text-muted);
-  transition:background .15s,color .15s;
-}
-.who-btn.active{background:rgba(255,255,255,.06);color:var(--text);}
-.who-btn.active.brias-active{background:rgba(232,118,74,.08);color:var(--orange);}
-
-/* Content */
-.content{flex:1;overflow-y:auto;padding:48px 0 80px;}
+/* ── Content area ── */
+.content-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.content-scroll{flex:1;overflow-y:auto;padding:48px 0 80px;}
 .content-inner{max-width:640px;margin:0 auto;padding:0 32px;animation:contentSwap .25s ease;}
 
 /* Day header */
@@ -195,11 +207,9 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:no
   font-weight:300;font-style:italic;line-height:.88;
   color:rgba(228,224,227,.1);letter-spacing:-.02em;
 }
+body.light .day-big{color:rgba(46,31,24,.08);}
 .day-big.tod{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.day-name{
-  font-family:var(--font-display);font-size:22px;font-style:italic;
-  font-weight:400;color:var(--text-muted);margin-top:4px;
-}
+.day-name{font-family:var(--font-display);font-size:22px;font-style:italic;font-weight:400;color:var(--text-muted);margin-top:4px;}
 .day-full{font-size:12px;font-weight:300;color:var(--text-dim);letter-spacing:.07em;text-transform:uppercase;margin-top:3px;}
 .day-lock{
   display:inline-flex;align-items:center;gap:6px;margin-top:12px;
@@ -208,29 +218,27 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:no
 
 /* Entry */
 .entry-wrap{border-top:1px solid var(--border);padding-top:28px;}
-
 .entry-body{
   background:var(--surface);border:1px solid var(--border);
   border-radius:16px;overflow:hidden;
+  transition:border-color .2s,background .45s ease;
 }
 .entry-body.editable:focus-within{border-color:rgba(232,118,74,.2);}
 .entry-body.brias{background:rgba(232,118,74,.03);border-color:rgba(232,118,74,.07);}
-
 .entry-ta{
   width:100%;min-height:200px;background:transparent;border:none;outline:none;
   color:var(--text);font-family:var(--font-serif);font-size:15px;font-weight:300;
   line-height:1.9;padding:26px 28px;resize:none;
+  caret-color:var(--orange);
 }
 .entry-ta::placeholder{color:var(--text-dim);font-style:italic;}
 .entry-ta.brias-ta{font-style:italic;color:var(--text-sub);}
-
 .entry-ro{
   padding:26px 28px;font-family:var(--font-serif);font-size:15px;font-weight:300;
   line-height:1.9;color:var(--text-sub);white-space:pre-wrap;word-break:break-word;min-height:80px;
 }
 .entry-ro.empty{color:var(--text-dim);font-style:italic;}
 .entry-ro.brias{font-style:italic;}
-
 .entry-foot{
   display:flex;align-items:center;justify-content:space-between;
   padding:10px 20px 14px;border-top:1px solid var(--border);
@@ -244,225 +252,534 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:no
 .save-btn:hover{opacity:.85;transform:translateY(-1px);}
 .save-btn:disabled{opacity:.25;cursor:default;transform:none;}
 
-/* scrollbar */
-::-webkit-scrollbar{width:4px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:rgba(255,255,255,.07);border-radius:4px;}
+/* ── Drawer ── */
+.drawer{position:fixed;inset:0;z-index:40;pointer-events:none;}
+.drawer-backdrop{position:absolute;inset:0;background:rgba(8,6,8,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);opacity:0;transition:opacity .38s ease;}
+.drawer-panel{position:absolute;top:0;left:0;bottom:0;width:280px;background:var(--sidebar);border-radius:0 28px 28px 0;transform:translateX(-100%);transition:transform .42s cubic-bezier(.16,1,.3,1),background .45s ease;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid rgba(255,255,255,.04);}
+.drawer.open{pointer-events:all;}
+.drawer.open .drawer-backdrop{opacity:1;}
+.drawer.open .drawer-panel{transform:translateX(0);}
+body.light .drawer-panel{background:var(--sidebar);}
+body.light .drawer-backdrop{background:rgba(30,12,0,.38);backdrop-filter:blur(10px);}
+.drawer-top{padding:28px 20px 18px;flex-shrink:0;}
+.drawer-logo{font-family:var(--font-display);font-size:30px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.drawer-nav{flex:1;padding:0 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
+.nav-section-label{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--text-dim);padding:4px 12px 6px;font-weight:500;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:16px;transition:background .15s;width:100%;text-align:left;}
+.nav-item:hover{background:rgba(255,255,255,.05);}
+body.light .nav-item:hover{background:rgba(80,40,20,.06);}
+.nav-item.active{background:linear-gradient(135deg,rgba(232,118,74,.1),rgba(212,74,122,.08));}
+body.light .nav-item.active{background:linear-gradient(135deg,rgba(232,118,74,.12),rgba(212,74,122,.09));}
+.nav-icon{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.nav-item:not(.active) .nav-icon{background:rgba(255,255,255,.04);}
+body.light .nav-item:not(.active) .nav-icon{background:rgba(80,40,20,.06);}
+body.light .nav-item:not(.active) .nav-icon svg{stroke:rgba(80,40,20,.4)!important;}
+.nav-item.active .nav-icon{background:linear-gradient(135deg,rgba(232,118,74,.18),rgba(212,74,122,.16));}
+.nav-texts{flex:1;min-width:0;}
+.nav-name{font-size:13px;font-weight:400;color:var(--text-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nav-item.active .nav-name{font-weight:500;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.nav-sub{font-size:11px;color:var(--text-dim);margin-top:2px;}
+.soon-badge{font-size:9px;padding:2px 7px;border-radius:20px;background:rgba(255,255,255,.05);color:var(--text-dim);letter-spacing:.03em;margin-left:4px;vertical-align:middle;-webkit-text-fill-color:var(--text-dim);}
+body.light .soon-badge{background:rgba(80,40,20,.07);color:var(--text-dim);-webkit-text-fill-color:var(--text-dim);}
+.drawer-divider{height:1px;background:rgba(255,255,255,.05);margin:8px 10px 10px;}
+body.light .drawer-divider{background:rgba(80,40,20,.1);}
+.drawer-footer{padding:10px 14px 22px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.footer-av{width:32px;height:32px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.footer-av span{font-family:var(--font-display);font-size:13px;color:#fff;font-style:italic;font-weight:600;}
+.footer-info{flex:1;min-width:0;}
+.footer-name{font-size:13px;font-weight:400;color:var(--text-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.footer-handle{font-size:11px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.drawer-settings-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .18s;}
+.drawer-settings-btn:hover{background:rgba(255,255,255,.08);}
+body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}
+body.light .drawer-settings-btn:hover{background:rgba(80,40,20,.12);}
+body.light .drawer-settings-btn svg{stroke:rgba(80,40,20,.45)!important;}
 
+/* ── Settings overlay ── */
+.settings-overlay{
+  position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;
+  background:rgba(10,7,9,.96);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  opacity:0;pointer-events:none;
+  transform:translateY(12px) scale(.99);
+  transition:opacity .32s ease,transform .38s cubic-bezier(.16,1,.3,1),background .45s ease;
+}
+.settings-overlay.open{opacity:1;pointer-events:all;transform:translateY(0) scale(1);}
+body.light .settings-overlay{background:rgba(228,214,199,.97);}
+.settings-header{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0;border-bottom:1px solid var(--border);}
+.settings-title{font-family:var(--font-display);font-size:22px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.settings-close-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:background .15s;}
+.settings-close-btn:hover{background:rgba(255,255,255,.1);}
+body.light .settings-close-btn{background:rgba(80,40,20,.07);}
+body.light .settings-close-btn:hover{background:rgba(80,40,20,.13);}
+body.light .settings-close-btn svg{stroke:rgba(80,40,20,.5)!important;}
+.settings-tabs{display:flex;gap:0;padding:0 24px;flex-shrink:0;border-bottom:1px solid var(--border);overflow-x:auto;}
+.settings-tabs::-webkit-scrollbar{display:none;}
+.stab{
+  flex:1;padding:14px 6px 13px;min-width:0;border-radius:0;font-size:11px;font-weight:400;
+  color:var(--text-muted);transition:color .2s;white-space:nowrap;text-align:center;
+  background:transparent;position:relative;border-bottom:2px solid transparent;margin-bottom:-1px;
+}
+.stab:hover{color:var(--text-sub);}
+.stab.active{color:var(--orange);font-weight:500;border-bottom:2px solid var(--orange);}
+.settings-content{flex:1;overflow-y:auto;display:flex;justify-content:center;padding:28px 20px;}
+.settings-body{width:100%;max-width:560px;}
+.s-section{margin-bottom:24px;}
+.s-section-title{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;font-weight:500;}
+.s-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;background:rgba(255,255,255,.03);border-radius:14px;margin-bottom:5px;gap:16px;transition:background .45s ease;}
+body.light .s-row{background:rgba(80,40,20,.05);}
+.s-row-left{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;}
+.s-row-label{font-size:13.5px;color:var(--text-sub);font-weight:400;letter-spacing:.01em;}
+.s-row-sub{font-size:11.5px;color:var(--text-dim);margin-top:2px;line-height:1.4;}
+.s-row-val{font-size:13px;color:var(--text-muted);flex-shrink:0;}
+.s-btn{
+  padding:7px 15px;border-radius:10px;font-size:12.5px;font-weight:400;
+  color:var(--text-sub);background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.07);
+  transition:background .18s,color .18s,border-color .18s;white-space:nowrap;flex-shrink:0;
+}
+.s-btn:hover{background:rgba(255,255,255,.09);color:var(--text);border-color:rgba(255,255,255,.11);}
+.s-btn.danger{color:rgba(220,90,90,.65);background:transparent;border-color:rgba(220,90,90,.15);}
+.s-btn.danger:hover{background:rgba(220,70,70,.07);color:rgba(220,90,90,.85);border-color:rgba(220,90,90,.25);}
+body.light .s-btn{color:var(--text-sub);background:rgba(80,40,20,.07);border-color:rgba(80,40,20,.1);}
+body.light .s-btn:hover{background:rgba(80,40,20,.13);color:var(--text);border-color:rgba(80,40,20,.16);}
+body.light .s-btn.danger{color:rgba(160,40,40,.8);background:transparent;border-color:rgba(160,40,40,.18);}
+body.light .s-btn.danger:hover{background:rgba(160,40,40,.07);}
+.toggle{width:42px;height:23px;border-radius:12px;background:rgba(255,255,255,.1);position:relative;transition:background .28s;flex-shrink:0;}
+.toggle.on{background:var(--grad);}
+.toggle::after{content:'';position:absolute;width:17px;height:17px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .26s cubic-bezier(.34,1.4,.6,1),background .28s,box-shadow .28s;box-shadow:0 1px 4px rgba(0,0,0,.3);}
+.toggle.on::after{left:22px;background:#1a161a;box-shadow:none;}
+body.light .toggle{background:rgba(80,40,20,.16);}
+body.light .toggle.on{background:var(--grad);}
+body.light .toggle::after{background:#fff;}
+body.light .toggle.on::after{left:22px;background:#ddc9b3;box-shadow:none;}
+.theme-toggle{
+  display:flex;position:relative;
+  background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:12px;padding:3px;gap:0;transition:background .45s ease,border-color .45s ease;
+}
+body.light .theme-toggle{background:rgba(80,40,20,.06);border-color:rgba(80,40,20,.1);}
+.theme-toggle-pill{
+  position:absolute;top:3px;bottom:3px;width:calc(50% - 3px);
+  background:var(--grad);border-radius:9px;
+  transition:left .35s cubic-bezier(.34,1.2,.6,1);pointer-events:none;
+}
+body:not(.light) .theme-toggle-pill{left:3px;}
+.theme-toggle.pill-right .theme-toggle-pill{left:calc(50%);}
+.theme-opt{
+  flex:1;padding:8px 14px;border-radius:9px;font-size:12.5px;font-weight:400;
+  color:var(--text-muted);background:transparent;transition:color .3s ease;
+  display:flex;align-items:center;justify-content:center;gap:6px;position:relative;z-index:1;
+}
+.theme-opt.active{color:#fff;font-weight:500;}
+body.light .theme-opt:not(.active){color:var(--text-sub);}
+.about-logo{font-family:var(--font-display);font-size:42px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:block;}
+.sub-intro{font-family:var(--font-serif);font-size:14px;font-weight:300;font-style:italic;line-height:1.65;color:var(--text-muted);margin-bottom:20px;}
+.sub-cards{display:flex;flex-direction:column;gap:10px;}
+.sub-card{border:1px solid var(--border);border-radius:18px;padding:18px 20px;background:rgba(255,255,255,.03);}
+body.light .sub-card{background:rgba(80,40,20,.05);border-color:rgba(80,40,20,.1);}
+.sub-card-name{font-family:var(--font-display);font-size:17px;font-weight:600;font-style:italic;color:var(--text-sub);margin-bottom:4px;}
+.sub-card-price{font-size:20px;font-weight:500;color:var(--text-sub);margin-bottom:8px;font-family:var(--font-display);font-style:italic;}
+.sub-card-price span{font-size:12px;font-weight:300;color:var(--text-dim);font-family:var(--font);font-style:normal;}
+.sub-card-perks{list-style:none;display:flex;flex-direction:column;gap:5px;margin-top:8px;padding-top:10px;border-top:1px solid var(--border);}
+body.light .sub-card-perks{border-top-color:rgba(80,40,20,.1);}
+.sub-card-perks li{font-family:var(--font-serif);font-size:12.5px;font-weight:300;font-style:italic;color:var(--text-muted);line-height:1.45;padding-left:14px;position:relative;}
+.sub-card-perks li::before{content:'–';position:absolute;left:0;color:var(--text-dim);}
+
+/* ── Mobile calendar sheet ── */
+.cal-backdrop-m{display:none;position:fixed;inset:0;z-index:24;background:rgba(0,0,0,.4);}
+.cal-backdrop-m.open{display:block;}
+.cal-sheet{
+  display:none;position:fixed;bottom:72px;left:0;right:0;z-index:25;
+  background:rgba(16,12,14,.98);backdrop-filter:blur(32px);
+  border-top:1px solid var(--border2);border-radius:20px 20px 0 0;
+  padding:16px 16px 28px;
+}
+body.light .cal-sheet{background:var(--sidebar);}
+.cal-sheet.open{display:block;animation:slideUp .25s cubic-bezier(.16,1,.3,1);}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.cal-sheet-handle{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,.15);margin:0 auto 14px;cursor:grab;}
+body.light .cal-sheet-handle{background:rgba(80,40,20,.2);}
+
+/* Fixed-height calendar header — arrows never shift between months */
+.sheet-cal-header{
+  display:grid;grid-template-columns:44px 1fr 44px;align-items:center;
+  height:48px;margin-bottom:12px;
+}
+.sheet-cal-label{
+  font-family:var(--font-display);font-size:22px;font-weight:500;font-style:italic;
+  color:var(--text-sub);cursor:pointer;text-align:center;
+  padding:4px 8px;border-radius:8px;transition:background .15s;
+}
+.sheet-cal-label:hover{background:rgba(255,255,255,.05);}
+body.light .sheet-cal-label:hover{background:rgba(80,40,20,.06);}
+.sheet-arr{
+  width:40px;height:40px;border-radius:12px;border:1px solid var(--border);
+  background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--text-sub);transition:background .12s,border-color .12s,color .12s;margin:0 auto;
+}
+.sheet-arr:hover:not(:disabled){background:var(--surface);border-color:rgba(255,255,255,.12);color:var(--text);}
+.sheet-arr:disabled{opacity:.18;cursor:default;}
+.sheet-arr svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+body.light .sheet-arr{border-color:rgba(80,40,20,.12);color:var(--text-sub);}
+
+/* ── Mobile bottom bar (journal-specific) ── */
+.bottom-nav{
+  display:none;position:fixed;bottom:16px;left:16px;right:16px;z-index:30;
+  height:62px;background:rgba(18,13,17,.9);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  border:1px solid rgba(255,255,255,.08);border-radius:22px;
+  align-items:center;padding:0 8px;
+  box-shadow:0 8px 32px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06);
+}
+body.light .bottom-nav{background:rgba(237,224,213,.96);border-color:rgba(80,40,20,.1);box-shadow:0 4px 24px rgba(80,40,20,.08),inset 0 1px 0 rgba(255,255,255,.7);}
+
+.bn-who{
+  display:flex;border-radius:13px;border:1px solid var(--border);
+  background:rgba(255,255,255,.03);overflow:hidden;flex-shrink:0;
+}
+body.light .bn-who{border-color:rgba(80,40,20,.1);background:rgba(80,40,20,.04);}
+.bn-who-btn{
+  padding:7px 14px;border:none;background:transparent;cursor:pointer;
+  font-family:var(--font);font-size:12px;font-weight:300;color:var(--text-muted);
+  transition:background .15s,color .15s;white-space:nowrap;
+}
+.bn-who-btn.active{background:rgba(255,255,255,.07);color:var(--text);}
+body.light .bn-who-btn.active{background:rgba(80,40,20,.08);color:var(--text);}
+.bn-who-btn.active.ba{background:rgba(232,118,74,.1);color:var(--orange);}
+
+.bn-spacer{flex:1;}
+
+.bn-btn{
+  display:flex;align-items:center;gap:7px;
+  padding:7px 13px;border-radius:13px;border:1px solid var(--border);
+  background:transparent;cursor:pointer;font-family:var(--font);
+  font-size:12px;font-weight:300;color:var(--text-muted);
+  transition:border-color .25s,color .25s,background .15s;flex-shrink:0;
+}
+body.light .bn-btn{border-color:rgba(80,40,20,.12);}
+.bn-btn:hover{border-color:rgba(255,255,255,.14);color:var(--text-sub);}
+.bn-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;flex-shrink:0;}
+.bn-btn.cal-active{border-color:rgba(232,118,74,.35);color:var(--orange);}
+
+.bn-today{
+  padding:7px 14px;border-radius:13px;border:1px solid var(--border);
+  background:transparent;cursor:pointer;font-family:var(--font);
+  font-size:12px;font-weight:300;color:var(--text-muted);
+  transition:border-color .25s,color .25s,box-shadow .25s;flex-shrink:0;margin-left:4px;
+}
+body.light .bn-today{border-color:rgba(80,40,20,.12);}
+.bn-today:hover{border-color:rgba(232,118,74,.3);color:var(--orange);}
+@keyframes todayPulse{0%,100%{box-shadow:0 0 0 0 rgba(232,118,74,.0);}50%{box-shadow:0 0 12px 2px rgba(232,118,74,.22);}}
+.bn-today.is-today{
+  border-color:rgba(232,118,74,.35);color:var(--orange);
+  box-shadow:0 0 10px rgba(232,118,74,.18);
+  animation:todayPulse 2.8s ease-in-out infinite;
+}
+
+.mobile-who{display:none;}
+.mobile-who-btn{}
+
+/* ── Responsive ── */
+/* ── Responsive ── */
 @media(max-width:700px){
-  .app{grid-template-columns:1fr;}
-  .desktop-only{display:none!important;}
-  .sidebar{display:none;}
+  .diary-sidebar{display:none;}
+  .topbar-right{display:none;}
+  .bottom-nav{display:flex;}
   .topbar{padding:0 12px;}
   .content-inner{padding:0 16px;}
-  .date-display{display:none;}
-  .topbar-right-btns{display:flex;align-items:center;gap:6px;}
-  .main{padding-bottom:96px;}
-  .content{padding-top:24px;}
-
-  /* Bottom nav */
-  .bottom-nav{
-    display:flex;position:fixed;bottom:16px;left:20px;right:20px;z-index:30;
-    height:62px;background:rgba(22,16,20,.88);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
-    border:1px solid rgba(255,255,255,.08);border-radius:22px;
-    align-items:center;justify-content:space-around;padding:0 12px;
-    box-shadow:0 8px 32px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06);
-  }
-  .bottom-btn{
-    display:flex;flex-direction:column;align-items:center;gap:5px;
-    flex:1;padding:8px 0;border:none;background:transparent;cursor:pointer;
-    font-family:var(--font);font-size:10px;font-weight:400;letter-spacing:.05em;
-    color:rgba(228,224,227,.18);transition:color .15s;
-  }
-  .bottom-btn span{color:inherit;transition:color .15s;}
-  .bottom-btn svg{width:20px;height:20px;stroke:rgba(212,74,122,.25);transition:stroke .15s;}
-  .bottom-btn.active span{color:var(--orange);}
-  .bottom-btn.active svg{stroke:var(--pink);}
-
-  /* Mobile who toggle — shown in topbar on mobile */
-  .mobile-who{
-    display:flex;border-radius:10px;border:1px solid var(--border);
-    background:var(--surface);overflow:hidden;
-  }
-  .mobile-who-btn{
-    flex:1;padding:6px 16px;border:none;background:transparent;cursor:pointer;
-    font-family:var(--font);font-size:13px;font-weight:300;color:var(--text-muted);
-    transition:background .15s,color .15s;
-  }
-  .mobile-who-btn.active{background:rgba(255,255,255,.07);color:var(--text);}
-  .mobile-who-btn.active.ba{background:rgba(232,118,74,.1);color:var(--orange);}
-
-  /* Calendar sheet */
-  .cal-backdrop-m{
-    display:none;position:fixed;inset:0;z-index:24;
-    background:rgba(0,0,0,.4);
-  }
-  .cal-backdrop-m.open{display:block;}
-  .cal-sheet{
-    display:none;position:fixed;bottom:64px;left:0;right:0;z-index:25;
-    background:rgba(16,12,14,.98);backdrop-filter:blur(32px);
-    border-top:1px solid var(--border2);border-radius:20px 20px 0 0;
-    padding:20px 16px 24px;
-  }
-  .cal-sheet.open{display:block;animation:slideUp .25s cubic-bezier(.16,1,.3,1);}
-  @keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
-  .cal-sheet-handle{
-    width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,.15);
-    margin:0 auto 16px;cursor:grab;
-  }
+  .content-scroll{padding-top:24px;padding-bottom:96px;}
+  #mobileWhoWrap{display:none!important;}
 }
 @media(min-width:701px){
-  .bottom-nav{display:none;}
-  .mobile-who{display:none;}
-  .cal-sheet{display:none;}
-  .topbar-right-btns{display:none;}
+  .cal-sheet{display:none!important;}
+  .cal-backdrop-m{display:none!important;}
+}
+@media(min-width:768px){
+  :root{--text-sub:rgba(228,224,227,.62);--text-muted:rgba(228,224,227,.40);--text-dim:rgba(228,224,227,.26);}
+  .topbar{height:60px;}
+  .topbar-logo{font-size:24px;}
+  .menu-btn{left:24px;}
+  .content-inner{max-width:640px;}
+  .settings-header{padding:0 36px;height:60px;}
+  .settings-title{font-size:24px;}
+  .settings-tabs{padding:0 32px;}
+  .stab{font-size:12.5px;padding:16px 8px 14px;letter-spacing:.01em;}
+  .settings-content{padding:36px 32px;}
+  .settings-body{max-width:600px;}
+  .s-row{padding:15px 18px;border-radius:16px;}
+  .s-row-label{font-size:14px;}
+  .s-row-sub{font-size:12px;}
 }
 </style>
 </head>
 <body>
 <canvas id="glow"></canvas>
 <div class="noise"></div>
-<div class="vignette"></div>
 
 <div class="app">
 
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="sidebar-top">
-      <span class="sidebar-logo">BRIAS</span>
-      <div class="who-toggle">
-        <button class="who-btn active" id="btnUser" onclick="setWho('user')"></button>
-        <button class="who-btn" id="btnBrias" onclick="setWho('brias')">BRIAS</button>
-      </div>
-    </div>
+  <!-- Topbar -->
+  <div class="topbar">
+    <button class="menu-btn" id="menuBtn" onclick="toggleDrawer()">
+      <div class="lns"><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>
+    </button>
+    <div class="topbar-logo">Journal</div>
 
-    <div class="month-nav">
-      <div class="month-label" id="sideMonthLabel"></div>
-      <div class="month-arrows">
-        <button class="arr-btn" id="sidePrevBtn" onclick="sideNav(-1)">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <button class="arr-btn" id="sideNextBtn" onclick="sideNav(1)">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-      </div>
-    </div>
-
-    <div class="mini-cal">
-      <div class="mini-cal-grid" id="miniCalGrid"></div>
-    </div>
-
-    <div class="year-section" id="yearSection"></div>
   </div>
 
-  <!-- Main -->
-  <div class="main">
-    <div class="topbar">
-      <div class="mobile-who">
+  <!-- Body -->
+  <div class="main-body">
+
+    <!-- Desktop sidebar -->
+    <div class="diary-sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-top-label">View</div>
+        <div class="who-toggle">
+          <button class="who-btn active" id="btnUser" onclick="setWho('user')"></button>
+          <button class="who-btn" id="btnBrias" onclick="setWho('brias')">BRIAS</button>
+        </div>
+      </div>
+
+      <div class="month-nav">
+        <button class="arr-btn" id="sidePrevBtn" onclick="sideNav(-1)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="month-label" id="sideMonthLabel"></div>
+        <button class="arr-btn" id="sideNextBtn" onclick="sideNav(1)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+
+      <button class="sidebar-today" id="sidebarToday" onclick="goToday()">Today</button>
+      <div class="mini-cal"><div class="mini-cal-grid" id="miniCalGrid"></div></div>
+      <div class="year-section" id="yearSection"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="content-area">
+
+      <!-- Mobile who toggle (in topbar on mobile) -->
+      <div class="mobile-who" id="mobileWhoWrap" style="margin:10px 14px 0;">
         <button class="mobile-who-btn active" id="mBtnUser" onclick="setWho('user')"></button>
         <button class="mobile-who-btn" id="mBtnBrias" onclick="setWho('brias')">BRIAS</button>
       </div>
-      <!-- Desktop page switch — center of topbar -->
-      <div class="page-switch desktop-only">
-        <button class="page-btn" onclick="window.location.href='app.html'">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          Chat
-        </button>
-        <button class="page-btn active">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-          Journal
-        </button>
-      </div>
-      <div class="topbar-right-btns">
-        <button class="today-btn" id="mCalBtn" onclick="toggleMobileCal()">Calendar</button>
-        <button class="today-btn" onclick="goToday()">Today</button>
-      </div>
-    </div>
 
-    <!-- Mobile calendar backdrop -->
-    <div class="cal-backdrop-m" id="calBackdropM" onclick="toggleMobileCal()"></div>
+      <!-- Mobile calendar backdrop -->
+      <div class="cal-backdrop-m" id="calBackdropM" onclick="toggleMobileCal()"></div>
 
-    <!-- Mobile calendar sheet -->
-    <div class="cal-sheet" id="calSheet">
-      <div class="cal-sheet-handle" id="calHandle"></div>
-
-      <!-- Year/month picker (hidden by default) -->
-      <div id="sheetPicker" style="display:none;">
-        <div id="sheetPickerInner"></div>
-      </div>
-
-      <!-- Normal calendar view -->
-      <div id="sheetCalView">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-          <button class="arr-btn" id="sheetPrevBtn" onclick="sheetNav(-1)" style="width:36px;height:36px;border-radius:10px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-          </button>
-          <div id="sheetMonthLabel" onclick="openSheetPicker()"
-            style="font-family:var(--font-display);font-size:20px;font-weight:500;font-style:italic;color:var(--text-sub);cursor:pointer;padding:4px 12px;border-radius:8px;transition:background .15s;"
-            onmouseover="this.style.background='rgba(255,255,255,.05)'" onmouseout="this.style.background=''">
+      <!-- Mobile calendar sheet -->
+      <div class="cal-sheet" id="calSheet">
+        <div class="cal-sheet-handle" id="calHandle"></div>
+        <div id="sheetPicker" style="display:none;"><div id="sheetPickerInner"></div></div>
+        <div id="sheetCalView">
+          <div class="sheet-cal-header">
+            <button class="sheet-arr" id="sheetPrevBtn" onclick="sheetNav(-1)">
+              <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div class="sheet-cal-label" id="sheetMonthLabel" onclick="openSheetPicker()"></div>
+            <button class="sheet-arr" id="sheetNextBtn" onclick="sheetNav(1)">
+              <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
           </div>
-          <button class="arr-btn" id="sheetNextBtn" onclick="sheetNav(1)" style="width:36px;height:36px;border-radius:10px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
+          <div class="mini-cal-grid" id="sheetCalGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;"></div>
         </div>
-        <div class="mini-cal-grid" id="sheetCalGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;"></div>
       </div>
-    </div>
 
-    <div class="content" id="contentScroll">
-      <div class="content-inner" id="contentInner"></div>
+      <div class="content-scroll" id="contentScroll">
+        <div class="content-inner" id="contentInner"></div>
+      </div>
     </div>
   </div>
-
 </div>
 
-<!-- Mobile bottom nav -->
-<div class="bottom-nav">
-  <button class="bottom-btn" onclick="window.location.href='app.html'">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-    <span>Chat</span>
+<!-- Mobile bottom bar -->
+<div class="bottom-nav" id="bottomNav">
+  <!-- Who toggle: left -->
+  <div class="bn-who">
+    <button class="bn-who-btn active" id="bnUser" onclick="setWho('user')"></button>
+    <button class="bn-who-btn" id="bnBrias" onclick="setWho('brias')">BRIAS</button>
+  </div>
+  <div class="bn-spacer"></div>
+  <!-- Calendar btn -->
+  <button class="bn-btn" id="bnCal" onclick="toggleMobileCal()">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Calendar
   </button>
-  <button class="bottom-btn active">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-    <span>Journal</span>
-  </button>
+  <!-- Today — glows when on today -->
+  <button class="bn-today" id="bnToday" onclick="goToday()">Today</button>
+</div>
+
+<!-- Drawer -->
+<div class="drawer" id="drawer">
+  <div class="drawer-backdrop" onclick="closeDrawer()"></div>
+  <div class="drawer-panel">
+    <div class="drawer-top"><div class="drawer-logo">BRIAS</div></div>
+    <div class="drawer-nav">
+      <div class="nav-section-label">Spaces</div>
+      <button class="nav-item" onclick="window.location.href='app.html'">
+        <div class="nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <div class="nav-texts"><div class="nav-name">Chat</div><div class="nav-sub">Your conversation with BRIAS</div></div>
+      </button>
+      <button class="nav-item active" onclick="closeDrawer()">
+        <div class="nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
+            <defs><linearGradient id="ng1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e8764a"/><stop offset="100%" stop-color="#d44a7a"/></linearGradient></defs>
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" stroke="url(#ng1)"/>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" stroke="url(#ng1)"/>
+          </svg>
+        </div>
+        <div class="nav-texts"><div class="nav-name">Journal</div><div class="nav-sub">You and BRIAS write here together</div></div>
+      </button>
+      <button class="nav-item">
+        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        <div class="nav-texts"><div class="nav-name">Agenda <span class="soon-badge">soon</span></div><div class="nav-sub">Keep track of mental steps</div></div>
+      </button>
+      <button class="nav-item">
+        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+        <div class="nav-texts"><div class="nav-name">Mindspace <span class="soon-badge">soon</span></div><div class="nav-sub">Dump it here, sort later</div></div>
+      </button>
+    </div>
+    <div class="drawer-divider"></div>
+    <div class="drawer-footer">
+      <div class="footer-av"><span id="drawerInitial">—</span></div>
+      <div class="footer-info">
+        <div class="footer-name" id="drawerName">—</div>
+        <div class="footer-handle" id="drawerHandle">—</div>
+      </div>
+      <button class="drawer-settings-btn" onclick="openSettings();closeDrawer();" title="Settings">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.3)" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings overlay -->
+<div class="settings-overlay" id="settingsOverlay">
+  <div class="settings-header">
+    <div class="settings-title">Settings</div>
+    <button class="settings-close-btn" onclick="closeSettings()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.5)" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="settings-tabs" id="settingsTabs">
+    <button class="stab active" onclick="switchTab(0)">Profile</button>
+    <button class="stab" onclick="switchTab(1)">Plan</button>
+    <button class="stab" onclick="switchTab(2)">Permissions</button>
+    <button class="stab" onclick="switchTab(3)">Customise</button>
+    <button class="stab" onclick="switchTab(4)">About</button>
+  </div>
+  <div class="settings-content">
+    <div class="settings-body" id="settingsBody"></div>
+  </div>
 </div>
 
 <script>
-// ── Auth check ──
+// ── Apply saved theme immediately ──
+if (localStorage.getItem('brias_theme') === 'light') document.body.classList.add('light');
+
 const API = 'https://api.brias.eu';
+let meData = null;
+
+// ── Auth ──
 (async function() {
   const token = localStorage.getItem('brias_token');
   if (!token) { window.location.href = 'auth.html'; return; }
   try {
     const r = await fetch(API + '/api/me', { headers: { 'Authorization': 'Bearer ' + token }, signal: AbortSignal.timeout(3000) });
     const d = await r.json();
-    if (!d.logged_in) { localStorage.removeItem('brias_token'); localStorage.removeItem('brias_username'); window.location.href = 'auth.html'; }
+    if (!d.logged_in) { localStorage.removeItem('brias_token'); localStorage.removeItem('brias_username'); window.location.href = 'auth.html'; return; }
+    meData = d;
+    const name = d.display_name || d.username || localStorage.getItem('brias_username') || '—';
+    document.getElementById('drawerName').textContent = name;
+    document.getElementById('drawerHandle').textContent = d.email || d.username || '—';
+    document.getElementById('drawerInitial').textContent = name.charAt(0).toUpperCase();
   } catch { window.location.href = 'auth.html'; }
 })();
 
-// ── State ──
-const TODAY = new Date(); TODAY.setHours(0,0,0,0);
-let viewDate  = new Date(TODAY);
-let sideMonth = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
-let who = 'user';
-let editingMode = false;
+function doLogout() {
+  localStorage.removeItem('brias_token'); localStorage.removeItem('brias_username');
+  window.location.href = 'auth.html';
+}
 
-// ── Helpers ──
-const MONTHS     = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const WEEKDAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-const MONTHS_SH  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+// ── Drawer ──
+function toggleDrawer() { document.getElementById('drawer').classList.contains('open') ? closeDrawer() : openDrawer(); }
+function openDrawer() { document.getElementById('drawer').classList.add('open'); document.getElementById('menuBtn').classList.add('open'); }
+function closeDrawer() { document.getElementById('drawer').classList.remove('open'); document.getElementById('menuBtn').classList.remove('open'); }
 
-function ds(d){ return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}` }
-function p2(n){ return String(n).padStart(2,'0') }
-function isToday(d){ return ds(d)===ds(TODAY) }
-function isFuture(d){ const c=new Date(d);c.setHours(0,0,0,0);return c>TODAY }
-function esc(s){ const d=document.createElement('div');d.textContent=s;return d.innerHTML }
-function getUsername(){ return localStorage.getItem('brias_username')||'You' }
-function skey(w,d){ const u=localStorage.getItem('brias_username')||'anon'; return `brias_diary_${u}_${w}_${d}` }
-function getEntry(w,d){ return localStorage.getItem(skey(w,ds(d)))||'' }
-function setEntry(w,d,v){ if(v.trim()) localStorage.setItem(skey(w,ds(d)),v.trim()); else localStorage.removeItem(skey(w,ds(d))) }
-function hasEntry(d){ return !!(localStorage.getItem(skey('user',ds(d)))||localStorage.getItem(skey('brias',ds(d)))) }
+// ── Settings ──
+const tabs = [
+  ()=>`
+    <div class="s-section">
+      <div class="s-section-title">Profile</div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Name</div></div><button class="s-btn">${esc(meData?.display_name||meData?.username||'—')}</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Age</div></div><button class="s-btn">${esc(String(meData?.age||'—'))}</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Email</div></div><div class="s-row-val">${esc(meData?.email||'—')}</div></div>
+    </div>
+    <div class="s-section">
+      <div class="s-section-title">Manage</div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Password</div></div><button class="s-btn">Change</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Sign out</div></div><button class="s-btn" onclick="doLogout()">Sign out</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Delete account</div></div><button class="s-btn danger">Delete</button></div>
+    </div>`,
+  ()=>`
+    <p class="sub-intro"></p>
+    <div class="sub-cards">
+      <div class="sub-card"><div class="sub-card-name">Standard</div><div class="sub-card-price">€— <span>/ month</span></div><ul class="sub-card-perks"><li></li><li></li><li></li></ul></div>
+      <div class="sub-card"><div class="sub-card-name">Supportive</div><div class="sub-card-price">€— <span>/ month</span></div><ul class="sub-card-perks"><li></li><li></li><li></li></ul></div>
+      <div class="sub-card"><div class="sub-card-name">Advanced</div><div class="sub-card-price">€— <span>/ month</span></div><ul class="sub-card-perks"><li></li><li></li><li></li></ul></div>
+    </div>`,
+  ()=>`
+    <div class="s-section">
+      <div class="s-section-title">Device</div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Notifications</div><div class="s-row-sub">Let BRIAS check in on you</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Microphone</div><div class="s-row-sub">For voice messages</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
+    </div>
+    <div class="s-section">
+      <div class="s-section-title">Data</div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Save conversations</div><div class="s-row-sub">Keep your chat history</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Save journal</div><div class="s-row-sub">Stored locally on your device</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+    </div>`,
+  ()=>`
+    <div class="s-section">
+      <div class="s-section-title">Appearance</div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Theme</div><div class="s-row-sub">Choose what feels right for you</div></div>
+        <div class="theme-toggle" id="themeToggle">
+          <div class="theme-toggle-pill"></div>
+          <button class="theme-opt ${!document.body.classList.contains('light')?'active':''}" onclick="setTheme('dark')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <span>Dark</span>
+          </button>
+          <button class="theme-opt ${document.body.classList.contains('light')?'active':''}" onclick="setTheme('light')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <span>Light</span>
+          </button>
+        </div>
+      </div>
+    </div>`,
+  ()=>`<span class="about-logo">BRIAS</span>`
+];
+
+function openSettings() { document.getElementById('settingsOverlay').classList.add('open'); switchTab(0); }
+function closeSettings() { document.getElementById('settingsOverlay').classList.remove('open'); }
+function switchTab(i) {
+  document.querySelectorAll('.stab').forEach((t,j)=>t.classList.toggle('active',j===i));
+  document.getElementById('settingsBody').innerHTML = tabs[i]();
+  const toggle = document.getElementById('themeToggle');
+  if (toggle) toggle.classList.toggle('pill-right', document.body.classList.contains('light'));
+}
+function setTheme(mode) {
+  if (mode==='light') document.body.classList.add('light');
+  else document.body.classList.remove('light');
+  localStorage.setItem('brias_theme', mode);
+  const toggle = document.getElementById('themeToggle');
+  if (toggle) toggle.classList.toggle('pill-right', mode==='light');
+  document.querySelectorAll('.theme-opt').forEach(btn => {
+    const isDark = btn.getAttribute('onclick').includes('dark');
+    btn.classList.toggle('active', mode==='dark' ? isDark : !isDark);
+  });
+}
 
 // ── WebGL glow ──
 (function(){
@@ -485,20 +802,39 @@ function hasEntry(d){ return !!(localStorage.getItem(skey('user',ds(d)))||localS
   (function tick(){gl.uniform1f(tLoc,(performance.now()-start)/1000);gl.uniform2f(rLoc,c.width||1,c.height||1);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);requestAnimationFrame(tick);})();
 })();
 
+// ── State ──
+const TODAY = new Date(); TODAY.setHours(0,0,0,0);
+let viewDate  = new Date(TODAY);
+let sideMonth = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
+let who = 'user';
+let editingMode = false;
+
+// ── Helpers ──
+const MONTHS   = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const WEEKDAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+function ds(d){ return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}` }
+function p2(n){ return String(n).padStart(2,'0') }
+function isToday(d){ return ds(d)===ds(TODAY) }
+function isFuture(d){ const c=new Date(d);c.setHours(0,0,0,0);return c>TODAY }
+function esc(s){ const d=document.createElement('div');d.textContent=s;return d.innerHTML }
+function getUsername(){ return localStorage.getItem('brias_username')||'You' }
+function skey(w,d){ const u=localStorage.getItem('brias_username')||'anon'; return `brias_diary_${u}_${w}_${d}` }
+function getEntry(w,d){ return localStorage.getItem(skey(w,ds(d)))||'' }
+function setEntry(w,d,v){ if(v.trim()) localStorage.setItem(skey(w,ds(d)),v.trim()); else localStorage.removeItem(skey(w,ds(d))) }
+function hasEntry(d){ return !!(localStorage.getItem(skey('user',ds(d)))||localStorage.getItem(skey('brias',ds(d)))) }
+
 // ── Who toggle ──
 function setWho(w){
-  who=w;editingMode=false;
-  renderTopbar();
-  // Desktop
-  const bu=document.getElementById('btnUser');
-  const bb=document.getElementById('btnBrias');
-  if(bu) bu.className='who-btn'+(w==='user'?' active':'');
+  who=w; editingMode=false;
+  const uname=getUsername();
+  // Desktop sidebar who-toggle
+  const bu=document.getElementById('btnUser'); const bb=document.getElementById('btnBrias');
+  if(bu){ bu.textContent=uname; bu.className='who-btn'+(w==='user'?' active':''); }
   if(bb) bb.className='who-btn'+(w==='brias'?' active brias-active':'');
-  // Mobile
-  const mu=document.getElementById('mBtnUser');
-  const mb=document.getElementById('mBtnBrias');
-  if(mu) mu.className='mobile-who-btn'+(w==='user'?' active':'');
-  if(mb) mb.className='mobile-who-btn'+(w==='brias'?' active ba':'');
+  // Bottom bar who-toggle
+  const bnu=document.getElementById('bnUser'); const bnb=document.getElementById('bnBrias');
+  if(bnu){ bnu.textContent=uname; bnu.className='bn-who-btn'+(w==='user'?' active':''); }
+  if(bnb) bnb.className='bn-who-btn'+(w==='brias'?' active ba':'');
   renderContent();
 }
 
@@ -531,8 +867,6 @@ function renderSide(){
   const todayFirst=new Date(TODAY.getFullYear(),TODAY.getMonth(),1);
   document.getElementById('sideMonthLabel').textContent=`${MONTHS[sideMonth.getMonth()]} ${sideMonth.getFullYear()}`;
   document.getElementById('sideNextBtn').disabled=sideMonth.getTime()>=todayFirst.getTime();
-
-  // Mini calendar
   const grid=document.getElementById('miniCalGrid');
   const days=['M','T','W','T','F','S','S'];
   let h=days.map(d=>`<div class="mini-lbl">${d}</div>`).join('');
@@ -545,17 +879,11 @@ function renderSide(){
     const f=isFuture(dd);
     let cls='mini-d';
     if(f)cls+=' f';
-    else{
-      if(isToday(dd))cls+=' tod';
-      if(ds(dd)===ds(viewDate))cls+=' sel';
-      if(hasEntry(dd))cls+=' has';
-    }
+    else{ if(isToday(dd))cls+=' tod'; if(ds(dd)===ds(viewDate))cls+=' sel'; if(hasEntry(dd))cls+=' has'; }
     const click=f?'':`onclick="pickDay('${ds(dd)}')"`;
     h+=`<div class="${cls}" ${click}>${d}</div>`;
   }
   grid.innerHTML=h;
-
-  // Year overview
   renderYearSection();
 }
 
@@ -563,16 +891,11 @@ let openYears = new Set([TODAY.getFullYear()]);
 
 function renderYearSection(){
   const sec=document.getElementById('yearSection');
-  const startYear=2025;
-  const endYear=TODAY.getFullYear();
+  const startYear=2025, endYear=TODAY.getFullYear();
   let h='';
   for(let y=endYear;y>=startYear;y--){
     const isOpen=openYears.has(y);
-    const yearHasEntry=(()=>{
-      const endM=(y===endYear)?TODAY.getMonth():11;
-      for(let m=0;m<=endM;m++) if(monthHasAnyEntry(y,m)) return true;
-      return false;
-    })();
+    const yearHasEntry=(()=>{ const endM=(y===endYear)?TODAY.getMonth():11; for(let m=0;m<=endM;m++) if(monthHasAnyEntry(y,m)) return true; return false; })();
     h+=`<div class="year-group">
       <div class="year-label-btn${isOpen?' open':''}" onclick="toggleYear(${y})">
         <span>${y}</span>
@@ -587,8 +910,7 @@ function renderYearSection(){
         const monthHasEntry=monthHasAnyEntry(y,m);
         const isActive=sideMonth.getFullYear()===y&&sideMonth.getMonth()===m;
         h+=`<div class="month-chip${isActive?' active':''}${monthHasEntry?' has-entries':''}" onclick="jumpMonth(${y},${m})">
-          ${MONTHS[m]}
-          <div class="month-chip-dot"></div>
+          ${MONTHS[m]}<div class="month-chip-dot"></div>
         </div>`;
       }
     }
@@ -597,77 +919,21 @@ function renderYearSection(){
   sec.innerHTML=h;
 }
 
-function toggleYear(y){
-  if(openYears.has(y)) openYears.delete(y);
-  else openYears.add(y);
-  renderYearSection();
-}
-
-function monthHasAnyEntry(y,m){
-  const dim=new Date(y,m+1,0).getDate();
-  for(let d=1;d<=dim;d++){
-    const dd=new Date(y,m,d);
-    if(hasEntry(dd))return true;
-  }
-  return false;
-}
-
+function toggleYear(y){ if(openYears.has(y)) openYears.delete(y); else openYears.add(y); renderYearSection(); }
+function monthHasAnyEntry(y,m){ const dim=new Date(y,m+1,0).getDate(); for(let d=1;d<=dim;d++){ if(hasEntry(new Date(y,m,d)))return true; } return false; }
 function jumpMonth(y,m){
   sideMonth=new Date(y,m,1);
-  // Also navigate viewDate to first day of that month (or today if current month)
-  const target=new Date(y,m,1);
-  const todayFirst=new Date(TODAY.getFullYear(),TODAY.getMonth(),1);
-  if(target.getTime()===todayFirst.getTime()){
-    viewDate=new Date(TODAY);
-  } else {
-    viewDate=new Date(y,m,1);
-  }
+  const target=new Date(y,m,1), todayFirst=new Date(TODAY.getFullYear(),TODAY.getMonth(),1);
+  viewDate = target.getTime()===todayFirst.getTime() ? new Date(TODAY) : new Date(y,m,1);
   renderAll();
 }
 
-// ── Main content ──
-function renderTopbar(){
-  // Date
-  const dd=document.getElementById('dateDisplay');
-  if(dd){
-    dd.textContent=`${viewDate.getDate()} ${MONTHS[viewDate.getMonth()]} ${viewDate.getFullYear()}`;
-    dd.className='date-display'+(isToday(viewDate)?' tod':'');
-  }
-  const uname=getUsername();
-  // Desktop who toggle (sidebar — may be hidden but exists in DOM)
-  const bu=document.getElementById('btnUser');
-  const bb=document.getElementById('btnBrias');
-  if(bu){
-    bu.textContent=uname;
-    bu.className='who-btn'+(who==='user'?' active':'');
-  }
-  if(bb){
-    bb.className='who-btn'+(who==='brias'?' active brias-active':'');
-  }
-  // Mobile who toggle
-  const mu=document.getElementById('mBtnUser');
-  const mb=document.getElementById('mBtnBrias');
-  if(mu){
-    mu.textContent=uname;
-    mu.className='mobile-who-btn'+(who==='user'?' active':'');
-  }
-  if(mb){
-    mb.className='mobile-who-btn'+(who==='brias'?' active ba':'');
-  }
-}
-
+// ── Content ──
 function renderContent(){
   const ci=document.getElementById('contentInner');
-  const editable=isToday(viewDate);
-  const isBrias=who==='brias';
-  const saved=getEntry(who,viewDate);
+  const editable=isToday(viewDate), isBrias=who==='brias', saved=getEntry(who,viewDate);
+  const dayNum=p2(viewDate.getDate()), wday=WEEKDAYS[viewDate.getDay()], mo=MONTHS[viewDate.getMonth()], yr=viewDate.getFullYear();
 
-  const dayNum=p2(viewDate.getDate());
-  const wday=WEEKDAYS[viewDate.getDay()];
-  const mo=MONTHS[viewDate.getMonth()];
-  const yr=viewDate.getFullYear();
-
-  // Day header
   let header=`<div class="day-header">
     <div class="day-big${isToday(viewDate)?' tod':''}">${dayNum}</div>
     <div class="day-name">${wday}</div>
@@ -678,7 +944,6 @@ function renderContent(){
     </div>`:''}
   </div>`;
 
-  // Entry
   let entry='';
   if(isBrias){
     const empty=!saved;
@@ -689,7 +954,6 @@ function renderContent(){
     </div>`;
   } else if(editable){
     if(saved && !editingMode){
-      // Saved state: show as diary page with edit button
       entry=`<div class="entry-wrap">
         <div class="entry-body" style="position:relative;">
           <div class="entry-ro" id="entryReadView">${esc(saved)}</div>
@@ -700,7 +964,6 @@ function renderContent(){
         </div>
       </div>`;
     } else {
-      // Empty or editing: textarea
       entry=`<div class="entry-wrap">
         <div class="entry-body editable">
           <textarea class="entry-ta" id="mainTa" placeholder="Write something for today…">${esc(saved)}</textarea>
@@ -731,60 +994,62 @@ function renderContent(){
   }
 }
 
-function startEditing(){
-  editingMode=true;
-  renderContent();
-}
-
+function startEditing(){ editingMode=true; renderContent(); }
 function doSave(){
   const ta=document.getElementById('mainTa');if(!ta)return;
   setEntry(who,viewDate,ta.value);
-  editingMode=false;
+  editingMode=false; renderContent(); renderSide();
+}
+
+function renderAll(){
+  if(mobileCalOpen) renderSheetCal();
+  const uname=getUsername();
+  // Desktop sidebar
+  const bu=document.getElementById('btnUser'); if(bu)bu.textContent=uname;
+  // Bottom bar — sync who labels and today-glow
+  const bnu=document.getElementById('bnUser'); if(bnu)bnu.textContent=uname;
+  const bnb=document.getElementById('bnBrias');
+  if(bnu) bnu.className='bn-who-btn'+(who==='user'?' active':'');
+  if(bnb) bnb.className='bn-who-btn'+(who==='brias'?' active ba':'');
+  updateTodayGlow();
   renderContent();
   renderSide();
 }
 
-// ── Render all ──
-function renderAll(){
-  if(mobileCalOpen) renderSheetCal();
-  renderTopbar();
-  renderContent();
-  renderSide();
+function updateTodayGlow(){
+  const onToday = isToday(viewDate);
+  const bnBtn=document.getElementById('bnToday');
+  if(bnBtn) bnBtn.classList.toggle('is-today', onToday);
+  const sideBtn=document.getElementById('sidebarToday');
+  if(sideBtn) sideBtn.classList.toggle('is-today', onToday);
 }
 
 // ── Mobile calendar sheet ──
 let mobileCalOpen = false;
-let sheetPickerMode = null; // null | 'year' | 'month'
+let sheetPickerMode = null;
 let sheetPickerYear = null;
 
 function sheetNav(dir){
   const todayFirst=new Date(TODAY.getFullYear(),TODAY.getMonth(),1);
   const next=new Date(sideMonth.getFullYear(),sideMonth.getMonth()+dir,1);
   if(next>todayFirst) return;
-  sideMonth=next;
-  renderSheetCal();
-  renderSide();
+  sideMonth=next; renderSheetCal(); renderSide();
 }
 
 function openSheetPicker(){
-  sheetPickerMode='year';
-  sheetPickerYear=null;
+  sheetPickerMode='year'; sheetPickerYear=null;
   renderSheetPicker();
   document.getElementById('sheetPicker').style.display='block';
   document.getElementById('sheetCalView').style.display='none';
 }
-
 function closeSheetPicker(){
   sheetPickerMode=null;
   document.getElementById('sheetPicker').style.display='none';
   document.getElementById('sheetCalView').style.display='block';
 }
-
 function renderSheetPicker(){
-  const inner=document.getElementById('sheetPickerInner');
-  if(!inner) return;
+  const inner=document.getElementById('sheetPickerInner'); if(!inner) return;
   const todayFirst=new Date(TODAY.getFullYear(),TODAY.getMonth(),1);
-
   if(sheetPickerMode==='year'){
     const startY=2025, endY=TODAY.getFullYear();
     let h=`<div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim);margin-bottom:14px;">Select year</div>
@@ -801,8 +1066,7 @@ function renderSheetPicker(){
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">`;
     for(let m=0;m<=11;m++){
-      const d=new Date(sheetPickerYear,m,1);
-      const future=d>todayFirst;
+      const d=new Date(sheetPickerYear,m,1), future=d>todayFirst;
       const active=sideMonth.getFullYear()===sheetPickerYear&&sideMonth.getMonth()===m;
       h+=`<button ${future?'disabled':''} onclick="pickSheetMonth(${m})" style="padding:12px 0;border:1px solid ${active?'rgba(232,118,74,.4)':'rgba(255,255,255,.07)'};border-radius:12px;background:${active?'rgba(232,118,74,.1)':'transparent'};color:${future?'rgba(228,224,227,.1)':(active?'var(--orange)':'var(--text-muted)')};font-family:var(--font);font-size:13px;font-weight:${active?'500':'300'};cursor:${future?'default':'pointer'};">${MONTHS[m].slice(0,3)}</button>`;
     }
@@ -810,113 +1074,62 @@ function renderSheetPicker(){
     inner.innerHTML=h;
   }
 }
+function pickSheetYear(y){ sheetPickerYear=y; sheetPickerMode='month'; renderSheetPicker(); }
+function pickSheetMonth(m){ sideMonth=new Date(sheetPickerYear,m,1); closeSheetPicker(); renderSheetCal(); renderSide(); }
 
-function pickSheetYear(y){
-  sheetPickerYear=y;
-  sheetPickerMode='month';
-  renderSheetPicker();
-}
-
-function pickSheetMonth(m){
-  sideMonth=new Date(sheetPickerYear,m,1);
-  closeSheetPicker();
-  renderSheetCal();
-  renderSide();
-}
 function toggleMobileCal(){
   mobileCalOpen = !mobileCalOpen;
-  const sheet = document.getElementById('calSheet');
-  const backdrop = document.getElementById('calBackdropM');
-  const btn = document.getElementById('mCalBtn');
-  if(mobileCalOpen){
-    sheet.classList.add('open');
-    if(backdrop) backdrop.classList.add('open');
-    if(btn) btn.style.color = 'var(--orange)';
-    renderSheetCal();
-  } else {
-    sheet.classList.remove('open');
-    if(backdrop) backdrop.classList.remove('open');
-    if(btn) btn.style.color = '';
-  }
+  const sheet=document.getElementById('calSheet'), backdrop=document.getElementById('calBackdropM');
+  const calBtn=document.getElementById('bnCal');
+  if(mobileCalOpen){ sheet.classList.add('open'); if(backdrop) backdrop.classList.add('open'); if(calBtn) calBtn.classList.add('cal-active'); renderSheetCal(); }
+  else { sheet.classList.remove('open'); if(backdrop) backdrop.classList.remove('open'); if(calBtn) calBtn.classList.remove('cal-active'); }
 }
 
-// Swipe down to close calendar sheet
+// Swipe down to close
 (function(){
-  let startY = 0, dragging = false;
-  document.addEventListener('touchstart', e => {
-    const handle = document.getElementById('calHandle');
-    const sheet = document.getElementById('calSheet');
-    if(!mobileCalOpen || !sheet) return;
-    // Allow swipe anywhere on the sheet
-    if(sheet.contains(e.target)){
-      startY = e.touches[0].clientY;
-      dragging = true;
-    }
-  }, {passive:true});
-  document.addEventListener('touchmove', e => {
-    if(!dragging || !mobileCalOpen) return;
-    const sheet = document.getElementById('calSheet');
-    const dy = e.touches[0].clientY - startY;
-    if(dy > 0 && sheet) sheet.style.transform = `translateY(${dy}px)`;
-  }, {passive:true});
-  document.addEventListener('touchend', e => {
-    if(!dragging) return;
-    dragging = false;
-    const sheet = document.getElementById('calSheet');
-    const dy = e.changedTouches[0].clientY - startY;
-    if(sheet) sheet.style.transform = '';
-    if(dy > 60) toggleMobileCal();
-  }, {passive:true});
+  let startY=0, dragging=false;
+  document.addEventListener('touchstart',e=>{ const sheet=document.getElementById('calSheet'); if(!mobileCalOpen||!sheet) return; if(sheet.contains(e.target)){startY=e.touches[0].clientY;dragging=true;} },{passive:true});
+  document.addEventListener('touchmove',e=>{ if(!dragging||!mobileCalOpen) return; const sheet=document.getElementById('calSheet'); const dy=e.touches[0].clientY-startY; if(dy>0&&sheet)sheet.style.transform=`translateY(${dy}px)`; },{passive:true});
+  document.addEventListener('touchend',e=>{ if(!dragging) return; dragging=false; const sheet=document.getElementById('calSheet'); const dy=e.changedTouches[0].clientY-startY; if(sheet)sheet.style.transform=''; if(dy>60)toggleMobileCal(); },{passive:true});
 })();
 
 function renderSheetCal(){
-  const label = document.getElementById('sheetMonthLabel');
-  const grid = document.getElementById('sheetCalGrid');
-  const nextBtn = document.getElementById('sheetNextBtn');
-  const prevBtn = document.getElementById('sheetPrevBtn');
-  if(!label || !grid) return;
-  const todayFirst = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
-  label.textContent = `${MONTHS[sideMonth.getMonth()]} ${sideMonth.getFullYear()}`;
-  if(nextBtn) nextBtn.disabled = sideMonth.getTime() >= todayFirst.getTime();
-  if(prevBtn) prevBtn.disabled = false;
+  const label=document.getElementById('sheetMonthLabel'), grid=document.getElementById('sheetCalGrid');
+  const nextBtn=document.getElementById('sheetNextBtn'), prevBtn=document.getElementById('sheetPrevBtn');
+  if(!label||!grid) return;
+  const todayFirst=new Date(TODAY.getFullYear(),TODAY.getMonth(),1);
+  label.textContent=`${MONTHS[sideMonth.getMonth()]} ${sideMonth.getFullYear()}`;
+  if(nextBtn) nextBtn.disabled=sideMonth.getTime()>=todayFirst.getTime();
+  if(prevBtn) prevBtn.disabled=false;
   const days=['M','T','W','T','F','S','S'];
-  let h = days.map(d=>`<div class="mini-lbl">${d}</div>`).join('');
-  const first = new Date(sideMonth.getFullYear(), sideMonth.getMonth(), 1);
-  const dow = (first.getDay()+6)%7;
+  let h=days.map(d=>`<div class="mini-lbl">${d}</div>`).join('');
+  const first=new Date(sideMonth.getFullYear(),sideMonth.getMonth(),1);
+  const dow=(first.getDay()+6)%7;
   for(let i=0;i<dow;i++) h+=`<div class="mini-d e"></div>`;
-  const dim = new Date(sideMonth.getFullYear(), sideMonth.getMonth()+1, 0).getDate();
+  const dim=new Date(sideMonth.getFullYear(),sideMonth.getMonth()+1,0).getDate();
   for(let d=1;d<=dim;d++){
-    const dd = new Date(sideMonth.getFullYear(), sideMonth.getMonth(), d);
-    const f = isFuture(dd);
+    const dd=new Date(sideMonth.getFullYear(),sideMonth.getMonth(),d);
+    const f=isFuture(dd);
     let cls='mini-d';
     if(f) cls+=' f';
-    else {
-      if(isToday(dd)) cls+=' tod';
-      if(ds(dd)===ds(viewDate)) cls+=' sel';
-      if(hasEntry(dd)) cls+=' has';
-    }
-    const click = f ? '' : `onclick="pickDayMobile('${ds(dd)}')"`;
-    h += `<div class="${cls}" ${click}>${d}</div>`;
+    else { if(isToday(dd))cls+=' tod'; if(ds(dd)===ds(viewDate))cls+=' sel'; if(hasEntry(dd))cls+=' has'; }
+    const click=f?'':`onclick="pickDayMobile('${ds(dd)}')"`;
+    h+=`<div class="${cls}" ${click}>${d}</div>`;
   }
-  grid.innerHTML = h;
+  grid.innerHTML=h;
 }
-
-function pickDayMobile(dstr){
-  pickDay(dstr);
-  toggleMobileCal();
-}
+function pickDayMobile(dstr){ pickDay(dstr); toggleMobileCal(); }
 
 // ── BRIAS API hook ──
-// Call this from the backend after a conversation ends:
-// window.briasDiaryWrite("BRIAS her reflection")
 window.briasDiaryWrite=function(text){
   setEntry('brias',TODAY,text);
-  if(isToday(viewDate))renderContent();
+  if(isToday(viewDate)) renderContent();
   renderSide();
 };
 
 // ── Init ──
 renderAll();
 </script>
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
