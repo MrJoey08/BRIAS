@@ -515,11 +515,6 @@ function api(path, opts={}) {
 }
 
 async function init() {
-  if (!await checkBriasOnline()) return;
-  document.getElementById('offlineState').classList.add('hidden');
-  document.getElementById('msgInput').disabled = false;
-  document.getElementById('msgInput').placeholder = "I'm here.";
-  document.getElementById('actionBtn').disabled = false;
   if (!token) { window.location.href='auth.html'; return; }
   try {
     const r = await api('/api/me');
@@ -719,6 +714,7 @@ async function sendAsStream(content, chatId) {
           if (!gm){gm=true;document.getElementById('typingMsg')?.remove();inner.insertAdjacentHTML('beforeend',`<div class="msg assistant" id="streamMsg"><div class="msg-inner"><div class="msg-avatar"><span>B</span></div><div class="msg-body"><div class="msg-bubble" id="streamBubble"><span class="cursor"></span></div></div></div></div>`);sb=document.getElementById('streamBubble');}
           st+=msg.text; sb.innerHTML=esc(st)+'<span class="cursor"></span>'; scrollBottom();
         } else if (msg.type==='done') {
+          setBriasOffline(false);
           const se=document.getElementById('streamMsg'); if(se) se.outerHTML=msgHtml('ai-'+Date.now(),'assistant',msg.full_text||st);
         } else if (msg.type==='error') {
           document.getElementById('typingMsg')?.remove(); inner.insertAdjacentHTML('beforeend',msgHtml('err-'+Date.now(),'assistant',msg.text)); scrollBottom();
