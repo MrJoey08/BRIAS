@@ -515,14 +515,14 @@ function api(path, opts={}) {
 }
 
 async function init() {
-  if (!token) { window.location.href='auth.html'; return; }
   try {
-    const r = await api('/api/me');
-    if (r.status === 401) { doLogout(); return; }
-    if (!r.ok) { setOffline(true); return; }
+    const r = await fetch(API+'/api/me', {signal:AbortSignal.timeout(3000), headers:token?{'Authorization':'Bearer '+token}:{}});
+    if (!r.ok && r.status !== 401) return; // server error, stay offline
+    setOffline(false);
+    if (!token || r.status === 401) { window.location.href='auth.html'; return; }
     meData = await r.json();
     if (!meData.logged_in) { doLogout(); return; }
-  } catch(e) { setOffline(true); return; }
+  } catch(e) { return; } // server unreachable, stay offline
   const name = meData.display_name||meData.username||username||'—';
   document.getElementById('drawerName').textContent = name;
   document.getElementById('drawerHandle').textContent = meData.email||meData.username||'—';
@@ -729,13 +729,15 @@ async function sendAsStream(content, chatId) {
 
 function setOffline(off) {
   const os = document.getElementById('offlineState');
-  const box = document.getElementById('inputBox');
+  const inp = document.getElementById('msgInput');
+  const btn = document.getElementById('actionBtn');
   if (off) {
     os.classList.add('visible');
-    if (box) box.style.display = 'none';
+    inp.disabled = true; inp.placeholder = '';
   } else {
     os.classList.remove('visible');
-    if (box) box.style.display = '';
+    inp.disabled = false; inp.placeholder = "I'm here.";
+    btn.disabled = false;
   }
 }
 function scrollBottom(){const c=document.getElementById('msgContainer');setTimeout(()=>c.scrollTop=c.scrollHeight,30);}
