@@ -1336,7 +1336,7 @@ body.light .sheet-d.e{color:rgba(46,31,24,.1);}
       <div class="footer-av"><span id="drawerInitial">—</span></div>
       <div class="footer-info">
         <div class="footer-name" id="drawerName">—</div>
-        <div class="footer-handle" id="drawerHandle">brias.eu</div>
+        <div class="footer-handle" id="drawerHandle">—</div>
       </div>
       <button class="drawer-settings-btn" onclick="openSettings();closeDrawer();" title="Settings">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.3)" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -1367,7 +1367,32 @@ body.light .sheet-d.e{color:rgba(46,31,24,.1);}
 
 <script>
 // Apply saved theme immediately
-(function(){const t=localStorage.getItem('brias_theme');if(t==='light')document.body.classList.add('light');})();
+if (localStorage.getItem('brias_theme') === 'light') document.body.classList.add('light');
+
+const API = 'https://api.brias.eu';
+let meData = null;
+
+// ── Auth ──
+(async function() {
+  const token = localStorage.getItem('brias_token');
+  if (!token) { window.location.href = 'auth.html'; return; }
+  try {
+    const r = await fetch(API + '/api/me', { headers: { 'Authorization': 'Bearer ' + token }, signal: AbortSignal.timeout(3000) });
+    const d = await r.json();
+    if (!d.logged_in) { localStorage.removeItem('brias_token'); localStorage.removeItem('brias_username'); window.location.href = 'auth.html'; return; }
+    meData = d;
+    const name = d.display_name || d.username || localStorage.getItem('brias_username') || '—';
+    document.getElementById('drawerName').textContent = name;
+    document.getElementById('drawerHandle').textContent = d.email || d.username || '—';
+    document.getElementById('drawerInitial').textContent = name.charAt(0).toUpperCase();
+  } catch { window.location.href = 'auth.html'; }
+})();
+
+function doLogout() {
+  localStorage.removeItem('brias_token'); localStorage.removeItem('brias_username');
+  window.location.href = 'auth.html';
+}
+
 // ── Constants & helpers ──
 const TODAY = new Date();
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -1384,6 +1409,7 @@ let clockFormat=getClockFormat();
 function startOfWeek(d){const r=new Date(d);const day=r.getDay();const diff=r.getDate()-day+(day===0?-6:1);r.setDate(diff);r.setHours(0,0,0,0);return r;}
 function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
 function isToday(d){const nd=new Date(d);return ds(nd)===ds(TODAY);}
+function getUsername(){ return meData?.display_name || meData?.username || localStorage.getItem('brias_username') || 'You'; }
 
 // ── Storage ──
 function getWho(){return 'user';} // planner is always user-owned
@@ -2521,13 +2547,14 @@ const tabs = [
   ()=>`
     <div class="s-section">
       <div class="s-section-title">Profile</div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Name</div></div><button class="s-btn">${esc(getUsername())}</button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Email</div></div><div class="s-row-val">—</div></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Name</div></div><button class="s-btn">${esc(meData?.display_name||meData?.username||'—')}</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Age</div></div><button class="s-btn">${esc(String(meData?.age||'—'))}</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Email</div></div><div class="s-row-val">${esc(meData?.email||'—')}</div></div>
     </div>
     <div class="s-section">
       <div class="s-section-title">Manage</div>
       <div class="s-row"><div class="s-row-left"><div class="s-row-label">Password</div></div><button class="s-btn">Change</button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Sign out</div></div><button class="s-btn" onclick="localStorage.removeItem('brias_token');window.location.href='auth.html'">Sign out</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Sign out</div></div><button class="s-btn" onclick="doLogout()">Sign out</button></div>
       <div class="s-row"><div class="s-row-left"><div class="s-row-label">Delete account</div></div><button class="s-btn danger">Delete</button></div>
     </div>`,
   ()=>`
@@ -2753,13 +2780,6 @@ function updateMobileCalBtn(){
 function renderAll(){
   renderSidebar();
   renderContent();
-  const uname=getUsername();
-  const di=document.getElementById('drawerInitial');
-  const dn=document.getElementById('drawerName');
-  const dh=document.getElementById('drawerHandle');
-  if(di)di.textContent=uname[0]||'?';
-  if(dn)dn.textContent=uname;
-  if(dh)dh.textContent='brias.eu';
   initMobileViewTabs();
   renderPscCal();
   updateMobileCalBtn();
