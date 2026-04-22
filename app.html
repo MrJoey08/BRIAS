@@ -515,6 +515,7 @@ function api(path, opts={}) {
 }
 
 async function init() {
+  if (!await checkBriasOnline()) { setBriasOffline(true); return; }
   if (!token) { window.location.href='auth.html'; return; }
   try {
     const r = await api('/api/me');
@@ -527,7 +528,6 @@ async function init() {
   document.getElementById('drawerName').textContent = name;
   document.getElementById('drawerHandle').textContent = meData.email||meData.username||'—';
   document.getElementById('drawerInitial').textContent = name.charAt(0).toUpperCase();
-  if (!await checkBriasOnline()) setBriasOffline(true);
   try {
     const chats = await api('/api/chats').then(r=>r.json());
     if (chats.length > 0) {
