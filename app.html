@@ -517,9 +517,11 @@ function api(path, opts={}) {
 async function init() {
   if (!token) { window.location.href='auth.html'; return; }
   try {
-    const r = await api('/api/me'); meData = await r.json();
+    const r = await api('/api/me');
+    if (r.status === 401) { doLogout(); return; }
+    meData = await r.json();
     if (!meData.logged_in) { doLogout(); return; }
-  } catch(e) { window.location.href='auth.html'; return; }
+  } catch(e) { setBriasOffline(true); return; }
   const name = meData.display_name||meData.username||username||'—';
   document.getElementById('drawerName').textContent = name;
   document.getElementById('drawerHandle').textContent = meData.email||meData.username||'—';
