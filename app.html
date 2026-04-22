@@ -518,7 +518,7 @@ async function init() {
   try {
     const r = await fetch(API+'/api/me', {signal:AbortSignal.timeout(3000), headers:token?{'Authorization':'Bearer '+token}:{}});
     if (!r.ok && r.status !== 401) return; // server error, stay offline
-    setOffline(false);
+
     if (!token || r.status === 401) { window.location.href='auth.html'; return; }
     meData = await r.json();
     if (!meData.logged_in) { doLogout(); return; }
@@ -714,7 +714,7 @@ async function sendAsStream(content, chatId) {
           if (!gm){gm=true;document.getElementById('typingMsg')?.remove();inner.insertAdjacentHTML('beforeend',`<div class="msg assistant" id="streamMsg"><div class="msg-inner"><div class="msg-avatar"><span>B</span></div><div class="msg-body"><div class="msg-bubble" id="streamBubble"><span class="cursor"></span></div></div></div></div>`);sb=document.getElementById('streamBubble');}
           st+=msg.text; sb.innerHTML=esc(st)+'<span class="cursor"></span>'; scrollBottom();
         } else if (msg.type==='done') {
-          setOffline(false);
+      
           const se=document.getElementById('streamMsg'); if(se) se.outerHTML=msgHtml('ai-'+Date.now(),'assistant',msg.full_text||st);
         } else if (msg.type==='error') {
           document.getElementById('typingMsg')?.remove(); inner.insertAdjacentHTML('beforeend',msgHtml('err-'+Date.now(),'assistant',msg.text)); scrollBottom();
