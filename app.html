@@ -96,8 +96,8 @@ textarea::placeholder{color:var(--text-dim);}
 .typing-dots span:nth-child(3){animation:bDot 1.4s ease-in-out .32s infinite;}
 .cursor{display:inline-block;width:1.5px;height:13px;background:var(--orange);margin-left:2px;vertical-align:middle;animation:blink .7s step-end infinite;}
 
-.offline-state{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;margin-bottom:16px;max-width:700px;margin-left:auto;margin-right:auto;}
-.offline-state.hidden{display:none;}
+.offline-state{display:none;flex-direction:column;align-items:center;text-align:center;gap:16px;margin-bottom:32px;}
+.offline-state.visible{display:flex;}
 .offline-sweep{width:100%;height:1px;background:rgba(255,255,255,.06);overflow:hidden;position:relative;}
 .offline-sweep-fill{position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(232,118,74,.5),transparent);animation:sweep 2.4s ease-in-out infinite;}
 @keyframes sweep{0%{left:-100%;}100%{left:200%;}}
@@ -424,12 +424,12 @@ body.light .theme-opt:not(.active){color:var(--text-sub);}
     </div>
   </div>
   <div class="input-area">
-    <div class="offline-state" id="offlineState">
+    <div class="offline-state visible" id="offlineState">
       <div class="offline-sweep"><div class="offline-sweep-fill"></div></div>
       <div class="offline-title">Unavailable right now</div>
       <div class="offline-sub">BRIAS is having her moment.<br>She should be back soon.</div>
     </div>
-    <div class="input-box">
+    <div class="input-box" id="inputBox">
       <textarea id="msgInput" rows="1" placeholder="" disabled oninput="autoResize(this);updateBtn();" onkeydown="handleKey(event)"></textarea>
       <button class="send-btn inactive" id="actionBtn" disabled onclick="handleActionBtn()">
         <svg id="iconSend" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
@@ -506,7 +506,7 @@ body.light .theme-opt:not(.active){color:var(--text-sub);}
 const API = 'https://api.brias.eu';
 let token = localStorage.getItem('brias_token');
 let username = localStorage.getItem('brias_username');
-let activeChatId = null, isStreaming = false, meData = null, offlineTimer = null;
+let activeChatId = null, isStreaming = false, meData = null;
 // Apply saved theme immediately
 if (localStorage.getItem('brias_theme')==='light') document.body.classList.add('light');
 
@@ -519,10 +519,10 @@ async function init() {
   try {
     const r = await api('/api/me');
     if (r.status === 401) { doLogout(); return; }
-    if (!r.ok) { setBriasOffline(true); return; }
+    if (!r.ok) { setOffline(true); return; }
     meData = await r.json();
     if (!meData.logged_in) { doLogout(); return; }
-  } catch(e) { setBriasOffline(true); return; }
+  } catch(e) { setOffline(true); return; }
   const name = meData.display_name||meData.username||username||'—';
   document.getElementById('drawerName').textContent = name;
   document.getElementById('drawerHandle').textContent = meData.email||meData.username||'—';
@@ -714,7 +714,7 @@ async function sendAsStream(content, chatId) {
           if (!gm){gm=true;document.getElementById('typingMsg')?.remove();inner.insertAdjacentHTML('beforeend',`<div class="msg assistant" id="streamMsg"><div class="msg-inner"><div class="msg-avatar"><span>B</span></div><div class="msg-body"><div class="msg-bubble" id="streamBubble"><span class="cursor"></span></div></div></div></div>`);sb=document.getElementById('streamBubble');}
           st+=msg.text; sb.innerHTML=esc(st)+'<span class="cursor"></span>'; scrollBottom();
         } else if (msg.type==='done') {
-          setBriasOffline(false);
+          setOffline(false);
           const se=document.getElementById('streamMsg'); if(se) se.outerHTML=msgHtml('ai-'+Date.now(),'assistant',msg.full_text||st);
         } else if (msg.type==='error') {
           document.getElementById('typingMsg')?.remove(); inner.insertAdjacentHTML('beforeend',msgHtml('err-'+Date.now(),'assistant',msg.text)); scrollBottom();
@@ -723,30 +723,19 @@ async function sendAsStream(content, chatId) {
     }
   } catch {
     document.getElementById('typingMsg')?.remove();
-    setBriasOffline(true);
+    setOffline(true);
   } finally { isStreaming=false; setStopMode(false); scrollBottom(); }
 }
 
-async function checkBriasOnline() {
-  try {
-    const r = await fetch(API+'/api/me', { signal: AbortSignal.timeout(3000) });
-    return r.ok || r.status === 401;
-  } catch { return false; }
-}
-function setBriasOffline(off) {
+function setOffline(off) {
   const os = document.getElementById('offlineState');
-  const inp = document.getElementById('msgInput');
-  const btn = document.getElementById('actionBtn');
+  const box = document.getElementById('inputBox');
   if (off) {
-    os.classList.remove('hidden');
-    inp.disabled = true; inp.placeholder = '';
-    btn.disabled = true; btn.classList.replace('active','inactive');
-    if (!offlineTimer) offlineTimer = setInterval(async () => { if (await checkBriasOnline()) setBriasOffline(false); }, 5000);
+    os.classList.add('visible');
+    if (box) box.style.display = 'none';
   } else {
-    os.classList.add('hidden');
-    inp.disabled = false; inp.placeholder = "I'm here.";
-    btn.disabled = false;
-    if (offlineTimer) { clearInterval(offlineTimer); offlineTimer = null; }
+    os.classList.remove('visible');
+    if (box) box.style.display = '';
   }
 }
 function scrollBottom(){const c=document.getElementById('msgContainer');setTimeout(()=>c.scrollTop=c.scrollHeight,30);}
