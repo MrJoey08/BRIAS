@@ -96,8 +96,8 @@ textarea::placeholder{color:var(--text-dim);}
 .typing-dots span:nth-child(3){animation:bDot 1.4s ease-in-out .32s infinite;}
 .cursor{display:inline-block;width:1.5px;height:13px;background:var(--orange);margin-left:2px;vertical-align:middle;animation:blink .7s step-end infinite;}
 
-.offline-state{display:none;flex-direction:column;align-items:center;text-align:center;gap:16px;margin-bottom:16px;max-width:700px;margin-left:auto;margin-right:auto;}
-.offline-state.visible{display:flex;}
+.offline-state{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;margin-bottom:16px;max-width:700px;margin-left:auto;margin-right:auto;}
+.offline-state.hidden{display:none;}
 .offline-sweep{width:100%;height:1px;background:rgba(255,255,255,.06);overflow:hidden;position:relative;}
 .offline-sweep-fill{position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(232,118,74,.5),transparent);animation:sweep 2.4s ease-in-out infinite;}
 @keyframes sweep{0%{left:-100%;}100%{left:200%;}}
@@ -424,7 +424,7 @@ body.light .theme-opt:not(.active){color:var(--text-sub);}
     </div>
   </div>
   <div class="input-area">
-    <div class="offline-state visible" id="offlineState">
+    <div class="offline-state" id="offlineState">
       <div class="offline-sweep"><div class="offline-sweep-fill"></div></div>
       <div class="offline-title">Unavailable right now</div>
       <div class="offline-sub">BRIAS is having her moment.<br>She should be back soon.</div>
@@ -516,7 +516,10 @@ function api(path, opts={}) {
 
 async function init() {
   if (!await checkBriasOnline()) return;
-  setBriasOffline(false);
+  document.getElementById('offlineState').classList.add('hidden');
+  document.getElementById('msgInput').disabled = false;
+  document.getElementById('msgInput').placeholder = "I'm here.";
+  document.getElementById('actionBtn').disabled = false;
   if (!token) { window.location.href='auth.html'; return; }
   try {
     const r = await api('/api/me');
@@ -739,12 +742,12 @@ function setBriasOffline(off) {
   const inp = document.getElementById('msgInput');
   const btn = document.getElementById('actionBtn');
   if (off) {
-    os.classList.add('visible');
+    os.classList.remove('hidden');
     inp.disabled = true; inp.placeholder = '';
     btn.disabled = true; btn.classList.replace('active','inactive');
     if (!offlineTimer) offlineTimer = setInterval(async () => { if (await checkBriasOnline()) setBriasOffline(false); }, 5000);
   } else {
-    os.classList.remove('visible');
+    os.classList.add('hidden');
     inp.disabled = false; inp.placeholder = "I'm here.";
     btn.disabled = false;
     if (offlineTimer) { clearInterval(offlineTimer); offlineTimer = null; }
