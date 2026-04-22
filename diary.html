@@ -69,12 +69,11 @@ body.light canvas{opacity:0;}
 .topbar-logo{font-family:var(--font-display);font-size:22px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.03em;}
 
 /* Hamburger */
-.menu-btn{position:absolute;left:16px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;}
-.lns{display:flex;flex-direction:column;gap:4px;align-items:center;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
-.ln{display:block;width:26px;height:5px;border-radius:100px;background:var(--grad);flex-shrink:0;transition:transform .52s cubic-bezier(.22,1.35,.5,1),opacity .38s ease;}
-.menu-btn.open .ln:nth-child(1){transform:translateY(9px) rotate(45deg);}
-.menu-btn.open .ln:nth-child(2){opacity:0;transform:scaleX(0);}
-.menu-btn.open .ln:nth-child(3){transform:translateY(-9px) rotate(-45deg);}
+.menu-btn{position:absolute;left:8px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;}
+.lns{display:flex;flex-direction:column;gap:8px;align-items:center;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
+.ln{display:block;width:26px;height:2px;border-radius:100px;background:var(--grad);flex-shrink:0;transition:transform .52s cubic-bezier(.22,1.35,.5,1),opacity .38s ease;}
+.menu-btn.open .ln:nth-child(1){transform:translateY(5px) rotate(45deg);}
+.menu-btn.open .ln:nth-child(2){transform:translateY(-5px) rotate(-45deg);}
 
 /* Topbar right area */
 .topbar-right{position:absolute;right:16px;display:flex;align-items:center;gap:6px;}
@@ -496,7 +495,7 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
   :root{--text-sub:rgba(228,224,227,.62);--text-muted:rgba(228,224,227,.40);--text-dim:rgba(228,224,227,.26);}
   .topbar{height:60px;}
   .topbar-logo{font-size:24px;}
-  .menu-btn{left:24px;}
+  .menu-btn{left:10px;}
   .content-inner{max-width:640px;}
   .settings-header{padding:0 36px;height:60px;}
   .settings-title{font-size:24px;}
@@ -519,7 +518,7 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
   <!-- Topbar -->
   <div class="topbar">
     <button class="menu-btn" id="menuBtn" onclick="toggleDrawer()">
-      <div class="lns"><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>
+      <div class="lns"><span class="ln"></span><span class="ln"></span></div>
     </button>
     <div class="topbar-logo">Journal</div>
 
