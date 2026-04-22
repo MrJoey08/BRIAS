@@ -70,8 +70,8 @@ body.light canvas{opacity:0;}
 
 /* Hamburger */
 .menu-btn{position:absolute;left:8px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;}
-.lns{display:flex;flex-direction:column;gap:8px;align-items:center;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
-.ln{display:block;width:26px;height:3px;border-radius:100px;background:var(--grad);flex-shrink:0;transition:transform .52s cubic-bezier(.22,1.35,.5,1),opacity .38s ease;}
+.lns{display:flex;flex-direction:column;gap:5px;align-items:center;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
+.ln{display:block;width:26px;height:5px;border-radius:100px;background:var(--grad);flex-shrink:0;transition:transform .52s cubic-bezier(.22,1.35,.5,1),opacity .38s ease;}
 .menu-btn.open .ln:nth-child(1){transform:translateY(5px) rotate(45deg);}
 .menu-btn.open .ln:nth-child(2){transform:translateY(-5px) rotate(-45deg);}
 
@@ -165,7 +165,7 @@ body.light .sidebar-today{border-color:rgba(80,40,20,.1);}
 body.light .mini-d.e,body.light .mini-d.f{color:rgba(46,31,24,.1);}
 .mini-d.has::after{
   content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);
-  width:3px;height:3px;border-radius:50%;background:rgba(232,118,74,.45);
+  width:3px;height:5px;border-radius:50%;background:rgba(232,118,74,.45);
 }
 .mini-d.tod{background:rgba(232,118,74,.1);color:var(--orange);font-weight:500;border:1px solid rgba(232,118,74,.2);}
 .mini-d.sel{background:var(--grad)!important;color:#fff!important;font-weight:500;}
@@ -1052,7 +1052,7 @@ function renderSheetPicker(){
   if(sheetPickerMode==='year'){
     const startY=2025, endY=TODAY.getFullYear();
     let h=`<div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim);margin-bottom:14px;">Select year</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">`;
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;">`;
     for(let y=endY;y>=startY;y--){
       const active=sideMonth.getFullYear()===y;
       h+=`<button onclick="pickSheetYear(${y})" style="padding:12px 0;border:1px solid ${active?'rgba(232,118,74,.4)':'rgba(255,255,255,.07)'};border-radius:12px;background:${active?'rgba(232,118,74,.1)':'transparent'};color:${active?'var(--orange)':'var(--text-muted)'};font-family:var(--font);font-size:15px;font-weight:${active?'500':'300'};cursor:pointer;">${y}</button>`;
@@ -1063,7 +1063,7 @@ function renderSheetPicker(){
     let h=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
       <button onclick="sheetPickerMode='year';renderSheetPicker()" style="border:none;background:transparent;color:var(--text-muted);cursor:pointer;font-size:13px;padding:4px 0;">← ${sheetPickerYear}</button>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">`;
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;">`;
     for(let m=0;m<=11;m++){
       const d=new Date(sheetPickerYear,m,1), future=d>todayFirst;
       const active=sideMonth.getFullYear()===sheetPickerYear&&sideMonth.getMonth()===m;
