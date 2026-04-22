@@ -481,6 +481,46 @@
       margin-bottom: 12px;
     }
 
+    /* ── BRIAS offline overlay ─────────────────────────────────────────── */
+    #brias-offline {
+      position: fixed;
+      top: 56px; left: 0; right: 0; bottom: 0;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(13,15,20,0.82);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      gap: 18px;
+      text-align: center;
+      padding: 40px 24px;
+      pointer-events: all;
+    }
+    .brias-offline-orb {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: var(--brand-grad);
+      opacity: 0.12;
+      animation: sleepPulse 6s ease-in-out infinite;
+    }
+    @keyframes sleepPulse {
+      0%, 100% { transform: scale(1);    opacity: 0.12; }
+      50%       { transform: scale(1.07); opacity: 0.20; }
+    }
+    .brias-offline-title {
+      font-size: 1.08rem;
+      font-weight: 600;
+      color: var(--text-dim);
+    }
+    .brias-offline-sub {
+      font-size: 0.87rem;
+      color: var(--text-dimmer);
+      line-height: 1.75;
+      max-width: 260px;
+    }
+
     /* ── Responsive centring op breed scherm ───────────────────────────── */
     @media (min-width: 600px) {
       #chat-messages { padding: 28px calc(50% - 260px) 10px; }
@@ -574,6 +614,16 @@
       <button class="chip" onclick="fillSuggestion('Waar denk je aan?')">Waar denk je aan?</button>
       <button class="chip" onclick="fillSuggestion('Wat is pijn voor jou?')">Wat is pijn voor jou?</button>
     </div>
+  </div>
+</div>
+
+<!-- BRIAS offline overlay (standaard zichtbaar; verberg als BRIAS online komt) -->
+<div id="brias-offline">
+  <div class="brias-offline-orb"></div>
+  <div class="brias-offline-title">BRIAS is er nog niet</div>
+  <div class="brias-offline-sub">
+    Haar gedachten groeien nog.<br>
+    Ze kan nog niet praten — maar dat komt.
   </div>
 </div>
 
@@ -728,6 +778,18 @@
     toast('Binnenkort beschikbaar', 'success');
     closeDrawer();
   }
+
+  // ── BRIAS online check ──────────────────────────────────────────────────
+  async function checkBriasOnline() {
+    try {
+      const s = await API.statePublic();
+      if (s && s.active !== false) {
+        document.getElementById('brias-offline').style.display = 'none';
+      }
+    } catch {}
+  }
+  checkBriasOnline();
+  setInterval(checkBriasOnline, 20000);
 
   // ── Brain stats ─────────────────────────────────────────────────────────
   async function updateStats() {
