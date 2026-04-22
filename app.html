@@ -519,6 +519,7 @@ async function init() {
   try {
     const r = await api('/api/me');
     if (r.status === 401) { doLogout(); return; }
+    if (!r.ok) { setBriasOffline(true); return; }
     meData = await r.json();
     if (!meData.logged_in) { doLogout(); return; }
   } catch(e) { setBriasOffline(true); return; }
@@ -728,9 +729,8 @@ async function sendAsStream(content, chatId) {
 
 async function checkBriasOnline() {
   try {
-    const r = await fetch(API+'/api/status', { signal: AbortSignal.timeout(3000) });
-    const d = await r.json();
-    return d.ai_online !== false;
+    const r = await fetch(API+'/api/me', { signal: AbortSignal.timeout(3000) });
+    return r.ok || r.status === 401;
   } catch { return false; }
 }
 function setBriasOffline(off) {
