@@ -8,3 +8,4 @@ brain/database/*.db
 *.ggml
 node_modules/
 .DS_Store
+.claude/worktrees/
