@@ -552,6 +552,63 @@ function doLogout() {
   window.location.href='auth.html';
 }
 
+async function refreshMe() {
+  try {
+    const r = await api('/api/me');
+    if (!r.ok) return;
+    const d = await r.json();
+    if (!d.logged_in) return;
+    meData = d;
+    const name = meData.display_name||meData.username||'—';
+    document.getElementById('drawerName').textContent = name;
+    document.getElementById('drawerHandle').textContent = meData.email||'—';
+    document.getElementById('drawerInitial').textContent = (name.charAt(0)||'?').toUpperCase();
+    if (document.getElementById('settingsOverlay').classList.contains('open')) {
+      const active = document.querySelector('.stab.active');
+      if (active) {
+        const i = Array.from(document.querySelectorAll('.stab')).indexOf(active);
+        if (i >= 0) switchTab(i);
+      }
+    }
+  } catch(e) {}
+}
+
+async function saveProfile(display_name, age) {
+  try {
+    const r = await api('/api/profile', { method:'POST', body:JSON.stringify({display_name, age: age===''||age==null?null:parseInt(age)}) });
+    if (!r.ok) return false;
+    await refreshMe();
+    return true;
+  } catch(e) { return false; }
+}
+
+async function editName() {
+  const cur = meData?.display_name||'';
+  const next = prompt('What should BRIAS call you?', cur);
+  if (next==null) return;
+  const trimmed = next.trim();
+  if (!trimmed) return;
+  const ok = await saveProfile(trimmed, meData?.age??null);
+  if (!ok) alert('Could not save. Try again in a moment.');
+}
+
+async function editAge() {
+  if (!meData?.display_name) {
+    alert('Please set your name first.');
+    return;
+  }
+  const cur = meData?.age;
+  const next = prompt('Your age (leave empty to skip)', cur==null?'':String(cur));
+  if (next==null) return;
+  const trimmed = next.trim();
+  if (trimmed && (!/^\d+$/.test(trimmed) || parseInt(trimmed)<10 || parseInt(trimmed)>120)) {
+    alert('Please enter a number between 10 and 120.');
+    return;
+  }
+  const ok = await saveProfile(meData.display_name, trimmed===''?null:trimmed);
+  if (!ok) alert('Could not save. Try again in a moment.');
+}
+
 function toggleDrawer() { document.getElementById('drawer').classList.contains('open')?closeDrawer():openDrawer(); }
 function openDrawer() { document.getElementById('drawer').classList.add('open'); document.getElementById('menuBtn').classList.add('open'); }
 function closeDrawer() { document.getElementById('drawer').classList.remove('open'); document.getElementById('menuBtn').classList.remove('open'); }
@@ -560,8 +617,8 @@ const tabs = [
   ()=>`
     <div class="s-section">
       <div class="s-section-title">Profile</div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Name</div></div><button class="s-btn">${esc(meData?.display_name||meData?.username||'—')}</button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Age</div></div><button class="s-btn">${esc(String(meData?.age||'—'))}</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Name</div></div><button class="s-btn" onclick="editName()">${esc(meData?.display_name||'Set name')}</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Age</div></div><button class="s-btn" onclick="editAge()">${esc(meData?.age==null?'Set age':String(meData.age))}</button></div>
       <div class="s-row"><div class="s-row-left"><div class="s-row-label">Email</div></div><div class="s-row-val">${esc(meData?.email||'—')}</div></div>
     </div>
     <div class="s-section">

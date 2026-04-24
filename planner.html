@@ -1375,6 +1375,80 @@ body.light .sheet-d.e{color:rgba(46,31,24,.1);}
 <script>
 // Apply saved theme immediately
 (function(){const t=localStorage.getItem('brias_theme');if(t==='light')document.body.classList.add('light');})();
+
+// ── Auth + user profile ──
+const API = 'https://api.brias.eu';
+let meData = null;
+function authHeaders(){const t=localStorage.getItem('brias_token');return t?{'Authorization':'Bearer '+t}:{};}
+function api(path, opts={}){return fetch(API+path,{...opts,headers:{'Content-Type':'application/json',...authHeaders(),...(opts.headers||{})}});}
+function getUsername(){
+  if(meData){return meData.display_name||meData.username||meData.email||'—';}
+  return localStorage.getItem('brias_username')||'—';
+}
+function getEmail(){return meData?.email||'—';}
+function getAge(){return meData?.age??null;}
+async function loadMe(){
+  const token=localStorage.getItem('brias_token');
+  if(!token)return;
+  try{
+    const r=await api('/api/me');
+    if(!r.ok)return;
+    const d=await r.json();
+    if(!d.logged_in)return;
+    meData=d;
+    if(d.username)localStorage.setItem('brias_username',d.username);
+    renderDrawerFooter();
+    if(document.getElementById('settingsOverlay')?.classList.contains('open')){
+      const active=document.querySelector('.stab.active');
+      if(active){const i=Array.from(document.querySelectorAll('.stab')).indexOf(active);if(i>=0)switchTab(i);}
+    }
+  }catch(e){}
+}
+function renderDrawerFooter(){
+  const uname=getUsername();
+  const di=document.getElementById('drawerInitial');
+  const dn=document.getElementById('drawerName');
+  const dh=document.getElementById('drawerHandle');
+  if(di)di.textContent=(uname[0]||'?').toUpperCase();
+  if(dn)dn.textContent=uname;
+  if(dh)dh.textContent=getEmail();
+}
+async function saveProfile(display_name, age){
+  const token=localStorage.getItem('brias_token');
+  if(!token)return false;
+  try{
+    const r=await api('/api/profile',{method:'POST',body:JSON.stringify({display_name,age:age===''||age==null?null:parseInt(age)})});
+    if(!r.ok)return false;
+    await loadMe();
+    return true;
+  }catch(e){return false;}
+}
+async function editName(){
+  const cur=meData?.display_name||'';
+  const next=prompt('What should BRIAS call you?', cur);
+  if(next==null)return;
+  const trimmed=next.trim();
+  if(!trimmed)return;
+  const ok=await saveProfile(trimmed, getAge());
+  if(!ok)alert('Could not save. Try again in a moment.');
+}
+async function editAge(){
+  if(!meData?.display_name){
+    alert('Please set your name first.');
+    return;
+  }
+  const cur=getAge();
+  const next=prompt('Your age (leave empty to skip)', cur==null?'':String(cur));
+  if(next==null)return;
+  const trimmed=next.trim();
+  if(trimmed && (!/^\d+$/.test(trimmed) || parseInt(trimmed)<10 || parseInt(trimmed)>120)){
+    alert('Please enter a number between 10 and 120.');
+    return;
+  }
+  const ok=await saveProfile(meData.display_name, trimmed===''?null:trimmed);
+  if(!ok)alert('Could not save. Try again in a moment.');
+}
+
 // ── Constants & helpers ──
 const TODAY = new Date();
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -2528,13 +2602,14 @@ const tabs = [
   ()=>`
     <div class="s-section">
       <div class="s-section-title">Profile</div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Name</div></div><button class="s-btn">${esc(getUsername())}</button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Email</div></div><div class="s-row-val">—</div></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Name</div></div><button class="s-btn" onclick="editName()">${esc(meData?.display_name||'Set name')}</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Age</div></div><button class="s-btn" onclick="editAge()">${esc(meData?.age==null?'Set age':String(meData.age))}</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Email</div></div><div class="s-row-val">${esc(meData?.email||'—')}</div></div>
     </div>
     <div class="s-section">
       <div class="s-section-title">Manage</div>
       <div class="s-row"><div class="s-row-left"><div class="s-row-label">Password</div></div><button class="s-btn">Change</button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Sign out</div></div><button class="s-btn" onclick="localStorage.removeItem('brias_token');window.location.href='auth.html'">Sign out</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Sign out</div></div><button class="s-btn" onclick="localStorage.removeItem('brias_token');localStorage.removeItem('brias_username');window.location.href='auth.html'">Sign out</button></div>
       <div class="s-row"><div class="s-row-left"><div class="s-row-label">Delete account</div></div><button class="s-btn danger">Delete</button></div>
     </div>`,
   ()=>`
@@ -2760,13 +2835,7 @@ function updateMobileCalBtn(){
 function renderAll(){
   renderSidebar();
   renderContent();
-  const uname=getUsername();
-  const di=document.getElementById('drawerInitial');
-  const dn=document.getElementById('drawerName');
-  const dh=document.getElementById('drawerHandle');
-  if(di)di.textContent=uname[0]||'?';
-  if(dn)dn.textContent=uname;
-  if(dh)dh.textContent='brias.eu';
+  renderDrawerFooter();
   initMobileViewTabs();
   renderPscCal();
   updateMobileCalBtn();
@@ -2774,6 +2843,7 @@ function renderAll(){
 
 window.addEventListener('resize',()=>{initMobileViewTabs();renderContent();updateMobileCalBtn();});
 renderAll();
+loadMe();
 
 // ── BRIAS Global API ──
 window.briasPlannerAddEvent=function(ev){
