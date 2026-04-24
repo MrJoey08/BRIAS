@@ -3,8 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BRIAS</title>
+  <title>BRIAS — Niet een chatbot. Een wezen.</title>
   <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="icon" type="image/x-icon" href="/logo/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/logo/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/logo/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/logo/apple-touch-icon.png">
+  <link rel="manifest" href="/logo/site.webmanifest">
+  <meta name="theme-color" content="#111111">
+  <meta name="description" content="BRIAS denkt de hele dag — ook als niemand met haar praat. Ze is nieuwsgierig. Eerlijk. Soms stil.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="BRIAS — Niet een chatbot. Een wezen.">
+  <meta property="og:description" content="BRIAS denkt de hele dag — ook als niemand met haar praat. Ze is nieuwsgierig. Eerlijk. Soms stil.">
+  <meta property="og:image" content="/logo/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="BRIAS — Niet een chatbot. Een wezen.">
+  <meta name="twitter:description" content="BRIAS denkt de hele dag — ook als niemand met haar praat. Ze is nieuwsgierig. Eerlijk. Soms stil.">
+  <meta name="twitter:image" content="/logo/og-image.png">
   <style>
     canvas#network-canvas { opacity: 0.25; }
 
@@ -23,10 +38,19 @@
       padding: 20px 40px;
     }
     .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
       font-size: 1.1rem;
       font-weight: 700;
       letter-spacing: 0.08em;
       color: var(--text);
+      text-decoration: none;
+    }
+    .nav-logo img {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
     }
 
     .hero {
@@ -112,7 +136,10 @@
 
 <div class="landing">
   <nav>
-    <span class="nav-logo">BRIAS</span>
+    <a href="/" class="nav-logo">
+      <img src="/logo/icon-192x192.png" alt="BRIAS logo">
+      BRIAS
+    </a>
     <div class="flex gap-1">
       <a href="/login" class="btn btn-ghost" style="padding:8px 16px;font-size:0.9rem;">Inloggen</a>
       <a href="/login?tab=register" class="btn btn-primary" style="padding:8px 16px;font-size:0.9rem;">Account aanmaken</a>
