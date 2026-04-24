@@ -11,6 +11,12 @@
       "headers": [
         { "key": "Content-Type", "value": "text/css; charset=utf-8" }
       ]
+    },
+    {
+      "source": "/logo/site.webmanifest",
+      "headers": [
+        { "key": "Content-Type", "value": "application/manifest+json; charset=utf-8" }
+      ]
     }
   ],
   "rewrites": [
