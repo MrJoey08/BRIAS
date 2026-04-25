@@ -2656,7 +2656,7 @@ const tabs = [
   ()=>`<span class="about-logo">BRIAS</span>`
 ];
 
-function openSettings() { document.getElementById('settingsOverlay').classList.add('open'); switchTab(0); }
+function openSettings() { document.getElementById('settingsOverlay').classList.add('open'); switchTab(0); loadMe(); }
 function closeSettings() { document.getElementById('settingsOverlay').classList.remove('open'); }
 function switchTab(i) {
   document.querySelectorAll('.stab').forEach((t,j)=>t.classList.toggle('active',j===i));

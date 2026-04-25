@@ -688,20 +688,85 @@ if (localStorage.getItem('brias_theme') === 'light') document.body.classList.add
 const API = 'https://api.brias.eu';
 let meData = null;
 
+function authHeaders(){const t=localStorage.getItem('brias_token');return t?{'Authorization':'Bearer '+t}:{};}
+function api(path, opts={}){return fetch(API+path,{...opts,headers:{'Content-Type':'application/json',...authHeaders(),...(opts.headers||{})}});}
+
+function applyMeToDrawer(){
+  const name = meData?.display_name || meData?.username || localStorage.getItem('brias_username') || '—';
+  const dn = document.getElementById('drawerName');
+  const dh = document.getElementById('drawerHandle');
+  const di = document.getElementById('drawerInitial');
+  if(dn) dn.textContent = name;
+  if(dh) dh.textContent = meData?.email || '—';
+  if(di) di.textContent = (name.charAt(0)||'?').toUpperCase();
+}
+
+async function loadMe(){
+  const token = localStorage.getItem('brias_token');
+  if(!token) return false;
+  try{
+    const r = await api('/api/me');
+    if(!r.ok) return false;
+    const d = await r.json();
+    if(!d.logged_in) return false;
+    meData = d;
+    if(d.username) localStorage.setItem('brias_username', d.username);
+    applyMeToDrawer();
+    if(document.getElementById('settingsOverlay')?.classList.contains('open')){
+      const active = document.querySelector('.stab.active');
+      if(active){ const i = Array.from(document.querySelectorAll('.stab')).indexOf(active); if(i>=0) switchTab(i); }
+    }
+    return true;
+  }catch(e){ return false; }
+}
+
+async function saveProfile(display_name, age){
+  try{
+    const r = await api('/api/profile',{method:'POST',body:JSON.stringify({display_name, age: age===''||age==null?null:parseInt(age)})});
+    if(!r.ok) return false;
+    await loadMe();
+    return true;
+  }catch(e){ return false; }
+}
+
+async function editName(){
+  const cur = meData?.display_name || '';
+  const next = prompt('What should BRIAS call you?', cur);
+  if(next==null) return;
+  const trimmed = next.trim();
+  if(!trimmed) return;
+  const ok = await saveProfile(trimmed, meData?.age??null);
+  if(!ok) alert('Could not save. Try again in a moment.');
+}
+
+async function editAge(){
+  if(!meData?.display_name){ alert('Please set your name first.'); return; }
+  const cur = meData?.age;
+  const next = prompt('Your age (leave empty to skip)', cur==null?'':String(cur));
+  if(next==null) return;
+  const trimmed = next.trim();
+  if(trimmed && (!/^\d+$/.test(trimmed) || parseInt(trimmed)<10 || parseInt(trimmed)>120)){
+    alert('Please enter a number between 10 and 120.');
+    return;
+  }
+  const ok = await saveProfile(meData.display_name, trimmed===''?null:trimmed);
+  if(!ok) alert('Could not save. Try again in a moment.');
+}
+
 // ── Auth ──
 (async function() {
   const token = localStorage.getItem('brias_token');
   if (!token) { window.location.href = 'auth.html'; return; }
-  try {
-    const r = await fetch(API + '/api/me', { headers: { 'Authorization': 'Bearer ' + token }, signal: AbortSignal.timeout(3000) });
-    const d = await r.json();
-    if (!d.logged_in) { localStorage.removeItem('brias_token'); localStorage.removeItem('brias_username'); window.location.href = 'auth.html'; return; }
-    meData = d;
-    const name = d.display_name || d.username || localStorage.getItem('brias_username') || '—';
-    document.getElementById('drawerName').textContent = name;
-    document.getElementById('drawerHandle').textContent = d.email || d.username || '—';
-    document.getElementById('drawerInitial').textContent = name.charAt(0).toUpperCase();
-  } catch { window.location.href = 'auth.html'; }
+  applyMeToDrawer();
+  const ok = await loadMe();
+  if(!ok){
+    // Couldn't reach the server right now — keep the page usable with cached values.
+    return;
+  }
+  if(meData && meData.profile_done === false){
+    // Force the user to complete their profile.
+    window.location.href = 'auth.html';
+  }
 })();
 
 function doLogout() {
@@ -719,8 +784,8 @@ const tabs = [
   ()=>`
     <div class="s-section">
       <div class="s-section-title">Profile</div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Name</div></div><button class="s-btn">${esc(meData?.display_name||meData?.username||'—')}</button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Age</div></div><button class="s-btn">${esc(String(meData?.age||'—'))}</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Name</div></div><button class="s-btn" onclick="editName()">${esc(meData?.display_name||'Set name')}</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Age</div></div><button class="s-btn" onclick="editAge()">${esc(meData?.age==null?'Set age':String(meData.age))}</button></div>
       <div class="s-row"><div class="s-row-left"><div class="s-row-label">Email</div></div><div class="s-row-val">${esc(meData?.email||'—')}</div></div>
     </div>
     <div class="s-section">
@@ -767,7 +832,7 @@ const tabs = [
   ()=>`<span class="about-logo">BRIAS</span>`
 ];
 
-function openSettings() { document.getElementById('settingsOverlay').classList.add('open'); switchTab(0); }
+function openSettings() { document.getElementById('settingsOverlay').classList.add('open'); switchTab(0); loadMe(); }
 function closeSettings() { document.getElementById('settingsOverlay').classList.remove('open'); }
 function switchTab(i) {
   document.querySelectorAll('.stab').forEach((t,j)=>t.classList.toggle('active',j===i));

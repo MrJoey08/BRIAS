@@ -523,7 +523,7 @@ function api(path, opts={}) {
 
 async function init() {
   try {
-    const r = await fetch(API+'/api/me', {signal:AbortSignal.timeout(3000), headers:token?{'Authorization':'Bearer '+token}:{}});
+    const r = await fetch(API+'/api/me', {headers:token?{'Authorization':'Bearer '+token}:{}});
     if (!r.ok && r.status !== 401) return; // server error, stay offline
 
     if (!token || r.status === 401) { window.location.href='auth.html'; return; }
@@ -689,7 +689,7 @@ const tabs = [
   ()=>`<span class="about-logo">BRIAS</span>`
 ];
 
-function openSettings() { document.getElementById('settingsOverlay').classList.add('open'); switchTab(0); }
+function openSettings() { document.getElementById('settingsOverlay').classList.add('open'); switchTab(0); refreshMe(); }
 function closeSettings() { document.getElementById('settingsOverlay').classList.remove('open'); }
 function switchTab(i) {
   document.querySelectorAll('.stab').forEach((t,j)=>t.classList.toggle('active',j===i));
