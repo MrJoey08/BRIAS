@@ -547,6 +547,8 @@ function api(path, opts={}) {
 }
 
 async function init() {
+  // Immediately render whatever we have cached so the drawer never looks empty.
+  applyMeToDrawer();
   try {
     const r = await fetch(API+'/api/me', {headers:token?{'Authorization':'Bearer '+token}:{}});
     if (!r.ok && r.status !== 401) return; // server error, stay offline
@@ -554,11 +556,12 @@ async function init() {
     if (!token || r.status === 401) { window.location.href='auth.html'; return; }
     meData = await r.json();
     if (!meData.logged_in) { doLogout(); return; }
+    if (meData.email) localStorage.setItem('brias_email', meData.email);
+    if (meData.display_name) localStorage.setItem('brias_display_name', meData.display_name);
+    if (meData.age!=null) localStorage.setItem('brias_age', String(meData.age));
+    if (meData.username) localStorage.setItem('brias_username', meData.username);
   } catch(e) { return; } // server unreachable, stay offline
-  const name = meData.display_name||meData.username||username||'—';
-  document.getElementById('drawerName').textContent = name;
-  document.getElementById('drawerHandle').textContent = meData.email||meData.username||'—';
-  document.getElementById('drawerInitial').textContent = name.charAt(0).toUpperCase();
+  applyMeToDrawer();
   try {
     const chats = await api('/api/chats').then(r=>r.json());
     if (chats.length > 0) {
@@ -577,6 +580,23 @@ function doLogout() {
   window.location.href='auth.html';
 }
 
+function profileName(){ return meData?.display_name || localStorage.getItem('brias_display_name') || ''; }
+function profileEmail(){ return meData?.email || localStorage.getItem('brias_email') || ''; }
+function profileAge(){
+  if(meData && meData.age!=null) return meData.age;
+  const a = localStorage.getItem('brias_age');
+  return a ? parseInt(a) : null;
+}
+function applyMeToDrawer(){
+  const name = profileName() || localStorage.getItem('brias_username') || '—';
+  const dn = document.getElementById('drawerName');
+  const dh = document.getElementById('drawerHandle');
+  const di = document.getElementById('drawerInitial');
+  if(dn) dn.textContent = name;
+  if(dh) dh.textContent = profileEmail() || '—';
+  if(di) di.textContent = (name.charAt(0)||'?').toUpperCase();
+}
+
 async function refreshMe() {
   try {
     const r = await api('/api/me');
@@ -584,10 +604,11 @@ async function refreshMe() {
     const d = await r.json();
     if (!d.logged_in) return;
     meData = d;
-    const name = meData.display_name||meData.username||'—';
-    document.getElementById('drawerName').textContent = name;
-    document.getElementById('drawerHandle').textContent = meData.email||'—';
-    document.getElementById('drawerInitial').textContent = (name.charAt(0)||'?').toUpperCase();
+    if(d.email) localStorage.setItem('brias_email', d.email);
+    if(d.display_name) localStorage.setItem('brias_display_name', d.display_name);
+    if(d.age!=null) localStorage.setItem('brias_age', String(d.age));
+    if(d.username) localStorage.setItem('brias_username', d.username);
+    applyMeToDrawer();
     if (document.getElementById('settingsOverlay').classList.contains('open')) {
       const active = document.querySelector('.stab.active');
       if (active) {
@@ -599,15 +620,28 @@ async function refreshMe() {
 }
 
 async function saveProfile(display_name, age) {
+  const ageVal = age===''||age==null?null:parseInt(age);
   try {
-    const r = await api('/api/profile', { method:'POST', body:JSON.stringify({display_name, age: age===''||age==null?null:parseInt(age)}) });
+    const r = await api('/api/profile', { method:'POST', body:JSON.stringify({display_name, age: ageVal}) });
     if (!r.ok) {
       let detail='';
       try { const d=await r.json(); detail=d.detail||''; } catch{}
       console.error('saveProfile failed', r.status, detail);
       return {ok:false, error: detail || `Could not save (HTTP ${r.status}).`};
     }
+    localStorage.setItem('brias_display_name', display_name);
+    localStorage.setItem('brias_username', display_name);
+    if(ageVal==null) localStorage.removeItem('brias_age'); else localStorage.setItem('brias_age', String(ageVal));
+    if(meData){ meData.display_name = display_name; meData.username = display_name; meData.age = ageVal; meData.profile_done = true; }
+    applyMeToDrawer();
     await refreshMe();
+    if (document.getElementById('settingsOverlay').classList.contains('open')) {
+      const active = document.querySelector('.stab.active');
+      if (active) {
+        const i = Array.from(document.querySelectorAll('.stab')).indexOf(active);
+        if (i >= 0) switchTab(i);
+      }
+    }
     return {ok:true};
   } catch(e) {
     console.error('saveProfile error', e);
@@ -628,13 +662,13 @@ function openProfileModal(field){
     title.textContent='Your name';
     sub.textContent='What should BRIAS call you?';
     input.type='text'; input.placeholder='Name';
-    input.value = meData?.display_name || '';
+    input.value = profileName();
     input.removeAttribute('min'); input.removeAttribute('max');
   } else {
     title.textContent='Your age';
     sub.textContent='Optional. Helps BRIAS understand context.';
     input.type='number'; input.min='10'; input.max='120'; input.placeholder='Age';
-    input.value = meData?.age==null?'':String(meData.age);
+    const a = profileAge(); input.value = a==null?'':String(a);
   }
   m.classList.add('open');
   setTimeout(()=>{ input.focus(); input.select?.(); }, 80);
@@ -652,15 +686,15 @@ async function submitProfileModal(){
   if(pmField==='name'){
     if(!v){ err.textContent='Please enter a name.'; err.classList.add('visible'); return; }
   } else {
-    if(!meData?.display_name){ err.textContent='Please set your name first.'; err.classList.add('visible'); return; }
+    if(!profileName()){ err.textContent='Please set your name first.'; err.classList.add('visible'); return; }
     if(v && (!/^\d+$/.test(v) || parseInt(v)<10 || parseInt(v)>120)){
       err.textContent='Please enter a number between 10 and 120.'; err.classList.add('visible'); return;
     }
   }
   btn.disabled=true; btn.textContent='Saving…';
   const res = pmField==='name'
-    ? await saveProfile(v, meData?.age??null)
-    : await saveProfile(meData.display_name, v===''?null:v);
+    ? await saveProfile(v, profileAge())
+    : await saveProfile(profileName(), v===''?null:v);
   btn.disabled=false; btn.textContent='Save';
   if(res.ok){ closeProfileModal(); }
   else { err.textContent = res.error || 'Could not save. Try again.'; err.classList.add('visible'); }
@@ -682,9 +716,9 @@ const tabs = [
   ()=>`
     <div class="s-section">
       <div class="s-section-title">Profile</div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Name</div></div><button class="s-btn" onclick="editName()">${esc(meData?.display_name||'Set name')}</button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Age</div></div><button class="s-btn" onclick="editAge()">${esc(meData?.age==null?'Set age':String(meData.age))}</button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Email</div></div><div class="s-row-val">${esc(meData?.email||'—')}</div></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Name</div></div><button class="s-btn" onclick="editName()">${esc(profileName()||'Set name')}</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Age</div></div><button class="s-btn" onclick="editAge()">${esc(profileAge()==null?'Set age':String(profileAge()))}</button></div>
+      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Email</div></div><div class="s-row-val">${esc(profileEmail()||'—')}</div></div>
     </div>
     <div class="s-section">
       <div class="s-section-title">Manage</div>

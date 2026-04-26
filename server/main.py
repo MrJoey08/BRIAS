@@ -172,6 +172,7 @@ async def google_auth_endpoint(request: Request):
         "token":            token,
         "username":         user["username"] or user["contact"],
         "display_name":     user["username"],
+        "email":            user["contact"],
         "profile_complete": user["profile_done"],
     }
 
