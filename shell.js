@@ -159,7 +159,7 @@ const SHELL = (() => {
   <div class="pmodal-card">
     <div class="pmodal-title" id="shellPmTitle">Edit</div>
     <div class="pmodal-sub" id="shellPmSub"></div>
-    <input class="pmodal-input" id="shellPmInput" />
+    <div id="shellPmFields"></div>
     <div class="pmodal-err" id="shellPmErr"></div>
     <div class="pmodal-actions">
       <button class="pmodal-btn pmodal-cancel" onclick="SHELL.closeProfileModal()">Cancel</button>
@@ -175,15 +175,15 @@ const SHELL = (() => {
     () => `
       <div class="s-section">
         <div class="s-section-title">Profile</div>
-        <div class="s-row"><div class="s-row-left"><div class="s-row-label">Name</div></div><button class="s-btn" onclick="SHELL.editName()">${_esc(_meData?.display_name || 'Set name')}</button></div>
-        <div class="s-row"><div class="s-row-left"><div class="s-row-label">Age</div></div><button class="s-btn" onclick="SHELL.editAge()">${_esc(_meData?.age == null ? 'Set age' : String(_meData.age))}</button></div>
-        <div class="s-row"><div class="s-row-left"><div class="s-row-label">Email</div></div><div class="s-row-val">${_esc(_meData?.email || '—')}</div></div>
+        <div class="s-row"><div class="s-row-left"><div class="s-row-label">Name</div></div><button class="s-btn" onclick="SHELL.editName()">${_esc(_pName() || 'Set name')}</button></div>
+        <div class="s-row"><div class="s-row-left"><div class="s-row-label">Age</div></div><button class="s-btn" onclick="SHELL.editAge()">${_esc(_pAge() == null ? 'Set age' : String(_pAge()))}</button></div>
+        <div class="s-row"><div class="s-row-left"><div class="s-row-label">Email</div></div><div class="s-row-val">${_esc(_pEmail() || '—')}</div></div>
       </div>
       <div class="s-section">
         <div class="s-section-title">Manage</div>
-        <div class="s-row"><div class="s-row-left"><div class="s-row-label">Password</div></div><button class="s-btn">Change</button></div>
+        <div class="s-row"><div class="s-row-left"><div class="s-row-label">Password</div></div><button class="s-btn" onclick="SHELL.editPassword()">Change</button></div>
         <div class="s-row"><div class="s-row-left"><div class="s-row-label">Sign out</div></div><button class="s-btn" onclick="SHELL.logout()">Sign out</button></div>
-        <div class="s-row"><div class="s-row-left"><div class="s-row-label">Delete account</div></div><button class="s-btn danger">Delete</button></div>
+        <div class="s-row"><div class="s-row-left"><div class="s-row-label">Delete account</div></div><button class="s-btn danger" onclick="SHELL.editDelete()">Delete</button></div>
       </div>`,
     // 1 — Plan
     () => `
@@ -232,8 +232,27 @@ const SHELL = (() => {
   let _meData = null;
   let _apiBase = 'https://api.brias.eu';
   let _token = localStorage.getItem('brias_token');
-  let _pmField = null;
+  let _pmField = null; // 'name' | 'age' | 'password' | 'delete'
   let _logoutFn = null;
+
+  // ── Profile getters with localStorage fallback so the panel never shows
+  //    just dashes when /api/me is briefly unreachable. ──────────────────────
+  function _pName()  { return _meData?.display_name || localStorage.getItem('brias_display_name') || ''; }
+  function _pEmail() { return _meData?.email || localStorage.getItem('brias_email') || ''; }
+  function _pAge() {
+    if (_meData && _meData.age != null) return _meData.age;
+    const a = localStorage.getItem('brias_age');
+    return a ? parseInt(a, 10) : null;
+  }
+
+  function _persistMe(d) {
+    if (!d) return;
+    if (d.username) localStorage.setItem('brias_username', d.username);
+    if (d.email) localStorage.setItem('brias_email', d.email);
+    if (d.display_name) localStorage.setItem('brias_display_name', d.display_name);
+    if (d.age != null) localStorage.setItem('brias_age', String(d.age));
+    else localStorage.removeItem('brias_age');
+  }
 
   function _api(path, opts = {}) {
     return fetch(_apiBase + path, {
@@ -279,11 +298,10 @@ const SHELL = (() => {
   }
 
   function _updateDrawerUser() {
-    if (!_meData) return;
-    const name = _meData.display_name || _meData.username || localStorage.getItem('brias_username') || '—';
+    const name = _pName() || localStorage.getItem('brias_username') || '—';
     const el = id => document.getElementById(id);
     if (el('shellDrawerName')) el('shellDrawerName').textContent = name;
-    if (el('shellDrawerHandle')) el('shellDrawerHandle').textContent = _meData.email || _meData.username || '—';
+    if (el('shellDrawerHandle')) el('shellDrawerHandle').textContent = _pEmail() || '—';
     if (el('shellDrawerInitial')) el('shellDrawerInitial').textContent = (name.charAt(0) || '?').toUpperCase();
   }
 
@@ -339,6 +357,7 @@ const SHELL = (() => {
       const d = await r.json();
       if (!d.logged_in) return;
       _meData = d;
+      _persistMe(d);
       _updateDrawerUser();
       // herlaad actieve tab
       const active = document.querySelector('#shellSettingsTabs .stab.active');
@@ -349,29 +368,53 @@ const SHELL = (() => {
     } catch {}
   }
 
-  // ── Profile modal ────────────────────────────────────────────────────────
-  function editName() { _openProfileModal('name'); }
-  function editAge() { _openProfileModal('age'); }
+  // ── Profile / password / delete modal ────────────────────────────────────
+  function editName()     { _openProfileModal('name'); }
+  function editAge()      { _openProfileModal('age'); }
+  function editPassword() { _openProfileModal('password'); }
+  function editDelete()   { _openProfileModal('delete'); }
 
   function _openProfileModal(field) {
     _pmField = field;
-    const err = document.getElementById('shellPmErr');
+    const title  = document.getElementById('shellPmTitle');
+    const sub    = document.getElementById('shellPmSub');
+    const fields = document.getElementById('shellPmFields');
+    const err    = document.getElementById('shellPmErr');
+    const btn    = document.getElementById('shellPmSaveBtn');
     err.textContent = ''; err.classList.remove('visible');
-    const input = document.getElementById('shellPmInput');
+    btn.disabled = false;
+    btn.classList.remove('danger');
+    btn.textContent = 'Save';
+
     if (field === 'name') {
-      document.getElementById('shellPmTitle').textContent = 'Your name';
-      document.getElementById('shellPmSub').textContent = 'What should BRIAS call you?';
-      input.type = 'text'; input.placeholder = 'Name';
-      input.removeAttribute('min'); input.removeAttribute('max');
-      input.value = _meData?.display_name || '';
-    } else {
-      document.getElementById('shellPmTitle').textContent = 'Your age';
-      document.getElementById('shellPmSub').textContent = 'Optional. Helps BRIAS understand context.';
-      input.type = 'number'; input.min = '10'; input.max = '120'; input.placeholder = 'Age';
-      input.value = _meData?.age == null ? '' : String(_meData.age);
+      title.textContent = 'Your name';
+      sub.textContent   = 'What should BRIAS call you?';
+      fields.innerHTML  = `<input class="pmodal-input" id="shellPmIn1" type="text" placeholder="Name" value="${_esc(_pName())}" />`;
+    } else if (field === 'age') {
+      title.textContent = 'Your age';
+      sub.textContent   = 'Optional. Helps BRIAS understand context.';
+      const a = _pAge();
+      fields.innerHTML  = `<input class="pmodal-input" id="shellPmIn1" type="number" min="10" max="120" placeholder="Age" value="${a == null ? '' : _esc(String(a))}" />`;
+    } else if (field === 'password') {
+      title.textContent = 'Change password';
+      sub.textContent   = 'Enter your current password, then a new one.';
+      fields.innerHTML = `
+        <input class="pmodal-input" id="shellPmIn1" type="password" placeholder="Current password" autocomplete="current-password" />
+        <input class="pmodal-input" id="shellPmIn2" type="password" placeholder="New password" autocomplete="new-password" style="margin-top:10px;" />
+        <input class="pmodal-input" id="shellPmIn3" type="password" placeholder="Confirm new password" autocomplete="new-password" style="margin-top:10px;" />`;
+    } else if (field === 'delete') {
+      title.textContent = 'Delete account';
+      sub.textContent   = 'This wipes everything BRIAS knows about you. It cannot be undone. Enter your password to confirm.';
+      fields.innerHTML  = `<input class="pmodal-input" id="shellPmIn1" type="password" placeholder="Password" autocomplete="current-password" />`;
+      btn.classList.add('danger');
+      btn.textContent   = 'Delete';
     }
+
     document.getElementById('shellProfileModal')?.classList.add('open');
-    setTimeout(() => { input.focus(); input.select?.(); }, 80);
+    setTimeout(() => {
+      const inp = document.getElementById('shellPmIn1');
+      if (inp) { inp.focus(); inp.select?.(); }
+    }, 80);
   }
 
   function closeProfileModal() {
@@ -379,43 +422,126 @@ const SHELL = (() => {
     _pmField = null;
   }
 
-  async function submitProfileModal() {
-    const input = document.getElementById('shellPmInput');
+  function _showErr(msg) {
     const err = document.getElementById('shellPmErr');
+    err.textContent = msg;
+    err.classList.add('visible');
+  }
+
+  async function submitProfileModal() {
     const btn = document.getElementById('shellPmSaveBtn');
-    const v = input.value.trim();
+    const err = document.getElementById('shellPmErr');
     err.textContent = ''; err.classList.remove('visible');
 
     if (_pmField === 'name') {
-      if (!v) { err.textContent = 'Please enter a name.'; err.classList.add('visible'); return; }
-    } else {
-      if (!_meData?.display_name) { err.textContent = 'Please set your name first.'; err.classList.add('visible'); return; }
-      if (v && (!/^\d+$/.test(v) || parseInt(v) < 10 || parseInt(v) > 120)) {
-        err.textContent = 'Please enter a number between 10 and 120.'; err.classList.add('visible'); return;
+      const v = (document.getElementById('shellPmIn1').value || '').trim();
+      if (!v) return _showErr('Please enter a name.');
+      btn.disabled = true; btn.textContent = 'Saving…';
+      const res = await _saveProfile(v, _pAge());
+      btn.disabled = false; btn.textContent = 'Save';
+      if (res.ok) closeProfileModal();
+      else _showErr(res.error || 'Could not save. Try again.');
+
+    } else if (_pmField === 'age') {
+      const raw = (document.getElementById('shellPmIn1').value || '').trim();
+      if (!_pName()) return _showErr('Please set your name first.');
+      if (raw && (!/^\d+$/.test(raw) || parseInt(raw, 10) < 10 || parseInt(raw, 10) > 120)) {
+        return _showErr('Please enter a number between 10 and 120.');
+      }
+      btn.disabled = true; btn.textContent = 'Saving…';
+      const res = await _saveProfile(_pName(), raw === '' ? null : raw);
+      btn.disabled = false; btn.textContent = 'Save';
+      if (res.ok) closeProfileModal();
+      else _showErr(res.error || 'Could not save. Try again.');
+
+    } else if (_pmField === 'password') {
+      const oldP = document.getElementById('shellPmIn1').value;
+      const newP = document.getElementById('shellPmIn2').value;
+      const conf = document.getElementById('shellPmIn3').value;
+      if (!oldP || !newP) return _showErr('Please fill in both passwords.');
+      if (newP.length < 6) return _showErr('New password must be at least 6 characters.');
+      if (newP !== conf)   return _showErr('New passwords do not match.');
+      btn.disabled = true; btn.textContent = 'Saving…';
+      const res = await _changePassword(oldP, newP);
+      btn.disabled = false; btn.textContent = 'Save';
+      if (res.ok) closeProfileModal();
+      else _showErr(res.error || 'Could not change password.');
+
+    } else if (_pmField === 'delete') {
+      const pw = document.getElementById('shellPmIn1').value;
+      if (!pw) return _showErr('Please enter your password.');
+      btn.disabled = true; btn.textContent = 'Deleting…';
+      const res = await _deleteAccount(pw);
+      btn.disabled = false; btn.textContent = 'Delete';
+      if (res.ok) {
+        // Account is gone — wipe local data and bounce to auth.
+        try { localStorage.clear(); } catch (_) {}
+        window.location.href = 'auth.html';
+      } else {
+        _showErr(res.error || 'Could not delete account.');
       }
     }
-
-    btn.disabled = true; btn.textContent = 'Saving…';
-    const res = _pmField === 'name'
-      ? await _saveProfile(v, _meData?.age ?? null)
-      : await _saveProfile(_meData.display_name, v === '' ? null : v);
-    btn.disabled = false; btn.textContent = 'Save';
-    if (res.ok) { closeProfileModal(); }
-    else { err.textContent = res.error || 'Could not save. Try again.'; err.classList.add('visible'); }
   }
 
   async function _saveProfile(display_name, age) {
+    const ageVal = age === '' || age == null ? null : parseInt(age, 10);
     try {
       const r = await _api('/api/profile', {
         method: 'POST',
-        body: JSON.stringify({ display_name, age: age === '' || age == null ? null : parseInt(age) }),
+        body: JSON.stringify({ display_name, age: ageVal }),
       });
       if (!r.ok) {
         let detail = '';
         try { const d = await r.json(); detail = d.detail || ''; } catch {}
         return { ok: false, error: detail || `Could not save (HTTP ${r.status}).` };
       }
+      // Optimistic local update so the UI reflects the change even if /api/me is slow.
+      localStorage.setItem('brias_display_name', display_name);
+      localStorage.setItem('brias_username', display_name);
+      if (ageVal == null) localStorage.removeItem('brias_age');
+      else localStorage.setItem('brias_age', String(ageVal));
+      if (_meData) {
+        _meData.display_name = display_name;
+        _meData.username = display_name;
+        _meData.age = ageVal;
+        _meData.profile_done = true;
+      }
+      _updateDrawerUser();
       await _refreshMe();
+      return { ok: true };
+    } catch {
+      return { ok: false, error: 'Network error — could not reach BRIAS.' };
+    }
+  }
+
+  async function _changePassword(oldP, newP) {
+    try {
+      const r = await _api('/api/account/password', {
+        method: 'POST',
+        body: JSON.stringify({ old_password: oldP, new_password: newP }),
+      });
+      if (!r.ok) {
+        let detail = '';
+        try { const d = await r.json(); detail = d.detail || ''; } catch {}
+        return { ok: false, error: detail || `Could not change password (HTTP ${r.status}).` };
+      }
+      return { ok: true };
+    } catch {
+      return { ok: false, error: 'Network error — could not reach BRIAS.' };
+    }
+  }
+
+  async function _deleteAccount(password) {
+    try {
+      const r = await _api('/api/account/delete', {
+        method: 'POST',
+        body: JSON.stringify({ password }),
+      });
+      if (!r.ok) {
+        let detail = '';
+        try { const d = await r.json(); detail = d.detail || ''; } catch {}
+        return { ok: false, error: detail || `Could not delete account (HTTP ${r.status}).` };
+      }
       return { ok: true };
     } catch {
       return { ok: false, error: 'Network error — could not reach BRIAS.' };
@@ -425,8 +551,8 @@ const SHELL = (() => {
   // ── Logout ───────────────────────────────────────────────────────────────
   function logout() {
     if (_logoutFn) { _logoutFn(); return; }
-    localStorage.removeItem('brias_token');
-    localStorage.removeItem('brias_username');
+    // Wipe local profile cache so the next login starts clean.
+    ['brias_token','brias_username','brias_email','brias_display_name','brias_age'].forEach(k => localStorage.removeItem(k));
     window.location.href = 'auth.html';
   }
 
@@ -446,6 +572,8 @@ const SHELL = (() => {
     // profile modal
     editName,
     editAge,
+    editPassword,
+    editDelete,
     closeProfileModal,
     submitProfileModal,
     // logout

@@ -87,6 +87,13 @@ class ProfileBody(BaseModel):
     display_name: str
     age: int | None = None
 
+class PasswordBody(BaseModel):
+    old_password: str
+    new_password: str
+
+class DeleteAccountBody(BaseModel):
+    password: str = ""
+
 class ChatBody(BaseModel):
     title: str = "New chat"
 
@@ -228,6 +235,26 @@ async def profile(body: ProfileBody, authorization: str | None = Header(default=
     user = _user(authorization)
     username = auth.update_profile(user["id"], body.display_name, body.age)
     return {"username": username}
+
+
+@app.post("/api/account/password")
+async def change_password(body: PasswordBody, authorization: str | None = Header(default=None)):
+    user = _user(authorization)
+    if len(body.new_password) < 6:
+        raise HTTPException(400, "New password must be at least 6 characters")
+    ok = auth.change_password(user["id"], body.old_password, body.new_password)
+    if not ok:
+        raise HTTPException(401, "Current password is incorrect")
+    return {"ok": True}
+
+
+@app.post("/api/account/delete")
+async def delete_account(body: DeleteAccountBody, authorization: str | None = Header(default=None)):
+    user = _user(authorization)
+    ok = auth.delete_account(user["id"], body.password)
+    if not ok:
+        raise HTTPException(401, "Password is incorrect")
+    return {"ok": True}
 
 
 @app.post("/api/logout")
