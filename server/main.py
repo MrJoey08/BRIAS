@@ -201,6 +201,7 @@ async def register(body: LoginBody):
     return {
         "token":    token,
         "username": u["username"] or u["contact"],
+        "email":    u["contact"],
         "profile_complete": u["profile_done"],
     }
 
@@ -214,6 +215,7 @@ async def login(body: LoginBody):
     return {
         "token":    token,
         "username": user["username"] or user["contact"],
+        "email":    user["contact"],
         "profile_complete": user["profile_done"],
     }
 
