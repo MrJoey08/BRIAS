@@ -71,6 +71,7 @@ async function doAuthStep1() {
     if (d.token) {
       localStorage.setItem('brias_token', d.token);
       localStorage.setItem('brias_username', d.username);
+      if (d.email) localStorage.setItem('brias_email', d.email);
       window.location.href = 'app.html';
       return;
     }
@@ -93,6 +94,7 @@ async function doAuthStep2() {
     if (!r.ok) { e.textContent = d.detail || 'Invalid code'; e.classList.remove('hidden'); return; }
     localStorage.setItem('brias_token', d.token);
     localStorage.setItem('brias_username', d.username);
+    if (d.email) localStorage.setItem('brias_email', d.email);
     if (authMode === 'register' && !d.profile_complete) { showStep(3); return; }
     window.location.href = 'app.html';
   } catch(err) {
