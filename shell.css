@@ -138,6 +138,34 @@ body.light .pmodal-cancel:hover{background:rgba(80,40,20,.06);}
   .nav-name{font-size:13.5px;}
   .nav-sub{font-size:11.5px;}
 }
+/* ── Light mode overrides for shell elements ── */
+body.light .nav-item:hover{background:rgba(80,40,20,.06);}
+body.light .nav-item.active{background:linear-gradient(135deg,rgba(232,118,74,.12),rgba(212,74,122,.09));}
+body.light .nav-item:not(.active) .nav-icon{background:rgba(80,40,20,.06);}
+body.light .nav-item:not(.active) .nav-icon svg{stroke:rgba(80,40,20,.4)!important;}
+body.light .drawer-settings-btn svg{stroke:rgba(80,40,20,.45)!important;}
+body.light .settings-close-btn svg{stroke:rgba(80,40,20,.5)!important;}
+body.light .drawer-divider{background:rgba(80,40,20,.1);}
+body.light .drawer-backdrop{background:rgba(30,12,0,.38);backdrop-filter:blur(10px);}
+body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}
+body.light .drawer-settings-btn:hover{background:rgba(80,40,20,.12);}
+body.light .soon-badge{background:rgba(80,40,20,.07);color:var(--text-dim);-webkit-text-fill-color:var(--text-dim);}
+body.light .s-row{background:rgba(80,40,20,.05);}
+body.light .s-btn{color:var(--text-sub);background:rgba(80,40,20,.07);border-color:rgba(80,40,20,.1);}
+body.light .s-btn:hover{background:rgba(80,40,20,.13);color:var(--text);border-color:rgba(80,40,20,.16);}
+body.light .s-btn.danger{color:rgba(160,40,40,.8);background:transparent;border-color:rgba(160,40,40,.18);}
+body.light .s-btn.danger:hover{background:rgba(160,40,40,.07);}
+body.light .toggle{background:rgba(80,40,20,.16);}
+body.light .toggle.on{background:var(--grad);}
+body.light .toggle::after{background:#fff;}
+body.light .toggle.on::after{background:#ddc9b3;}
+body.light .settings-close-btn{background:rgba(80,40,20,.07);}
+body.light .settings-close-btn:hover{background:rgba(80,40,20,.13);}
+body.light .sub-card{background:rgba(80,40,20,.05);border-color:rgba(80,40,20,.1);}
+body.light .sub-card-perks{border-top-color:rgba(80,40,20,.1);}
+body.light .theme-toggle{background:rgba(80,40,20,.06);border-color:rgba(80,40,20,.1);}
+body.light .theme-opt:not(.active){color:var(--text-sub);}
+
 @media (max-width:600px){
   .settings-tabs{padding:0;overflow-x:auto;}
   .settings-tabs::-webkit-scrollbar{display:none;}

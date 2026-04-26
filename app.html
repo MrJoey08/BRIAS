@@ -12,6 +12,7 @@
 <link rel="manifest" href="/logo/site.webmanifest">
 <meta name="theme-color" content="#131013">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Bitter:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shell.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 button{outline:none!important;border:none;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent;}
@@ -49,8 +50,6 @@ body.light{
   --input-focus:rgba(232,118,74,.35);
 }
 
-body.light .drawer-panel{background:var(--sidebar);}
-body.light ::-webkit-scrollbar-thumb{background:rgba(80,40,20,.12);}
 html,body{height:100%;overflow:hidden;}
 body{font-family:var(--font);background:var(--bg);color:var(--text);transition:background .5s ease,color .4s ease;}
 ::-webkit-scrollbar{width:4px;}
@@ -122,252 +121,17 @@ textarea::placeholder{color:var(--text-dim);}
 .stop-btn{width:32px;height:32px;border-radius:12px;border:1px solid rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .stop-sq{width:9px;height:9px;border-radius:3px;background:rgba(255,255,255,.4);}
 
-/* ── Drawer ── */
-.drawer{position:fixed;inset:0;z-index:40;pointer-events:none;}
-.drawer-backdrop{position:absolute;inset:0;background:rgba(8,6,8,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);opacity:0;transition:opacity .38s ease;}
-.drawer-panel{position:absolute;top:0;left:0;bottom:0;width:280px;background:var(--sidebar);border-radius:0 28px 28px 0;transform:translateX(-100%);transition:transform .42s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column;overflow:hidden;border-right:1px solid rgba(255,255,255,.04);}
-.drawer.open{pointer-events:all;}
-.drawer.open .drawer-backdrop{opacity:1;}
-.drawer.open .drawer-panel{transform:translateX(0);}
-.drawer-top{padding:28px 20px 18px;flex-shrink:0;}
-.drawer-logo{font-family:var(--font-display);font-size:30px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.drawer-nav{flex:1;padding:0 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
-.nav-section-label{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--text-dim);padding:4px 12px 6px;font-weight:500;}
-.nav-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:16px;transition:background .15s;width:100%;text-align:left;}
-.nav-item:hover{background:rgba(255,255,255,.05);}
-.nav-item.active{background:linear-gradient(135deg,rgba(232,118,74,.1),rgba(212,74,122,.08));}
-.nav-icon{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.nav-item:not(.active) .nav-icon{background:rgba(255,255,255,.04);}
-.nav-item.active .nav-icon{background:linear-gradient(135deg,rgba(232,118,74,.18),rgba(212,74,122,.16));}
-.nav-texts{flex:1;min-width:0;}
-.nav-name{font-size:13px;font-weight:400;color:var(--text-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.nav-item.active .nav-name{font-weight:500;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.nav-sub{font-size:11px;color:var(--text-dim);margin-top:2px;}
-.soon-badge{font-size:9px;padding:2px 7px;border-radius:20px;background:rgba(255,255,255,.05);color:var(--text-dim);letter-spacing:.03em;margin-left:4px;vertical-align:middle;-webkit-text-fill-color:var(--text-dim);}
-.drawer-divider{height:1px;background:rgba(255,255,255,.05);margin:8px 10px 10px;}
-.drawer-footer{padding:10px 14px 22px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.footer-av{width:32px;height:32px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.footer-av span{font-family:var(--font-display);font-size:13px;color:#fff;font-style:italic;font-weight:600;}
-.footer-info{flex:1;min-width:0;}
-.footer-name{font-size:13px;font-weight:400;color:var(--text-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.footer-handle{font-size:11px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.drawer-settings-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .18s;}
-.drawer-settings-btn:hover{background:rgba(255,255,255,.08);}
 
-/* ── Settings ── */
-.settings-overlay{
-  position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;
-  background:rgba(10,7,9,.96);
-  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  opacity:0;pointer-events:none;
-  transform:translateY(12px) scale(.99);
-  transition:opacity .32s ease, transform .38s cubic-bezier(.16,1,.3,1), background .45s ease;
-}
-.settings-overlay.open{opacity:1;pointer-events:all;transform:translateY(0) scale(1);}
-body.light .settings-overlay{background:rgba(228,214,199,.97);}
-.settings-header{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0;border-bottom:1px solid var(--border);}
-.settings-title{font-family:var(--font-display);font-size:22px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.settings-close-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:background .15s;}
-.settings-close-btn:hover{background:rgba(255,255,255,.1);}
-
-/* tabs — clean underline indicator */
-.settings-tabs{display:flex;gap:0;padding:0 24px;flex-shrink:0;border-bottom:1px solid var(--border);overflow-x:auto;}
-.settings-tabs::-webkit-scrollbar{display:none;}
-.stab{
-  flex:1;padding:14px 6px 13px;min-width:0;
-  border-radius:0;font-size:11px;font-weight:400;
-  color:var(--text-muted);
-  transition:color .2s;
-  white-space:nowrap;text-align:center;
-  background:transparent;
-  position:relative;
-  border-bottom:2px solid transparent;
-  margin-bottom:-1px;
-}
-.stab:hover{color:var(--text-sub);}
-.stab.active{
-  color:var(--orange);
-  font-weight:500;
-  border-bottom:2px solid var(--orange);
-}
-
-.settings-content{flex:1;overflow-y:auto;display:flex;justify-content:center;padding:28px 20px;}
-.settings-body{width:100%;max-width:560px;}
-
-.s-section{margin-bottom:24px;}
-.s-section-title{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;font-weight:500;}
-.s-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;background:rgba(255,255,255,.03);border-radius:14px;margin-bottom:5px;gap:16px;}
-.s-row-left{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;}
-.s-row-label{font-size:13.5px;color:var(--text-sub);font-weight:400;letter-spacing:.01em;}
-.s-row-sub{font-size:11.5px;color:var(--text-dim);margin-top:2px;line-height:1.4;}
-.s-row-val{font-size:13px;color:var(--text-muted);flex-shrink:0;}
-
-/* Settings buttons — warm grey, fits the palette */
-.s-btn{
-  padding:7px 15px;border-radius:10px;font-size:12.5px;font-weight:400;
-    color:var(--text-sub);
-  background:rgba(255,255,255,.055);
-  border:1px solid rgba(255,255,255,.07);
-  transition:background .18s,color .18s,border-color .18s;
-  white-space:nowrap;flex-shrink:0;
-  letter-spacing:.01em;
-}
-.s-btn:hover{
-  background:rgba(255,255,255,.09);
-    color:var(--text);
-  border-color:rgba(255,255,255,.11);
-}
-.s-btn.danger{
-  color:rgba(220,90,90,.65);
-  background:transparent;
-  border-color:rgba(220,90,90,.15);
-}
-.s-btn.danger:hover{
-  background:rgba(220,70,70,.07);
-  color:rgba(220,90,90,.85);
-  border-color:rgba(220,90,90,.25);
-}
-
-/* toggle:
-   OFF = white knob, dim track
-   ON  = knob matches track colour exactly (same grey as the box bg), gradient track */
-.toggle{
-  width:42px;height:23px;border-radius:12px;
-  background:rgba(255,255,255,.1);
-  position:relative;transition:background .28s;flex-shrink:0;
-}
-.toggle.on{background:var(--grad);}
-/* off knob: white */
-.toggle::after{
-  content:'';position:absolute;
-  width:17px;height:17px;border-radius:50%;
-  background:#fff;
-  top:3px;left:3px;
-  transition:left .26s cubic-bezier(.34,1.4,.6,1),background .28s,box-shadow .28s;
-  box-shadow:0 1px 4px rgba(0,0,0,.3);
-}
-/* on knob: matches s-row bg so it blends into the gradient track */
-.toggle.on::after{
-  left:22px;
-  background:#1a161a;
-  box-shadow:none;
-}
-body.light .toggle.on::after{
-  left:22px;
-  background:#ddc9b3;
-  box-shadow:none;
-}
-
-/* Theme toggle — two-option selector */
-.theme-toggle{display:flex;gap:3px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;overflow:hidden;padding:3px;transition:background .45s ease,border-color .45s ease;}
-body.light .theme-toggle{background:rgba(80,40,20,.06);}
-.theme-toggle{
-  display:flex;position:relative;
-  background:rgba(255,255,255,.05);border:1px solid var(--border);
-  border-radius:12px;padding:3px;gap:0;
-  transition:background .45s ease,border-color .45s ease;
-}
-body.light .theme-toggle{background:rgba(80,40,20,.06);border-color:rgba(80,40,20,.1);}
-.theme-toggle-pill{
-  position:absolute;top:3px;bottom:3px;
-  width:calc(50% - 3px);
-  background:var(--grad);
-  border-radius:9px;
-  transition:left .35s cubic-bezier(.34,1.2,.6,1);
-  pointer-events:none;
-}
-body.light .theme-toggle-pill{left:3px;}
-body:not(.light) .theme-toggle-pill{left:3px;}
-.theme-toggle.pill-right .theme-toggle-pill{left:calc(50%);}
-.theme-opt{
-  flex:1;padding:8px 14px;border-radius:9px;font-size:12.5px;font-weight:400;
-  color:var(--text-muted);background:transparent;
-  transition:color .3s ease;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  position:relative;z-index:1;
-}
-.theme-opt.active{color:#fff;font-weight:500;}
-body.light .theme-opt:not(.active){color:var(--text-sub);}
-
-/* Smooth transition on all major elements for theme switch */
-.topbar,.s-row,.s-btn,.toggle,.msg-bubble,.input-box,.nav-item,.drawer-backdrop{transition:background .45s ease,border-color .45s ease,color .35s ease;}
-.drawer-panel{transition:transform .42s cubic-bezier(.16,1,.3,1),background .45s ease,border-color .45s ease;}
-.drawer-panel{transition:transform .42s cubic-bezier(.16,1,.3,1),background .45s ease,border-color .45s ease;}
-
-/* About */
-.about-logo{font-family:var(--font-display);font-size:42px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:block;}
-
-/* Subscription cards */
-.sub-intro{font-family:var(--font-serif);font-size:14px;font-weight:300;font-style:italic;line-height:1.65;color:var(--text-muted);margin-bottom:20px;}
-.sub-cards{display:flex;flex-direction:column;gap:10px;}
-.sub-card{border:1px solid var(--border);border-radius:18px;padding:18px 20px;background:rgba(255,255,255,.03);}
-.sub-card-name{font-family:var(--font-display);font-size:17px;font-weight:600;font-style:italic;color:var(--text-sub);margin-bottom:4px;}
-.sub-card-price{font-size:20px;font-weight:500;color:var(--text-sub);margin-bottom:8px;font-family:var(--font-display);font-style:italic;}
-.sub-card-price span{font-size:12px;font-weight:300;color:var(--text-dim);font-family:var(--font);font-style:normal;}
-.sub-card-perks{list-style:none;display:flex;flex-direction:column;gap:5px;margin-top:8px;padding-top:10px;border-top:1px solid var(--border);}
-.sub-card-perks li{font-family:var(--font-serif);font-size:12.5px;font-weight:300;font-style:italic;color:var(--text-muted);line-height:1.45;padding-left:14px;position:relative;}
-.sub-card-perks li::before{content:'–';position:absolute;left:0;color:var(--text-dim);}
-
-/* Light mode — comprehensive overrides for all hardcoded dark colors */
+/* Light mode — comprehensive overrides */
 
 body.light .drawer-panel{background:var(--sidebar);}
 body.light ::-webkit-scrollbar-thumb{background:rgba(80,40,20,.14);}
 body.light .msg.assistant .msg-bubble{border-color:rgba(80,40,20,.12);}
-body.light .nav-item:hover{background:rgba(80,40,20,.06);}
-body.light .nav-item.active{background:linear-gradient(135deg,rgba(232,118,74,.12),rgba(212,74,122,.09));}
-body.light .nav-item:not(.active) .nav-icon{background:rgba(80,40,20,.06);}
 /* drawer icons — override hardcoded white stroke */
-body.light .nav-item:not(.active) .nav-icon svg{stroke:rgba(80,40,20,.4)!important;}
-body.light .drawer-settings-btn svg{stroke:rgba(80,40,20,.45)!important;}
-body.light .settings-close-btn svg{stroke:rgba(80,40,20,.5)!important;}
-body.light .drawer-divider{background:rgba(80,40,20,.1);}
-body.light .drawer-backdrop{background:rgba(30,12,0,.38);backdrop-filter:blur(10px);}
-body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}
-body.light .drawer-settings-btn:hover{background:rgba(80,40,20,.12);}
-body.light .soon-badge{background:rgba(80,40,20,.07);color:var(--text-dim);-webkit-text-fill-color:var(--text-dim);}
-body.light .s-row{background:rgba(80,40,20,.05);}
-body.light .s-btn{color:var(--text-sub);background:rgba(80,40,20,.07);border-color:rgba(80,40,20,.1);}
-body.light .s-btn:hover{background:rgba(80,40,20,.13);color:var(--text);border-color:rgba(80,40,20,.16);}
-body.light .s-btn.danger{color:rgba(160,40,40,.8);background:transparent;border-color:rgba(160,40,40,.18);}
-body.light .s-btn.danger:hover{background:rgba(160,40,40,.07);}
-body.light .toggle{background:rgba(80,40,20,.16);}
-body.light .toggle.on{background:var(--grad);}
-body.light .toggle::after{background:#fff;}
-body.light .toggle.on::after{background:#ddc9b3;}
-body.light .settings-close-btn{background:rgba(80,40,20,.07);}
-body.light .settings-close-btn:hover{background:rgba(80,40,20,.13);}
 body.light .send-btn.inactive{background:rgba(80,40,20,.08);}
 body.light .stop-btn{border-color:rgba(80,40,20,.2);}
 body.light .stop-sq{background:rgba(30,12,0,.4);}
-body.light .sub-card{background:rgba(80,40,20,.05);border-color:rgba(80,40,20,.1);}
-body.light .sub-card-perks{border-top-color:rgba(80,40,20,.1);}
-body.light .theme-toggle{background:rgba(80,40,20,.06);border-color:rgba(80,40,20,.1);}
-body.light .theme-opt:not(.active){color:var(--text-sub);}
 
-/* ── Profile edit modal ── */
-.pmodal{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(8,5,7,.7);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);opacity:0;pointer-events:none;transition:opacity .25s ease;}
-.pmodal.open{opacity:1;pointer-events:all;}
-body.light .pmodal{background:rgba(228,214,199,.7);}
-.pmodal-card{width:100%;max-width:380px;background:rgba(19,15,17,.96);border:1px solid var(--border);border-radius:20px;padding:24px;box-shadow:0 24px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.04);transform:translateY(8px) scale(.98);transition:transform .3s cubic-bezier(.16,1,.3,1);}
-body.light .pmodal-card{background:rgba(240,230,220,.98);}
-.pmodal.open .pmodal-card{transform:translateY(0) scale(1);}
-.pmodal-title{font-family:var(--font-display);font-size:22px;font-weight:500;font-style:italic;color:var(--text);margin-bottom:4px;}
-.pmodal-sub{font-family:var(--font-serif);font-size:13px;font-weight:300;font-style:italic;color:var(--text-muted);margin-bottom:18px;line-height:1.5;}
-.pmodal-input{width:100%;padding:13px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;color:var(--text);font-family:var(--font);font-size:14px;font-weight:300;outline:none;transition:border-color .25s,background .25s;}
-.pmodal-input:focus{border-color:rgba(232,118,74,.55);background:rgba(232,118,74,.06);}
-body.light .pmodal-input{background:rgba(80,40,20,.05);border-color:rgba(80,40,20,.1);}
-body.light .pmodal-input:focus{border-color:rgba(232,118,74,.55);background:rgba(232,118,74,.07);}
-.pmodal-err{font-size:13px;color:#e06060;margin-top:10px;display:none;}
-.pmodal-err.visible{display:block;}
-.pmodal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end;}
-.pmodal-btn{padding:10px 18px;border-radius:11px;font-size:13px;font-weight:400;font-family:var(--font);cursor:pointer;transition:opacity .18s,transform .15s,background .18s;letter-spacing:.02em;}
-.pmodal-cancel{color:var(--text-sub);background:transparent;border:1px solid rgba(255,255,255,.08);}
-.pmodal-cancel:hover{background:rgba(255,255,255,.05);}
-body.light .pmodal-cancel{border-color:rgba(80,40,20,.12);}
-body.light .pmodal-cancel:hover{background:rgba(80,40,20,.06);}
-.pmodal-save{color:#fff;background:var(--grad);border:none;box-shadow:0 4px 20px rgba(212,74,122,.18);}
-.pmodal-save:hover{opacity:.92;transform:translateY(-1px);}
-.pmodal-save:disabled{opacity:.5;cursor:default;transform:none;}
 
 /* Mobile — full width, no wasted space */
 @media (max-width:600px){
@@ -442,7 +206,7 @@ body.light .pmodal-cancel:hover{background:rgba(80,40,20,.06);}
 <div class="noise"></div>
 <div class="app">
   <div class="topbar">
-    <button class="menu-btn" id="menuBtn" onclick="toggleDrawer()">
+    <button class="menu-btn" id="menuBtn" onclick="SHELL.toggleDrawer()">
       <div class="lns"><span class="ln"></span><span class="ln"></span></div>
     </button>
     <div class="topbar-logo">BRIAS</div>
@@ -471,87 +235,32 @@ body.light .pmodal-cancel:hover{background:rgba(80,40,20,.06);}
   </div>
 </div>
 
-<!-- Drawer -->
-<div class="drawer" id="drawer">
-  <div class="drawer-backdrop" onclick="closeDrawer()"></div>
-  <div class="drawer-panel">
-    <div class="drawer-top"><div class="drawer-logo">BRIAS</div></div>
-    <div class="drawer-nav">
-      <div class="nav-section-label">Spaces</div>
-      <button class="nav-item active" onclick="closeDrawer()">
-        <div class="nav-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
-            <defs><linearGradient id="ng1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e8764a"/><stop offset="100%" stop-color="#d44a7a"/></linearGradient></defs>
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="url(#ng1)"/>
-          </svg>
-        </div>
-        <div class="nav-texts"><div class="nav-name">Chat</div><div class="nav-sub">Your conversation with BRIAS</div></div>
-      </button>
-      <button class="nav-item" onclick="window.location.href='diary.html'">
-        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
-        <div class="nav-texts"><div class="nav-name">Journal</div><div class="nav-sub">You and BRIAS write here together</div></div>
-      </button>
-      <button class="nav-item" onclick="window.location.href='planner.html'">
-        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-        <div class="nav-texts"><div class="nav-name">Planner</div><div class="nav-sub">Keep track of mental steps</div></div>
-      </button>
-      <button class="nav-item">
-        <div class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
-        <div class="nav-texts"><div class="nav-name">Mindspace <span class="soon-badge">soon</span></div><div class="nav-sub">Dump it here, sort later</div></div>
-      </button>
-    </div>
-    <div class="drawer-divider"></div>
-    <div class="drawer-footer">
-      <div class="footer-av"><span id="drawerInitial">—</span></div>
-      <div class="footer-info">
-        <div class="footer-name" id="drawerName">—</div>
-        <div class="footer-handle" id="drawerHandle">—</div>
-      </div>
-      <button class="drawer-settings-btn" onclick="openSettings();closeDrawer();" title="Settings">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.3)" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      </button>
-    </div>
-  </div>
-</div>
+<!-- Settings shell handled by shell.js -->
 
-<!-- Settings -->
-<div class="settings-overlay" id="settingsOverlay">
-  <div class="settings-header">
-    <div class="settings-title">Settings</div>
-    <button class="settings-close-btn" onclick="closeSettings()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.5)" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-  </div>
-  <div class="settings-tabs" id="settingsTabs">
-    <button class="stab active" onclick="switchTab(0)">Profile</button>
-    <button class="stab" onclick="switchTab(1)">Plan</button>
-    <button class="stab" onclick="switchTab(2)">Permissions</button>
-    <button class="stab" onclick="switchTab(3)">Customise</button>
-    <button class="stab" onclick="switchTab(4)">About</button>
-  </div>
-  <div class="settings-content">
-    <div class="settings-body" id="settingsBody"></div>
-  </div>
-</div>
-
+<script src="shell.js"></script>
 <script>
 const API = 'https://api.brias.eu';
 let token = localStorage.getItem('brias_token');
-let username = localStorage.getItem('brias_username');
 let activeChatId = null, isStreaming = false, meData = null;
+
 // Apply saved theme immediately
 if (localStorage.getItem('brias_theme')==='light') document.body.classList.add('light');
+
+// Init shell with cached data so drawer shows immediately
+SHELL.init({
+  display_name: localStorage.getItem('brias_display_name') || '',
+  email: localStorage.getItem('brias_email') || '',
+  username: localStorage.getItem('brias_username') || '',
+}, { logout: doLogout });
 
 function api(path, opts={}) {
   return fetch(API+path, {...opts, headers:{'Content-Type':'application/json',...(token?{'Authorization':'Bearer '+token}:{}),...(opts.headers||{})}});
 }
 
 async function init() {
-  // Immediately render whatever we have cached so the drawer never looks empty.
-  applyMeToDrawer();
   try {
     const r = await fetch(API+'/api/me', {headers:token?{'Authorization':'Bearer '+token}:{}});
-    if (!r.ok && r.status !== 401) return; // server error, stay offline
+    if (!r.ok && r.status !== 401) return;
 
     if (!token || r.status === 401) { window.location.href='auth.html'; return; }
     meData = await r.json();
@@ -560,8 +269,8 @@ async function init() {
     if (meData.display_name) localStorage.setItem('brias_display_name', meData.display_name);
     if (meData.age!=null) localStorage.setItem('brias_age', String(meData.age));
     if (meData.username) localStorage.setItem('brias_username', meData.username);
-  } catch(e) { return; } // server unreachable, stay offline
-  applyMeToDrawer();
+    SHELL.updateUser(meData);
+  } catch(e) { return; }
   try {
     const chats = await api('/api/chats').then(r=>r.json());
     if (chats.length > 0) {
@@ -578,237 +287,6 @@ async function init() {
 function doLogout() {
   localStorage.removeItem('brias_token'); localStorage.removeItem('brias_username');
   window.location.href='auth.html';
-}
-
-function profileName(){ return meData?.display_name || localStorage.getItem('brias_display_name') || ''; }
-function profileEmail(){ return meData?.email || localStorage.getItem('brias_email') || ''; }
-function profileAge(){
-  if(meData && meData.age!=null) return meData.age;
-  const a = localStorage.getItem('brias_age');
-  return a ? parseInt(a) : null;
-}
-function applyMeToDrawer(){
-  const name = profileName() || localStorage.getItem('brias_username') || '—';
-  const dn = document.getElementById('drawerName');
-  const dh = document.getElementById('drawerHandle');
-  const di = document.getElementById('drawerInitial');
-  if(dn) dn.textContent = name;
-  if(dh) dh.textContent = profileEmail() || '—';
-  if(di) di.textContent = (name.charAt(0)||'?').toUpperCase();
-}
-
-async function refreshMe() {
-  try {
-    const r = await api('/api/me');
-    if (!r.ok) return;
-    const d = await r.json();
-    if (!d.logged_in) return;
-    meData = d;
-    if(d.email) localStorage.setItem('brias_email', d.email);
-    if(d.display_name) localStorage.setItem('brias_display_name', d.display_name);
-    if(d.age!=null) localStorage.setItem('brias_age', String(d.age));
-    if(d.username) localStorage.setItem('brias_username', d.username);
-    applyMeToDrawer();
-    if (document.getElementById('settingsOverlay').classList.contains('open')) {
-      const active = document.querySelector('.stab.active');
-      if (active) {
-        const i = Array.from(document.querySelectorAll('.stab')).indexOf(active);
-        if (i >= 0) switchTab(i);
-      }
-    }
-  } catch(e) {}
-}
-
-async function saveProfile(display_name, age) {
-  const ageVal = age===''||age==null?null:parseInt(age);
-  try {
-    const r = await api('/api/profile', { method:'POST', body:JSON.stringify({display_name, age: ageVal}) });
-    if (!r.ok) {
-      let detail='';
-      try { const d=await r.json(); detail=d.detail||''; } catch{}
-      console.error('saveProfile failed', r.status, detail);
-      return {ok:false, error: detail || `Could not save (HTTP ${r.status}).`};
-    }
-    localStorage.setItem('brias_display_name', display_name);
-    localStorage.setItem('brias_username', display_name);
-    if(ageVal==null) localStorage.removeItem('brias_age'); else localStorage.setItem('brias_age', String(ageVal));
-    if(meData){ meData.display_name = display_name; meData.username = display_name; meData.age = ageVal; meData.profile_done = true; }
-    applyMeToDrawer();
-    await refreshMe();
-    if (document.getElementById('settingsOverlay').classList.contains('open')) {
-      const active = document.querySelector('.stab.active');
-      if (active) {
-        const i = Array.from(document.querySelectorAll('.stab')).indexOf(active);
-        if (i >= 0) switchTab(i);
-      }
-    }
-    return {ok:true};
-  } catch(e) {
-    console.error('saveProfile error', e);
-    return {ok:false, error:'Network error — could not reach BRIAS.'};
-  }
-}
-
-let pmField = null;
-function openProfileModal(field){
-  pmField = field;
-  const m = document.getElementById('profileModal');
-  const title = document.getElementById('pmTitle');
-  const sub = document.getElementById('pmSub');
-  const input = document.getElementById('pmInput');
-  const err = document.getElementById('pmErr');
-  err.textContent=''; err.classList.remove('visible');
-  if(field==='name'){
-    title.textContent='Your name';
-    sub.textContent='What should BRIAS call you?';
-    input.type='text'; input.placeholder='Name';
-    input.value = profileName();
-    input.removeAttribute('min'); input.removeAttribute('max');
-  } else {
-    title.textContent='Your age';
-    sub.textContent='Optional. Helps BRIAS understand context.';
-    input.type='number'; input.min='10'; input.max='120'; input.placeholder='Age';
-    const a = profileAge(); input.value = a==null?'':String(a);
-  }
-  m.classList.add('open');
-  setTimeout(()=>{ input.focus(); input.select?.(); }, 80);
-}
-function closeProfileModal(){
-  document.getElementById('profileModal').classList.remove('open');
-  pmField = null;
-}
-async function submitProfileModal(){
-  const input = document.getElementById('pmInput');
-  const err = document.getElementById('pmErr');
-  const btn = document.getElementById('pmSaveBtn');
-  const v = input.value.trim();
-  err.textContent=''; err.classList.remove('visible');
-  if(pmField==='name'){
-    if(!v){ err.textContent='Please enter a name.'; err.classList.add('visible'); return; }
-  } else {
-    if(!profileName()){ err.textContent='Please set your name first.'; err.classList.add('visible'); return; }
-    if(v && (!/^\d+$/.test(v) || parseInt(v)<10 || parseInt(v)>120)){
-      err.textContent='Please enter a number between 10 and 120.'; err.classList.add('visible'); return;
-    }
-  }
-  btn.disabled=true; btn.textContent='Saving…';
-  const res = pmField==='name'
-    ? await saveProfile(v, profileAge())
-    : await saveProfile(profileName(), v===''?null:v);
-  btn.disabled=false; btn.textContent='Save';
-  if(res.ok){ closeProfileModal(); }
-  else { err.textContent = res.error || 'Could not save. Try again.'; err.classList.add('visible'); }
-}
-function editName(){ openProfileModal('name'); }
-function editAge(){ openProfileModal('age'); }
-document.addEventListener('keydown', e => {
-  const open = document.getElementById('profileModal')?.classList.contains('open');
-  if(!open) return;
-  if(e.key==='Enter'){ e.preventDefault(); submitProfileModal(); }
-  else if(e.key==='Escape'){ closeProfileModal(); }
-});
-
-function toggleDrawer() { document.getElementById('drawer').classList.contains('open')?closeDrawer():openDrawer(); }
-function openDrawer() { document.getElementById('drawer').classList.add('open'); document.getElementById('menuBtn').classList.add('open'); }
-function closeDrawer() { document.getElementById('drawer').classList.remove('open'); document.getElementById('menuBtn').classList.remove('open'); }
-
-const tabs = [
-  ()=>`
-    <div class="s-section">
-      <div class="s-section-title">Profile</div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Name</div></div><button class="s-btn" onclick="editName()">${esc(profileName()||'Set name')}</button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Age</div></div><button class="s-btn" onclick="editAge()">${esc(profileAge()==null?'Set age':String(profileAge()))}</button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Email</div></div><div class="s-row-val">${esc(profileEmail()||'—')}</div></div>
-    </div>
-    <div class="s-section">
-      <div class="s-section-title">Manage</div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Password</div></div><button class="s-btn">Change</button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Sign out</div></div><button class="s-btn" onclick="doLogout()">Sign out</button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Delete account</div></div><button class="s-btn danger">Delete</button></div>
-    </div>`,
-  ()=>`
-    <p class="sub-intro"><!-- Joey: vul hier je intro tekst in --></p>
-    <div class="sub-cards">
-      <div class="sub-card">
-        <div class="sub-card-name">Standard</div>
-        <div class="sub-card-price">€— <span>/ month</span></div>
-        <ul class="sub-card-perks">
-          <li><!-- perk 1 --></li>
-          <li><!-- perk 2 --></li>
-          <li><!-- perk 3 --></li>
-        </ul>
-      </div>
-      <div class="sub-card">
-        <div class="sub-card-name">Supportive</div>
-        <div class="sub-card-price">€— <span>/ month</span></div>
-        <ul class="sub-card-perks">
-          <li><!-- perk 1 --></li>
-          <li><!-- perk 2 --></li>
-          <li><!-- perk 3 --></li>
-        </ul>
-      </div>
-      <div class="sub-card">
-        <div class="sub-card-name">Advanced</div>
-        <div class="sub-card-price">€— <span>/ month</span></div>
-        <ul class="sub-card-perks">
-          <li><!-- perk 1 --></li>
-          <li><!-- perk 2 --></li>
-          <li><!-- perk 3 --></li>
-        </ul>
-      </div>
-    </div>`,
-  ()=>`
-    <div class="s-section">
-      <div class="s-section-title">Device</div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Notifications</div><div class="s-row-sub">Let BRIAS check in on you</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Microphone</div><div class="s-row-sub">For voice messages</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
-    </div>
-    <div class="s-section">
-      <div class="s-section-title">Data</div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Save conversations</div><div class="s-row-sub">Keep your chat history</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Save journal</div><div class="s-row-sub">Stored locally on your device</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
-    </div>`,
-  ()=>`
-    <div class="s-section">
-      <div class="s-section-title">Appearance</div>
-      <div class="s-row"><div class="s-row-left"><div class="s-row-label">Theme</div><div class="s-row-sub">Choose what feels right for you</div></div>
-        <div class="theme-toggle" id="themeToggle">
-          <div class="theme-toggle-pill"></div>
-          <button class="theme-opt ${!document.body.classList.contains('light')?'active':''}" onclick="setTheme('dark')">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-            <span>Dark</span>
-          </button>
-          <button class="theme-opt ${document.body.classList.contains('light')?'active':''}" onclick="setTheme('light')">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-            <span>Light</span>
-          </button>
-        </div>
-      </div>
-    </div>`,
-  ()=>`<span class="about-logo">BRIAS</span>`
-];
-
-function openSettings() { document.getElementById('settingsOverlay').classList.add('open'); switchTab(0); refreshMe(); }
-function closeSettings() { document.getElementById('settingsOverlay').classList.remove('open'); }
-function switchTab(i) {
-  document.querySelectorAll('.stab').forEach((t,j)=>t.classList.toggle('active',j===i));
-  document.getElementById('settingsBody').innerHTML = tabs[i]();
-  // init pill position after rendering
-  const toggle = document.getElementById('themeToggle');
-  if (toggle) toggle.classList.toggle('pill-right', document.body.classList.contains('light'));
-}
-function setTheme(mode) {
-  if (mode==='light') document.body.classList.add('light');
-  else document.body.classList.remove('light');
-  localStorage.setItem('brias_theme', mode);
-  // slide pill
-  const toggle = document.getElementById('themeToggle');
-  if (toggle) toggle.classList.toggle('pill-right', mode==='light');
-  // update active class on buttons
-  document.querySelectorAll('.theme-opt').forEach(btn => {
-    const isDark = btn.getAttribute('onclick').includes('dark');
-    btn.classList.toggle('active', mode==='dark' ? isDark : !isDark);
-  });
 }
 
 function renderMessages(msgs) {
@@ -877,7 +355,6 @@ async function sendAsStream(content, chatId) {
           if (!gm){gm=true;document.getElementById('typingMsg')?.remove();inner.insertAdjacentHTML('beforeend',`<div class="msg assistant" id="streamMsg"><div class="msg-inner"><div class="msg-avatar"><span>B</span></div><div class="msg-body"><div class="msg-bubble" id="streamBubble"><span class="cursor"></span></div></div></div></div>`);sb=document.getElementById('streamBubble');}
           st+=msg.text; sb.innerHTML=esc(st)+'<span class="cursor"></span>'; scrollBottom();
         } else if (msg.type==='done') {
-      
           const se=document.getElementById('streamMsg'); if(se) se.outerHTML=msgHtml('ai-'+Date.now(),'assistant',msg.full_text||st);
         } else if (msg.type==='error') {
           document.getElementById('typingMsg')?.remove(); inner.insertAdjacentHTML('beforeend',msgHtml('err-'+Date.now(),'assistant',msg.text)); scrollBottom();
@@ -911,19 +388,6 @@ function esc(s){const d=document.createElement('div');d.textContent=s;return d.i
 init();
 </script>
 
-<!-- Profile edit modal -->
-<div class="pmodal" id="profileModal">
-  <div class="pmodal-card">
-    <div class="pmodal-title" id="pmTitle">Edit</div>
-    <div class="pmodal-sub" id="pmSub"></div>
-    <input class="pmodal-input" id="pmInput" />
-    <div class="pmodal-err" id="pmErr"></div>
-    <div class="pmodal-actions">
-      <button class="pmodal-btn pmodal-cancel" onclick="closeProfileModal()">Cancel</button>
-      <button class="pmodal-btn pmodal-save" id="pmSaveBtn" onclick="submitProfileModal()">Save</button>
-    </div>
-  </div>
-</div>
 <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
