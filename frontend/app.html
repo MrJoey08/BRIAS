@@ -496,6 +496,78 @@
       #chat-messages { padding: 32px calc(50% - 310px) 12px; }
       .input-area     { padding: 10px calc(50% - 310px) 32px; }
     }
+
+    /* ── Offline scherm ─────────────────────────────────────────────────── */
+    .offline-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .offline-card {
+      width: 100%;
+      max-width: 400px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 8px 48px rgba(0,0,0,0.5);
+    }
+    .offline-card-top {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 36px 28px 32px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .offline-brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      background: var(--brand-grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+    }
+    .offline-tagline {
+      font-size: 0.88rem;
+      color: var(--text-dim);
+    }
+    .offline-card-bottom {
+      padding: 0 28px 28px;
+    }
+    .offline-bar {
+      height: 2px;
+      border-radius: 1px;
+      background: linear-gradient(90deg, var(--brand-a) 0%, var(--brand-b) 50%, var(--brand-a) 100%);
+      background-size: 200% 100%;
+      animation: offlineSweep 1.8s linear infinite;
+    }
+    @keyframes offlineSweep {
+      0%   { background-position: 0%   0; }
+      100% { background-position: 200% 0; }
+    }
+    .offline-msg {
+      text-align: center;
+      padding: 22px 0;
+    }
+    .offline-msg-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .offline-msg-sub {
+      font-size: 0.84rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
   </style>
 </head>
 <body>
@@ -705,6 +777,25 @@
   </div>
 </div>
 
+<!-- Offline scherm -->
+<div id="offline-screen" class="offline-overlay hidden">
+  <div class="offline-card">
+    <div class="offline-card-top">
+      <img src="/logo/icon-192x192.png" alt="" style="width:56px;height:56px;border-radius:15px;margin-bottom:16px;">
+      <div class="offline-brand">BRIAS</div>
+      <div class="offline-tagline">what's on your mind</div>
+    </div>
+    <div class="offline-card-bottom">
+      <div class="offline-bar"></div>
+      <div class="offline-msg">
+        <div class="offline-msg-title">unavailable right now</div>
+        <div class="offline-msg-sub">Brias is having her moment.<br>She should be back soon.</div>
+      </div>
+      <div class="offline-bar"></div>
+    </div>
+  </div>
+</div>
+
 <div id="toast-container"></div>
 <script src="/assets/js/api.js"></script>
 <script>
@@ -738,17 +829,28 @@
     closeDrawer();
   }
 
+  // ── Offline scherm ──────────────────────────────────────────────────────
+  function showOffline() {
+    document.getElementById('offline-screen').classList.remove('hidden');
+  }
+  function hideOffline() {
+    document.getElementById('offline-screen').classList.add('hidden');
+  }
+
   // ── Brain stats ─────────────────────────────────────────────────────────
   async function updateStats() {
     try {
       const s = await API.state();
+      hideOffline();
       document.getElementById('drawer-activity').textContent =
         (s.network.activity * 100).toFixed(1) + '%';
       document.getElementById('drawer-coherence').textContent =
         s.network.coherence.toFixed(3);
       document.getElementById('drawer-uptime').textContent =
         s.uptime_human;
-    } catch {}
+    } catch {
+      showOffline();
+    }
   }
   updateStats();
   setInterval(updateStats, 6000);
