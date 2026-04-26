@@ -498,15 +498,18 @@
     }
 
     /* ── Offline scherm ─────────────────────────────────────────────────── */
-    .offline-overlay {
+    #offline-screen {
       position: fixed;
-      inset: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
       background: var(--bg);
       z-index: 999;
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
       padding: 20px;
+    }
+    #offline-screen.visible {
+      display: flex;
     }
     .offline-card {
       width: 100%;
@@ -778,7 +781,7 @@
 </div>
 
 <!-- Offline scherm -->
-<div id="offline-screen" class="offline-overlay hidden">
+<div id="offline-screen">
   <div class="offline-card">
     <div class="offline-card-top">
       <img src="/logo/icon-192x192.png" alt="" style="width:56px;height:56px;border-radius:15px;margin-bottom:16px;">
@@ -831,10 +834,10 @@
 
   // ── Offline scherm ──────────────────────────────────────────────────────
   function showOffline() {
-    document.getElementById('offline-screen').classList.remove('hidden');
+    document.getElementById('offline-screen').classList.add('visible');
   }
   function hideOffline() {
-    document.getElementById('offline-screen').classList.add('hidden');
+    document.getElementById('offline-screen').classList.remove('visible');
   }
 
   // ── Brain stats ─────────────────────────────────────────────────────────
