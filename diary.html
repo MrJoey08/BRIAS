@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<script>!function(){var v=document.querySelector('meta[name=viewport]');if(v){document.addEventListener('focusin',function(e){/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)&&(v.content='width=device-width,initial-scale=1,maximum-scale=1')});document.addEventListener('focusout',function(){v.content='width=device-width,initial-scale=1'})}}()</script>
+<script>!function(){if(window.visualViewport){function s(){document.documentElement.style.setProperty("--app-h",visualViewport.height+"px");window.scrollTo(0,0);}visualViewport.addEventListener("resize",s);visualViewport.addEventListener("scroll",function(){window.scrollTo(0,0);});s();}}()</script>
 <title>BRIAS · Journal</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" type="image/x-icon" href="/logo/favicon.ico">
@@ -71,7 +71,7 @@ body.light canvas{opacity:0;}
 @keyframes logoReveal{from{opacity:0;transform:translateY(12px) scale(.96);}to{opacity:1;transform:translateY(0) scale(1);}}
 
 /* ── App shell ── */
-.app{position:relative;z-index:10;display:flex;flex-direction:column;height:100vh;animation:fadeIn .4s ease both;}
+.app{position:relative;z-index:10;display:flex;flex-direction:column;height:var(--app-h,100dvh);animation:fadeIn .4s ease both;}
 
 /* ── Topbar ── */
 .topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;transition:border-color .45s ease;}
