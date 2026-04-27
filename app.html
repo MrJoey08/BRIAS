@@ -103,7 +103,7 @@ textarea::placeholder{color:var(--text-dim);}
 .cursor{display:inline-block;width:1.5px;height:13px;background:var(--orange);margin-left:2px;vertical-align:middle;animation:blink .7s step-end infinite;}
 
 #msgContainer{position:relative;}
-#offlineCard{display:none;position:absolute;top:0;left:0;right:0;bottom:0;z-index:10;align-items:center;justify-content:center;padding:24px;}
+#offlineCard{display:none;position:absolute;top:0;left:0;right:0;bottom:0;z-index:10;align-items:center;justify-content:center;padding:24px;background:var(--bg);}
 #offlineCard.visible{display:flex;}
 .of-card{width:100%;max-width:460px;min-height:min(520px,78vh);display:flex;flex-direction:column;background:rgba(19,16,19,.96);border:1px solid rgba(255,255,255,.08);border-radius:24px;overflow:hidden;box-shadow:0 32px 96px rgba(0,0,0,.55),0 8px 32px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.05);animation:cardIn .9s cubic-bezier(.16,1,.3,1) both;}
 @keyframes cardIn{from{opacity:0;transform:translateY(28px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
@@ -238,7 +238,7 @@ body.light .stop-sq{background:rgba(30,12,0,.4);}
         </div>
       </div>
     </div>
-    <div class="messages-inner" id="msgInner">
+    <div class="messages-inner" id="msgInner" style="display:none">
       <div class="welcome" id="welcomeScreen">
         <div class="welcome-logo">BRIAS</div>
         <div class="welcome-sub">What's on your mind?</div>
@@ -396,11 +396,11 @@ function setOffline(off) {
   const btn = document.getElementById('actionBtn');
   if (off) {
     overlay.classList.add('visible');
-    if (inner) inner.style.visibility = 'hidden';
+    if (inner) inner.style.display = 'none';
     inp.disabled = true; inp.placeholder = '';
   } else {
     overlay.classList.remove('visible');
-    if (inner) inner.style.visibility = '';
+    if (inner) inner.style.display = '';
     inp.disabled = false; inp.placeholder = "I'm here.";
     btn.disabled = false;
   }
