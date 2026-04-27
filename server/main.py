@@ -122,14 +122,16 @@ async def me(authorization: str | None = Header(default=None)):
         user = _user(authorization)
     except HTTPException:
         return {"logged_in": False}
+    cfg = admin_config.load()
     return {
         "logged_in":    True,
         "username":     user["username"] or user["contact"],
-        "display_name": user["username"],          # null if profile not set yet
+        "display_name": user["username"],
         "email":        user["contact"],
         "age":          user.get("age"),
         "is_admin":     auth.is_admin(user["contact"]),
         "profile_done": user["profile_done"],
+        "brias_active": bool(cfg.get("brias_active", False)),
     }
 
 

@@ -302,7 +302,7 @@ async function init() {
       const c = await api('/api/chats',{method:'POST',body:JSON.stringify({title:'Chat'})}).then(r=>r.json());
       activeChatId = c.id;
     }
-    setOffline(false);
+    if (meData.brias_active) setOffline(false);
   } catch(e) {}
 }
 
