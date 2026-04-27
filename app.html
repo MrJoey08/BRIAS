@@ -102,13 +102,22 @@ textarea::placeholder{color:var(--text-dim);}
 .typing-dots span:nth-child(3){animation:bDot 1.4s ease-in-out .32s infinite;}
 .cursor{display:inline-block;width:1.5px;height:13px;background:var(--orange);margin-left:2px;vertical-align:middle;animation:blink .7s step-end infinite;}
 
-.offline-state{display:none;flex-direction:column;align-items:center;text-align:center;gap:16px;margin-bottom:32px;}
-.offline-state.visible{display:flex;}
-.offline-sweep{width:100%;height:1px;background:rgba(255,255,255,.06);overflow:hidden;position:relative;}
-.offline-sweep-fill{position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(232,118,74,.5),transparent);animation:sweep 2.4s ease-in-out infinite;}
+#offlineOverlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:200;align-items:center;justify-content:center;padding:24px;background:var(--bg);}
+#offlineOverlay.visible{display:flex;}
+.of-card{width:100%;max-width:460px;background:rgba(19,15,17,.82);backdrop-filter:blur(52px);-webkit-backdrop-filter:blur(52px);border:1px solid var(--border);border-radius:24px;overflow:hidden;box-shadow:0 32px 96px rgba(0,0,0,.55),0 8px 32px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.05);animation:cardIn .9s cubic-bezier(.16,1,.3,1) both;}
+@keyframes cardIn{from{opacity:0;transform:translateY(28px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+.of-top{position:relative;overflow:hidden;padding:48px 44px 44px;border-bottom:1px solid var(--border);}
+.of-top::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 20% 80%,rgba(232,118,74,.07) 0%,transparent 70%),radial-gradient(ellipse 60% 50% at 80% 20%,rgba(212,74,122,.06) 0%,transparent 70%);}
+.of-brand{font-family:var(--font-display);font-size:clamp(64px,14vw,96px);font-weight:600;font-style:italic;letter-spacing:.03em;line-height:.95;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 48px rgba(212,74,122,.15));}
+.of-tagline{font-family:var(--font-serif);font-size:15px;font-weight:300;font-style:italic;color:var(--text-sub);margin-top:20px;}
+.of-bottom{padding:28px 44px 36px;display:flex;flex-direction:column;}
+.of-sweep{width:100%;height:1px;background:rgba(255,255,255,.06);overflow:hidden;position:relative;}
+.of-sweep-fill{position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(232,118,74,.5),transparent);animation:sweep 2.4s ease-in-out infinite;}
 @keyframes sweep{0%{left:-100%;}100%{left:200%;}}
-.offline-title{font-family:var(--font-display);font-size:22px;font-weight:500;font-style:italic;color:var(--text-sub);}
-.offline-sub{font-family:var(--font-serif);font-size:14px;font-weight:300;color:var(--text-muted);line-height:1.65;}
+.of-msg{text-align:center;padding:24px 0;}
+.of-msg-title{font-family:var(--font-display);font-size:22px;font-weight:500;font-style:italic;color:var(--text-sub);margin-bottom:8px;}
+.of-msg-sub{font-family:var(--font-serif);font-size:14px;font-weight:300;color:var(--text-muted);line-height:1.65;}
+@media(max-width:480px){.of-top{padding:36px 28px 32px;}.of-bottom{padding:20px 28px 28px;}.of-brand{font-size:56px;}}
 .input-area{padding:12px 20px 24px;flex-shrink:0;}
 .input-box{display:flex;align-items:flex-end;gap:10px;background:var(--input-bg);border:1px solid var(--input-border);border-radius:20px;padding:12px 14px;max-width:700px;margin:0 auto;transition:border-color .2s;}
 .input-box:focus-within{border-color:var(--input-focus);}
@@ -220,11 +229,6 @@ body.light .stop-sq{background:rgba(30,12,0,.4);}
     </div>
   </div>
   <div class="input-area">
-    <div class="offline-state visible" id="offlineState">
-      <div class="offline-sweep"><div class="offline-sweep-fill"></div></div>
-      <div class="offline-title">Unavailable right now</div>
-      <div class="offline-sub">BRIAS is having her moment.<br>She should be back soon.</div>
-    </div>
     <div class="input-box" id="inputBox">
       <textarea id="msgInput" rows="1" placeholder="" disabled oninput="autoResize(this);updateBtn();" onkeydown="handleKey(event)"></textarea>
       <button class="send-btn inactive" id="actionBtn" disabled onclick="handleActionBtn()">
@@ -232,6 +236,24 @@ body.light .stop-sq{background:rgba(30,12,0,.4);}
       </button>
     </div>
     <div class="input-footer">BRIAS is not a substitute for professional help. She's AI and can make mistakes.</div>
+  </div>
+</div>
+
+<!-- Offline overlay -->
+<div id="offlineOverlay" class="visible">
+  <div class="of-card">
+    <div class="of-top">
+      <div class="of-brand">BRIAS</div>
+      <div class="of-tagline">What's on your mind?</div>
+    </div>
+    <div class="of-bottom">
+      <div class="of-sweep"><div class="of-sweep-fill"></div></div>
+      <div class="of-msg">
+        <div class="of-msg-title">unavailable right now</div>
+        <div class="of-msg-sub">Brias is having her moment.<br>She should be back soon.</div>
+      </div>
+      <div class="of-sweep"><div class="of-sweep-fill"></div></div>
+    </div>
   </div>
 </div>
 
@@ -281,6 +303,7 @@ async function init() {
       const c = await api('/api/chats',{method:'POST',body:JSON.stringify({title:'Chat'})}).then(r=>r.json());
       activeChatId = c.id;
     }
+    setOffline(false);
   } catch(e) {}
 }
 
@@ -368,14 +391,14 @@ async function sendAsStream(content, chatId) {
 }
 
 function setOffline(off) {
-  const os = document.getElementById('offlineState');
+  const overlay = document.getElementById('offlineOverlay');
   const inp = document.getElementById('msgInput');
   const btn = document.getElementById('actionBtn');
   if (off) {
-    os.classList.add('visible');
+    overlay.classList.add('visible');
     inp.disabled = true; inp.placeholder = '';
   } else {
-    os.classList.remove('visible');
+    overlay.classList.remove('visible');
     inp.disabled = false; inp.placeholder = "I'm here.";
     btn.disabled = false;
   }
