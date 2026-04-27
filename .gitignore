@@ -8,3 +8,6 @@ brain/database/*.db
 *.ggml
 node_modules/
 .DS_Store
+
+# Runtime data — never commit
+network_state/
