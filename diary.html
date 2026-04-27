@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-visual">
 <title>BRIAS · Journal</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" type="image/x-icon" href="/logo/favicon.ico">
@@ -53,6 +53,11 @@ body.light{
 }
 
 html,body{height:100%;overflow:hidden;}
+/* iOS Safari: vries de hoogte in zodat toetsenbord de layout niet verschuift */
+@supports (-webkit-touch-callout: none) {
+  html { height: -webkit-fill-available; }
+  body { height: -webkit-fill-available; }
+}
 body{font-family:var(--font);background:var(--bg);color:var(--text);transition:background .5s ease,color .4s ease;}
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
@@ -71,6 +76,9 @@ body.light canvas{opacity:0;}
 
 /* ── App shell ── */
 .app{position:relative;z-index:10;display:flex;flex-direction:column;height:100vh;animation:fadeIn .4s ease both;}
+@supports (-webkit-touch-callout: none) {
+  .app { height: -webkit-fill-available; }
+}
 
 /* ── Topbar ── */
 .topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;transition:border-color .45s ease;}
@@ -234,7 +242,7 @@ body.light .day-big{color:rgba(46,31,24,.08);}
 .entry-body.brias{background:rgba(232,118,74,.03);border-color:rgba(232,118,74,.07);}
 .entry-ta{
   width:100%;min-height:200px;background:transparent;border:none;outline:none;
-  color:var(--text);font-family:var(--font-serif);font-size:15px;font-weight:300;
+  color:var(--text);font-family:var(--font-serif);font-size:16px;font-weight:300;
   line-height:1.9;padding:26px 28px;resize:none;
   caret-color:var(--orange);
 }
