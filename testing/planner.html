@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
 <title>BRIAS · Planner</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=DM+Sans:wght@300;400;500&family=Bitter:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
 <style>
@@ -75,7 +76,7 @@ body.light canvas{opacity:0;}
 
 
 /* ── App shell ── */
-.app{position:relative;z-index:10;display:flex;flex-direction:column;height:100vh;animation:fadeIn .4s ease both;}
+.app{position:relative;z-index:10;display:flex;flex-direction:column;height:100vh;height:100svh;animation:fadeIn .4s ease both;}
 
 /* ── Topbar ── */
 .topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;transition:border-color .45s ease;}
@@ -286,7 +287,7 @@ body.light .bn-cal-btn{border-color:rgba(232,118,74,.25);background:rgba(232,118
 /* Plan text */
 .plan-area{
   width:100%;min-height:120px;background:transparent;border:none;outline:none;
-  color:var(--text-sub);font-family:var(--font-serif);font-size:14px;font-weight:300;
+  color:var(--text-sub);font-family:var(--font-serif);font-size:16px;font-weight:300;
   line-height:1.85;padding:12px 18px 18px;resize:none;caret-color:var(--orange);
 }
 .plan-area::placeholder{color:var(--text-dim);font-style:italic;}
@@ -514,7 +515,7 @@ body.light .modal-close:hover{background:rgba(80,40,20,.12);}
 .form-input{
   width:100%;background:var(--input-bg);border:1px solid var(--input-border);
   border-radius:11px;padding:10px 14px;
-  color:var(--text);font-family:var(--font);font-size:13.5px;font-weight:300;
+  color:var(--text);font-family:var(--font);font-size:16px;font-weight:300;
   outline:none;transition:border-color .2s;
 }
 .form-input:focus{border-color:var(--input-focus);}
@@ -523,7 +524,7 @@ textarea.form-input{resize:none;line-height:1.7;font-family:var(--font-serif);}
 .form-select{
   width:100%;background:var(--input-bg);border:1px solid var(--input-border);
   border-radius:11px;padding:10px 14px;
-  color:var(--text-sub);font-family:var(--font);font-size:13.5px;font-weight:300;
+  color:var(--text-sub);font-family:var(--font);font-size:16px;font-weight:300;
   outline:none;transition:border-color .2s;cursor:pointer;
   -webkit-appearance:none;appearance:none;
 }
@@ -981,6 +982,9 @@ body.light .sheet-arr{border-color:rgba(80,40,20,.12);color:var(--text-sub);}
 body.light .sheet-d.e{color:rgba(46,31,24,.1);}
 .sheet-d.tod{background:rgba(232,118,74,.1);color:var(--orange);font-weight:500;border:1px solid rgba(232,118,74,.2);}
 .sheet-d.sel{background:var(--grad)!important;color:#fff!important;font-weight:500;}
+@supports (-webkit-touch-callout:none){
+  input,textarea,select{font-size:16px !important;}
+}
 </style>
 </head>
 <body>

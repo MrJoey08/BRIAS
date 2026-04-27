@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
 <title>BRIAS · Journal</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" type="image/x-icon" href="/logo/favicon.ico">
@@ -70,7 +71,7 @@ body.light canvas{opacity:0;}
 @keyframes logoReveal{from{opacity:0;transform:translateY(12px) scale(.96);}to{opacity:1;transform:translateY(0) scale(1);}}
 
 /* ── App shell ── */
-.app{position:relative;z-index:10;display:flex;flex-direction:column;height:100vh;animation:fadeIn .4s ease both;}
+.app{position:relative;z-index:10;display:flex;flex-direction:column;height:100vh;height:100svh;animation:fadeIn .4s ease both;}
 
 /* ── Topbar ── */
 .topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;transition:border-color .45s ease;}
@@ -234,7 +235,7 @@ body.light .day-big{color:rgba(46,31,24,.08);}
 .entry-body.brias{background:rgba(232,118,74,.03);border-color:rgba(232,118,74,.07);}
 .entry-ta{
   width:100%;min-height:200px;background:transparent;border:none;outline:none;
-  color:var(--text);font-family:var(--font-serif);font-size:15px;font-weight:300;
+  color:var(--text);font-family:var(--font-serif);font-size:16px;font-weight:300;
   line-height:1.9;padding:26px 28px;resize:none;
   caret-color:var(--orange);
 }
@@ -382,6 +383,9 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
   .s-row{padding:15px 18px;border-radius:16px;}
   .s-row-label{font-size:14px;}
   .s-row-sub{font-size:12px;}
+}
+@supports (-webkit-touch-callout:none){
+  input,textarea,select{font-size:16px !important;}
 }
 
 </style>
