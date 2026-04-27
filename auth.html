@@ -411,7 +411,12 @@ startTypewriter('twText');
 document.getElementById('twWrap').style.display = 'none';
 
 // ── Offline ──
-async function checkOnline() { try { await fetch(API+'/api/me', { method:'GET', signal:AbortSignal.timeout(3000) }); return true; } catch { return false; } }
+async function checkOnline() {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 3000);
+  try { await fetch(API+'/api/me', { method:'GET', signal:ctrl.signal }); clearTimeout(timer); return true; }
+  catch { clearTimeout(timer); return false; }
+}
 function setOffline(off) {
   const os = document.getElementById('offlineState');
   const steps = document.querySelectorAll('.step');
