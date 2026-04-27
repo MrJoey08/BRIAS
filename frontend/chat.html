@@ -291,7 +291,10 @@ async function init() {
     if (meData.age!=null) localStorage.setItem('brias_age', String(meData.age));
     if (meData.username) localStorage.setItem('brias_username', meData.username);
     SHELL.updateUser(meData);
-  } catch(e) { return; }
+  } catch(e) {
+    if (!token) { window.location.href='login.html'; }
+    return;
+  }
   try {
     const chats = await api('/api/chats').then(r=>r.json());
     if (chats.length > 0) {
