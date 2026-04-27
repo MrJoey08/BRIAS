@@ -1,7 +1,7 @@
 {
   "headers": [
     {
-      "source": "/(.*\\.html)",
+      "source": "/frontend/(.*\\.html)",
       "headers": [
         { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
       ]
@@ -13,13 +13,13 @@
       ]
     },
     {
-      "source": "/assets/js/(.*).js",
+      "source": "/frontend/assets/js/(.*).js",
       "headers": [
         { "key": "Content-Type", "value": "application/javascript; charset=utf-8" }
       ]
     },
     {
-      "source": "/assets/css/(.*).css",
+      "source": "/frontend/assets/css/(.*).css",
       "headers": [
         { "key": "Content-Type", "value": "text/css; charset=utf-8" }
       ]
@@ -32,8 +32,18 @@
     }
   ],
   "rewrites": [
-    { "source": "/testing/:file", "destination": "/testing/:file" },
-    { "source": "/", "destination": "/index.html" }
+    { "source": "/", "destination": "/frontend/index.html" },
+    { "source": "/chat", "destination": "/frontend/chat.html" },
+    { "source": "/login", "destination": "/frontend/login.html" },
+    { "source": "/journal", "destination": "/frontend/journal.html" },
+    { "source": "/planner", "destination": "/frontend/planner.html" },
+    { "source": "/chat.html", "destination": "/frontend/chat.html" },
+    { "source": "/login.html", "destination": "/frontend/login.html" },
+    { "source": "/journal.html", "destination": "/frontend/journal.html" },
+    { "source": "/planner.html", "destination": "/frontend/planner.html" },
+    { "source": "/app.html", "destination": "/frontend/chat.html" },
+    { "source": "/auth.html", "destination": "/frontend/login.html" },
+    { "source": "/diary.html", "destination": "/frontend/journal.html" }
   ],
   "trailingSlash": false
 }

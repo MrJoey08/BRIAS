@@ -12,7 +12,7 @@
 <link rel="manifest" href="/logo/site.webmanifest">
 <meta name="theme-color" content="#131013">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Bitter:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="shell.css">
+<link rel="stylesheet" href="assets/css/shell.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 button{outline:none!important;border:none;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent;}
@@ -258,7 +258,7 @@ body.light .stop-sq{background:rgba(30,12,0,.4);}
 
 <!-- Settings shell handled by shell.js -->
 
-<script src="shell.js"></script>
+<script src="assets/js/shell.js"></script>
 <script>
 const API = 'https://api.brias.eu';
 let token = localStorage.getItem('brias_token');
@@ -283,7 +283,7 @@ async function init() {
     const r = await fetch(API+'/api/me', {headers:token?{'Authorization':'Bearer '+token}:{}});
     if (!r.ok && r.status !== 401) return;
 
-    if (!token || r.status === 401) { window.location.href='auth.html'; return; }
+    if (!token || r.status === 401) { window.location.href='login.html'; return; }
     meData = await r.json();
     if (!meData.logged_in) { doLogout(); return; }
     if (meData.email) localStorage.setItem('brias_email', meData.email);
@@ -308,7 +308,7 @@ async function init() {
 
 function doLogout() {
   localStorage.removeItem('brias_token'); localStorage.removeItem('brias_username');
-  window.location.href='auth.html';
+  window.location.href='login.html';
 }
 
 function renderMessages(msgs) {
