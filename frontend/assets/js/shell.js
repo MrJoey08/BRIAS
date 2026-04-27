@@ -9,11 +9,11 @@ const SHELL = (() => {
   // ── Welke pagina is actief (voor de nav highlight) ──────────────────────
   // Detecteer automatisch op basis van de URL. Of overschrijf via SHELL.activePage.
   const PAGE_MAP = {
-    'app.html':     'chat',
-    'diary.html':   'journal',
+    'chat.html':    'chat',
+    'journal.html': 'journal',
     'planner.html': 'planner',
   };
-  const _filename = location.pathname.split('/').pop() || 'app.html';
+  const _filename = location.pathname.split('/').pop() || 'chat.html';
   let activePage = PAGE_MAP[_filename] || 'chat';
 
   // ── HTML injecteren ──────────────────────────────────────────────────────
@@ -53,7 +53,7 @@ const SHELL = (() => {
     const nav = [
       {
         id: 'chat',
-        href: 'app.html',
+        href: 'chat.html',
         label: 'Chat',
         sub: 'Your conversation with BRIAS',
         icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
@@ -64,7 +64,7 @@ const SHELL = (() => {
       },
       {
         id: 'journal',
-        href: 'diary.html',
+        href: 'journal.html',
         label: 'Journal',
         sub: 'You and BRIAS write here together',
         icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
@@ -476,7 +476,7 @@ const SHELL = (() => {
       if (res.ok) {
         // Account is gone — wipe local data and bounce to auth.
         try { localStorage.clear(); } catch (_) {}
-        window.location.href = 'auth.html';
+        window.location.href = 'login.html';
       } else {
         _showErr(res.error || 'Could not delete account.');
       }
@@ -553,7 +553,7 @@ const SHELL = (() => {
     if (_logoutFn) { _logoutFn(); return; }
     // Wipe local profile cache so the next login starts clean.
     ['brias_token','brias_username','brias_email','brias_display_name','brias_age'].forEach(k => localStorage.removeItem(k));
-    window.location.href = 'auth.html';
+    window.location.href = 'login.html';
   }
 
   // ── Public API ───────────────────────────────────────────────────────────

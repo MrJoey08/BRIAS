@@ -12,7 +12,7 @@
 <link rel="manifest" href="/logo/site.webmanifest">
 <meta name="theme-color" content="#131013">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=DM+Sans:wght@300;400;500&family=Bitter:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="shell.css">
+<link rel="stylesheet" href="assets/css/shell.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 button{outline:none!important;border:none;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent;}
@@ -1171,7 +1171,7 @@ body.light .sheet-d.e{color:rgba(46,31,24,.1);}
 </div>
 
 
-<script src="shell.js"></script>
+<script src="assets/js/shell.js"></script>
 <script>
 // Apply saved theme immediately
 (function(){const t=localStorage.getItem('brias_theme');if(t==='light')document.body.classList.add('light');})();
@@ -1192,12 +1192,12 @@ SHELL.init({
 
 function doLogout(){
   localStorage.removeItem('brias_token');localStorage.removeItem('brias_username');
-  window.location.href='auth.html';
+  window.location.href='login.html';
 }
 
 (async function(){
   const token=localStorage.getItem('brias_token');
-  if(!token){window.location.href='auth.html';return;}
+  if(!token){window.location.href='login.html';return;}
   try{
     const r=await api('/api/me');
     if(!r.ok)return;
