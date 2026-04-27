@@ -225,7 +225,7 @@ const SHELL = (() => {
         </div>
       </div>`,
     // 4 — About
-    () => `<span class="about-logo">BRIAS</span>`,
+    () => `<span class="about-logo">BRIAS</span>` hey,
   ];
 
   // ── State ────────────────────────────────────────────────────────────────
