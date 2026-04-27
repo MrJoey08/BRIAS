@@ -102,8 +102,9 @@ textarea::placeholder{color:var(--text-dim);}
 .typing-dots span:nth-child(3){animation:bDot 1.4s ease-in-out .32s infinite;}
 .cursor{display:inline-block;width:1.5px;height:13px;background:var(--orange);margin-left:2px;vertical-align:middle;animation:blink .7s step-end infinite;}
 
-#offlineOverlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:200;align-items:center;justify-content:center;padding:24px;background:var(--bg);}
-#offlineOverlay.visible{display:flex;}
+#msgContainer{position:relative;}
+#offlineCard{display:none;position:absolute;top:0;left:0;right:0;bottom:0;z-index:10;align-items:center;justify-content:center;padding:24px;background:var(--bg);}
+#offlineCard.visible{display:flex;}
 .of-card{width:100%;max-width:460px;background:rgba(19,15,17,.82);backdrop-filter:blur(52px);-webkit-backdrop-filter:blur(52px);border:1px solid var(--border);border-radius:24px;overflow:hidden;box-shadow:0 32px 96px rgba(0,0,0,.55),0 8px 32px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.05);animation:cardIn .9s cubic-bezier(.16,1,.3,1) both;}
 @keyframes cardIn{from{opacity:0;transform:translateY(28px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
 .of-top{position:relative;overflow:hidden;padding:48px 44px 44px;border-bottom:1px solid var(--border);}
@@ -221,6 +222,22 @@ body.light .stop-sq{background:rgba(30,12,0,.4);}
     <div class="topbar-logo">BRIAS</div>
   </div>
   <div class="messages" id="msgContainer">
+    <div id="offlineCard" class="visible">
+      <div class="of-card">
+        <div class="of-top">
+          <div class="of-brand">BRIAS</div>
+          <div class="of-tagline">What's on your mind?</div>
+        </div>
+        <div class="of-bottom">
+          <div class="of-sweep"><div class="of-sweep-fill"></div></div>
+          <div class="of-msg">
+            <div class="of-msg-title">unavailable right now</div>
+            <div class="of-msg-sub">Brias is having her moment.<br>She should be back soon.</div>
+          </div>
+          <div class="of-sweep"><div class="of-sweep-fill"></div></div>
+        </div>
+      </div>
+    </div>
     <div class="messages-inner" id="msgInner">
       <div class="welcome" id="welcomeScreen">
         <div class="welcome-logo">BRIAS</div>
@@ -236,24 +253,6 @@ body.light .stop-sq{background:rgba(30,12,0,.4);}
       </button>
     </div>
     <div class="input-footer">BRIAS is not a substitute for professional help. She's AI and can make mistakes.</div>
-  </div>
-</div>
-
-<!-- Offline overlay -->
-<div id="offlineOverlay" class="visible">
-  <div class="of-card">
-    <div class="of-top">
-      <div class="of-brand">BRIAS</div>
-      <div class="of-tagline">What's on your mind?</div>
-    </div>
-    <div class="of-bottom">
-      <div class="of-sweep"><div class="of-sweep-fill"></div></div>
-      <div class="of-msg">
-        <div class="of-msg-title">unavailable right now</div>
-        <div class="of-msg-sub">Brias is having her moment.<br>She should be back soon.</div>
-      </div>
-      <div class="of-sweep"><div class="of-sweep-fill"></div></div>
-    </div>
   </div>
 </div>
 
@@ -391,7 +390,7 @@ async function sendAsStream(content, chatId) {
 }
 
 function setOffline(off) {
-  const overlay = document.getElementById('offlineOverlay');
+  const overlay = document.getElementById('offlineCard');
   const inp = document.getElementById('msgInput');
   const btn = document.getElementById('actionBtn');
   if (off) {
