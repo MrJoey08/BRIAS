@@ -238,7 +238,7 @@ body.light .stop-sq{background:rgba(30,12,0,.4);}
         </div>
       </div>
     </div>
-    <div class="messages-inner" id="msgInner" style="visibility:hidden">
+    <div class="messages-inner" id="msgInner" style="display:none">
       <div class="welcome" id="welcomeScreen">
         <div class="welcome-logo">BRIAS</div>
         <div class="welcome-sub">What's on your mind?</div>
@@ -396,11 +396,11 @@ function setOffline(off) {
   const btn = document.getElementById('actionBtn');
   if (off) {
     overlay.classList.add('visible');
-    if (inner) inner.style.visibility = 'hidden';
+    if (inner) inner.style.display = 'none';
     inp.disabled = true; inp.placeholder = '';
   } else {
     overlay.classList.remove('visible');
-    if (inner) inner.style.visibility = '';
+    if (inner) inner.style.display = '';
     inp.disabled = false; inp.placeholder = "I'm here.";
     btn.disabled = false;
   }
