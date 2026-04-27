@@ -23,7 +23,7 @@ from pydantic import BaseModel
 
 import server.admin_config as admin_config
 import server.auth as auth
-from brias.life import get_life
+from server.brias.life import get_life
 
 logging.basicConfig(
     level=logging.INFO,
