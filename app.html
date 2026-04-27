@@ -391,13 +391,16 @@ async function sendAsStream(content, chatId) {
 
 function setOffline(off) {
   const overlay = document.getElementById('offlineCard');
+  const inner  = document.getElementById('msgInner');
   const inp = document.getElementById('msgInput');
   const btn = document.getElementById('actionBtn');
   if (off) {
     overlay.classList.add('visible');
+    if (inner) inner.style.visibility = 'hidden';
     inp.disabled = true; inp.placeholder = '';
   } else {
     overlay.classList.remove('visible');
+    if (inner) inner.style.visibility = '';
     inp.disabled = false; inp.placeholder = "I'm here.";
     btn.disabled = false;
   }
