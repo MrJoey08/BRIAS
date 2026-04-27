@@ -47,16 +47,9 @@ button {
 
 input, textarea {
   font-family: inherit;
-  font-size: 1rem;
+  font-size: 16px;
   outline: none;
   transition: var(--trans);
-}
-
-/* iOS Safari zoom-preventie: bij font-size < 16px zoomt iOS automatisch in */
-@supports (-webkit-touch-callout: none) {
-  input, textarea, select {
-    font-size: 16px !important;
-  }
 }
 
 /* ── Scrollbar ─────────────────────────────────────────────────────────────── */
