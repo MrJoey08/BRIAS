@@ -444,6 +444,9 @@
       padding: 3px 0;
       align-self: center;
     }
+    @supports (-webkit-touch-callout: none) {
+      #msg-input { font-size: 16px; }
+    }
     #msg-input::placeholder { color: var(--text-dimmer); }
 
     #send-btn {

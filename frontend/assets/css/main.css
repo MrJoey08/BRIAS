@@ -52,6 +52,13 @@ input, textarea {
   transition: var(--trans);
 }
 
+/* iOS Safari zoom-preventie: bij font-size < 16px zoomt iOS automatisch in */
+@supports (-webkit-touch-callout: none) {
+  input, textarea, select {
+    font-size: 16px;
+  }
+}
+
 /* ── Scrollbar ─────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
