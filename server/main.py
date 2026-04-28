@@ -579,15 +579,15 @@ for fname in ["favicon.svg", "sitemap.xml"]:
 
 @app.get("/")
 async def index():
-    return FileResponse(str(FRONTEND / "index.html"))
+    return FileResponse(str(FRONTEND / "frontend/index.html"))
 
-@app.get("/auth")
-async def auth_page():
-    return FileResponse(str(FRONTEND / "auth.html"))
+@app.get("/login")
+async def login_page():
+    return FileResponse(str(FRONTEND / "frontend/login.html"))
 
-@app.get("/app")
-async def app_page():
-    return FileResponse(str(FRONTEND / "app.html"))
+@app.get("/chat")
+async def chat_page():
+    return FileResponse(str(FRONTEND / "frontend/chat.html"))
 
 
 @app.get("/health")
