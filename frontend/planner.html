@@ -1171,16 +1171,15 @@ body.light .sheet-d.e{color:rgba(46,31,24,.1);}
 </div>
 
 
+<script src="assets/js/config.js"></script>
 <script src="assets/js/shell.js"></script>
 <script>
 // Apply saved theme immediately
 (function(){const t=localStorage.getItem('brias_theme');if(t==='light')document.body.classList.add('light');})();
 
 // ── Auth + user profile ──
-const API = 'https://api.brias.eu';
 let meData = null;
-function authHeaders(){const t=localStorage.getItem('brias_token');return t?{'Authorization':'Bearer '+t}:{};}
-function api(path, opts={}){return fetch(API+path,{...opts,headers:{'Content-Type':'application/json',...authHeaders(),...(opts.headers||{})}});}
+function api(path, opts={}){return fetch(API+path,{...opts,credentials:'include',headers:{'Content-Type':'application/json',...(opts.headers||{})}});}
 function profileName(){ return meData?.display_name || localStorage.getItem('brias_display_name') || ''; }
 
 // Init shell with cached data so drawer shows immediately
@@ -1190,19 +1189,20 @@ SHELL.init({
   username: localStorage.getItem('brias_username') || '',
 }, { logout: doLogout });
 
-function doLogout(){
-  localStorage.removeItem('brias_token');localStorage.removeItem('brias_username');
+async function doLogout(){
+  try{ await api('/api/logout',{method:'POST'}); }catch{}
+  ['brias_username','brias_email','brias_display_name','brias_age'].forEach(k=>localStorage.removeItem(k));
   window.location.href='login.html';
 }
 
 (async function(){
-  const token=localStorage.getItem('brias_token');
-  if(!token){window.location.href='login.html';return;}
   try{
     const r=await api('/api/me');
+    if(r.status===401){window.location.href='login.html';return;}
     if(!r.ok)return;
     const d=await r.json();
-    if(!d.logged_in){doLogout();return;}
+    if(!d.logged_in){window.location.href='login.html';return;}
+    if(d.profile_done===false){window.location.href='login.html';return;}
     meData=d;
     if(d.username)localStorage.setItem('brias_username',d.username);
     if(d.email)localStorage.setItem('brias_email',d.email);

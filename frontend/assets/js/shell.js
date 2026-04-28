@@ -230,8 +230,6 @@ const SHELL = (() => {
 
   // ── State ────────────────────────────────────────────────────────────────
   let _meData = null;
-  let _apiBase = 'https://api.brias.eu';
-  let _token = localStorage.getItem('brias_token');
   let _pmField = null; // 'name' | 'age' | 'password' | 'delete'
   let _logoutFn = null;
 
@@ -255,11 +253,11 @@ const SHELL = (() => {
   }
 
   function _api(path, opts = {}) {
-    return fetch(_apiBase + path, {
+    return fetch(API + path, {
       ...opts,
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        ...(_token ? { 'Authorization': 'Bearer ' + _token } : {}),
         ...(opts.headers || {}),
       },
     });
@@ -278,7 +276,6 @@ const SHELL = (() => {
   // options.apiBase: optionele override voor de API url
   function init(meData, options = {}) {
     _meData = meData;
-    if (options.apiBase) _apiBase = options.apiBase;
     if (options.logout) _logoutFn = options.logout;
 
     // Pas theme toe vanuit localStorage
@@ -549,10 +546,10 @@ const SHELL = (() => {
   }
 
   // ── Logout ───────────────────────────────────────────────────────────────
-  function logout() {
+  async function logout() {
     if (_logoutFn) { _logoutFn(); return; }
-    // Wipe local profile cache so the next login starts clean.
-    ['brias_token','brias_username','brias_email','brias_display_name','brias_age'].forEach(k => localStorage.removeItem(k));
+    try { await _api('/api/logout', { method: 'POST' }); } catch {}
+    ['brias_username','brias_email','brias_display_name','brias_age'].forEach(k => localStorage.removeItem(k));
     window.location.href = 'login.html';
   }
 

@@ -17,7 +17,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from fastapi import FastAPI, Header, HTTPException, Request
+from fastapi import Cookie, Depends, FastAPI, Header, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -34,6 +34,14 @@ logger = logging.getLogger(__name__)
 
 DB = Path(__file__).parent.parent / "network_state" / "users.db"
 
+ALLOWED_ORIGINS = [
+    "https://brias.eu",
+    "https://www.brias.eu",
+]
+
+COOKIE_NAME = "brias_session"
+COOKIE_MAX_AGE = 30 * 24 * 3600  # 30 days
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -45,30 +53,59 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="BRIAS Accounts", version="2.0.0", lifespan=lifespan, docs_url="/api/docs", redoc_url=None)
 
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
-# ── Helpers ─────────────────────────────────────────────────────────────────
+# ── Auth dependencies ────────────────────────────────────────────────────────
 
-def _token(authorization: str | None) -> str:
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(401, "Niet ingelogd")
-    return authorization.removeprefix("Bearer ").strip()
+def _resolve_token(
+    authorization: str | None = Header(default=None),
+    brias_session: str | None = Cookie(default=None),
+) -> str:
+    """Extract token from httpOnly cookie (preferred) or Authorization header."""
+    if brias_session:
+        return brias_session
+    if authorization and authorization.startswith("Bearer "):
+        return authorization.removeprefix("Bearer ").strip()
+    raise HTTPException(401, "Niet ingelogd")
 
 
-def _user(authorization: str | None) -> dict:
-    user = auth.get_user_by_token(_token(authorization))
+def _require_user(token: str = Depends(_resolve_token)) -> dict:
+    user = auth.get_user_by_token(token)
     if not user:
         raise HTTPException(401, "Sessie verlopen")
     return user
 
 
-def _admin(authorization: str | None) -> dict:
-    user = _user(authorization)
+def _require_admin(user: dict = Depends(_require_user)) -> dict:
     if not auth.is_admin(user["contact"]):
         raise HTTPException(403, "Geen toegang")
     return user
 
+
+def _set_session_cookie(response: Response, token: str) -> None:
+    response.set_cookie(
+        key=COOKIE_NAME,
+        value=token,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        domain=".brias.eu",
+        max_age=COOKIE_MAX_AGE,
+    )
+
+
+def _clear_session_cookie(response: Response) -> None:
+    response.delete_cookie(key=COOKIE_NAME, domain=".brias.eu")
+
+
+# ── Helpers ──────────────────────────────────────────────────────────────────
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -126,10 +163,19 @@ async def health():
 # ── Auth ─────────────────────────────────────────────────────────────────────
 
 @app.get("/api/me")
-async def me(authorization: str | None = Header(default=None)):
-    try:
-        user = _user(authorization)
-    except HTTPException:
+async def me(
+    authorization: str | None = Header(default=None),
+    brias_session: str | None = Cookie(default=None),
+):
+    token = brias_session or (
+        authorization.removeprefix("Bearer ").strip()
+        if authorization and authorization.startswith("Bearer ")
+        else None
+    )
+    if not token:
+        return {"logged_in": False, "brias_active": False}
+    user = auth.get_user_by_token(token)
+    if not user:
         return {"logged_in": False, "brias_active": False}
     return {
         "logged_in":    True,
@@ -154,7 +200,7 @@ async def google_auth_endpoint(request: Request):
 
 
 @app.post("/api/register")
-async def register(body: LoginBody):
+async def register(body: LoginBody, response: Response):
     cfg = admin_config.load()
     if not cfg["allow_new_users"]:
         raise HTTPException(403, "Registration is currently closed")
@@ -164,16 +210,18 @@ async def register(body: LoginBody):
     if not user:
         raise HTTPException(409, "This contact is already registered")
     token, u = auth.login(body.contact, body.password)
-    return {"token": token, "username": u["username"] or u["contact"], "profile_complete": u["profile_done"]}
+    _set_session_cookie(response, token)
+    return {"username": u["username"] or u["contact"], "profile_complete": u["profile_done"]}
 
 
 @app.post("/api/login")
-async def login(body: LoginBody):
+async def login(body: LoginBody, response: Response):
     result = auth.login(body.contact, body.password)
     if not result:
         raise HTTPException(401, "Wrong contact or password")
     token, user = result
-    return {"token": token, "username": user["username"] or user["contact"], "profile_complete": user["profile_done"]}
+    _set_session_cookie(response, token)
+    return {"username": user["username"] or user["contact"], "profile_complete": user["profile_done"]}
 
 
 @app.post("/api/verify")
@@ -187,15 +235,13 @@ async def resend(request: Request):
 
 
 @app.post("/api/profile")
-async def profile(body: ProfileBody, authorization: str | None = Header(default=None)):
-    user = _user(authorization)
+async def profile(body: ProfileBody, user: dict = Depends(_require_user)):
     username = auth.update_profile(user["id"], body.display_name, body.age)
     return {"username": username}
 
 
 @app.post("/api/account/password")
-async def change_password(body: PasswordBody, authorization: str | None = Header(default=None)):
-    user = _user(authorization)
+async def change_password(body: PasswordBody, user: dict = Depends(_require_user)):
     if len(body.new_password) < 6:
         raise HTTPException(400, "New password must be at least 6 characters")
     ok = auth.change_password(user["id"], body.old_password, body.new_password)
@@ -205,28 +251,38 @@ async def change_password(body: PasswordBody, authorization: str | None = Header
 
 
 @app.post("/api/account/delete")
-async def delete_account(body: DeleteAccountBody, authorization: str | None = Header(default=None)):
-    user = _user(authorization)
+async def delete_account(body: DeleteAccountBody, response: Response, user: dict = Depends(_require_user)):
     ok = auth.delete_account(user["id"], body.password)
     if not ok:
         raise HTTPException(401, "Password is incorrect")
+    _clear_session_cookie(response)
     return {"ok": True}
 
 
 @app.post("/api/logout")
-async def logout(authorization: str | None = Header(default=None)):
-    try:
-        auth.logout(_token(authorization))
-    except Exception:
-        pass
+async def logout(
+    response: Response,
+    authorization: str | None = Header(default=None),
+    brias_session: str | None = Cookie(default=None),
+):
+    token = brias_session or (
+        authorization.removeprefix("Bearer ").strip()
+        if authorization and authorization.startswith("Bearer ")
+        else None
+    )
+    if token:
+        try:
+            auth.logout(token)
+        except Exception:
+            pass
+    _clear_session_cookie(response)
     return {"ok": True}
 
 
 # ── Chats ────────────────────────────────────────────────────────────────────
 
 @app.get("/api/chats")
-async def list_chats(authorization: str | None = Header(default=None)):
-    user = _user(authorization)
+async def list_chats(user: dict = Depends(_require_user)):
     with _db() as c:
         rows = c.execute(
             "SELECT id, title, created_at, updated_at FROM chats WHERE user_id=? ORDER BY updated_at DESC",
@@ -236,8 +292,7 @@ async def list_chats(authorization: str | None = Header(default=None)):
 
 
 @app.post("/api/chats")
-async def create_chat(body: ChatBody, authorization: str | None = Header(default=None)):
-    user = _user(authorization)
+async def create_chat(body: ChatBody, user: dict = Depends(_require_user)):
     cid = secrets.token_hex(16)
     now = _now()
     with _db() as c:
@@ -249,8 +304,7 @@ async def create_chat(body: ChatBody, authorization: str | None = Header(default
 
 
 @app.delete("/api/chats/{chat_id}")
-async def delete_chat(chat_id: str, authorization: str | None = Header(default=None)):
-    user = _user(authorization)
+async def delete_chat(chat_id: str, user: dict = Depends(_require_user)):
     with _db() as c:
         c.execute("DELETE FROM messages WHERE chat_id=?", (chat_id,))
         c.execute("DELETE FROM chats WHERE id=? AND user_id=?", (chat_id, user["id"]))
@@ -258,8 +312,7 @@ async def delete_chat(chat_id: str, authorization: str | None = Header(default=N
 
 
 @app.get("/api/chats/{chat_id}/messages")
-async def get_messages(chat_id: str, authorization: str | None = Header(default=None)):
-    user = _user(authorization)
+async def get_messages(chat_id: str, user: dict = Depends(_require_user)):
     with _db() as c:
         chat = c.execute("SELECT id FROM chats WHERE id=? AND user_id=?", (chat_id, user["id"])).fetchone()
         if not chat:
@@ -275,9 +328,8 @@ async def get_messages(chat_id: str, authorization: str | None = Header(default=
 async def stream_message(
     chat_id: str,
     body: MessageBody,
-    authorization: str | None = Header(default=None),
+    user: dict = Depends(_require_user),
 ):
-    user = _user(authorization)
     cfg = admin_config.load()
 
     user_msg_id = secrets.token_hex(16)
@@ -326,8 +378,7 @@ async def stream_message(
 
 
 @app.post("/api/chats/{chat_id}/abort")
-async def abort_chat(chat_id: str, authorization: str | None = Header(default=None)):
-    _user(authorization)
+async def abort_chat(chat_id: str, user: dict = Depends(_require_user)):
     return {"ok": True}
 
 
@@ -335,9 +386,8 @@ async def abort_chat(chat_id: str, authorization: str | None = Header(default=No
 async def patch_message(
     msg_id: str,
     body: PatchMessageBody,
-    authorization: str | None = Header(default=None),
+    user: dict = Depends(_require_user),
 ):
-    user = _user(authorization)
     with _db() as c:
         row = c.execute(
             "SELECT m.id, m.chat_id FROM messages m "
@@ -359,8 +409,7 @@ async def patch_message(
 # ── Memories ─────────────────────────────────────────────────────────────────
 
 @app.get("/api/memories")
-async def list_memories(authorization: str | None = Header(default=None)):
-    user = _user(authorization)
+async def list_memories(user: dict = Depends(_require_user)):
     with _db() as c:
         rows = c.execute(
             "SELECT id, tier, content, created_at FROM memories WHERE user_id=? ORDER BY created_at",
@@ -370,8 +419,7 @@ async def list_memories(authorization: str | None = Header(default=None)):
 
 
 @app.post("/api/memories")
-async def add_memory(body: MemoryBody, authorization: str | None = Header(default=None)):
-    user = _user(authorization)
+async def add_memory(body: MemoryBody, user: dict = Depends(_require_user)):
     mid = secrets.token_hex(16)
     now = _now()
     with _db() as c:
@@ -383,8 +431,7 @@ async def add_memory(body: MemoryBody, authorization: str | None = Header(defaul
 
 
 @app.delete("/api/memories/{mem_id}")
-async def delete_memory(mem_id: str, authorization: str | None = Header(default=None)):
-    user = _user(authorization)
+async def delete_memory(mem_id: str, user: dict = Depends(_require_user)):
     with _db() as c:
         c.execute("DELETE FROM memories WHERE id=? AND user_id=?", (mem_id, user["id"]))
     return {"ok": True}
@@ -393,28 +440,24 @@ async def delete_memory(mem_id: str, authorization: str | None = Header(default=
 # ── BRIAS mind — offline ──────────────────────────────────────────────────────
 
 @app.get("/api/brias/mind")
-async def brias_mind(authorization: str | None = Header(default=None)):
-    _user(authorization)
+async def brias_mind(user: dict = Depends(_require_user)):
     return {"mode": "offline", "brias_active": False}
 
 
 @app.get("/api/brias/thoughts")
-async def brias_thoughts(authorization: str | None = Header(default=None)):
-    _user(authorization)
+async def brias_thoughts(user: dict = Depends(_require_user)):
     return {"mode": "offline", "brias_active": False}
 
 
 # ── Admin ─────────────────────────────────────────────────────────────────────
 
 @app.get("/api/admin/config")
-async def get_admin_config(authorization: str | None = Header(default=None)):
-    _admin(authorization)
+async def get_admin_config(user: dict = Depends(_require_admin)):
     return admin_config.load()
 
 
 @app.post("/api/admin/config")
-async def update_admin_config(body: AdminUpdate, authorization: str | None = Header(default=None)):
-    _admin(authorization)
+async def update_admin_config(body: AdminUpdate, user: dict = Depends(_require_admin)):
     cfg = admin_config.load()
     if body.allow_new_users     is not None: cfg["allow_new_users"]     = body.allow_new_users
     if body.silent_mode         is not None: cfg["silent_mode"]         = body.silent_mode
@@ -424,12 +467,10 @@ async def update_admin_config(body: AdminUpdate, authorization: str | None = Hea
 
 
 @app.get("/api/admin/users")
-async def get_admin_users(authorization: str | None = Header(default=None)):
-    _admin(authorization)
+async def get_admin_users(user: dict = Depends(_require_admin)):
     return {"users": auth.list_users()}
 
 
 @app.get("/api/admin/brain")
-async def get_admin_brain(authorization: str | None = Header(default=None)):
-    _admin(authorization)
+async def get_admin_brain(user: dict = Depends(_require_admin)):
     return {"brias_active": False, "note": "BRIAS draait niet op deze server."}

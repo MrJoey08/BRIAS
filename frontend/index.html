@@ -35,20 +35,18 @@ body{background:var(--bg);display:flex;flex-direction:column;align-items:center;
 <body>
 <div class="logo">BRIAS</div>
 <div class="load-track"><div class="load-fill"></div></div>
+<script src="assets/js/config.js"></script>
 <script>
-const API = 'https://api.brias.eu';
-const token = localStorage.getItem('brias_token');
-
 async function init() {
-  if (token) {
-    try {
-      const r = await fetch(API + '/api/me', { headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(3000) });
-      const d = await r.json();
-      if (d.logged_in) { window.location.href = 'chat.html'; return; }
-    } catch(e) {}
-    localStorage.removeItem('brias_token');
-    localStorage.removeItem('brias_username');
-  }
+  try {
+    const r = await fetch(API + '/api/me', {
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(3000),
+    });
+    const d = await r.json();
+    if (d.logged_in) { window.location.href = 'chat.html'; return; }
+  } catch(e) {}
   window.location.href = 'login.html';
 }
 

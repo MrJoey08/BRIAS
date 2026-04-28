@@ -266,6 +266,17 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
 }
 .google-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);}
 .google-btn svg{flex-shrink:0;}
+.pwd-reqs{
+  margin:-4px 0 12px;padding:11px 14px;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
+  border-radius:12px;display:none;flex-direction:column;gap:5px;
+}
+.pwd-reqs.visible{display:flex;}
+.pwd-req{font-size:12px;font-weight:300;color:var(--text-muted);display:flex;align-items:center;gap:8px;transition:color .18s;}
+.pwd-req.ok{color:rgba(80,200,140,.9);}
+.pwd-req .rk{font-size:11px;width:13px;text-align:center;flex-shrink:0;}
+.pwd-req.ok .rk::before{content:'✓';}
+.pwd-req:not(.ok) .rk::before{content:'○';}
 </style>
 <script src="https://accounts.google.com/gsi/client" async></script>
 </head>
@@ -313,8 +324,14 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
           <span class="field-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
         </div>
         <div class="field">
-          <input id="authPass" type="password" placeholder="Password" autocomplete="current-password">
+          <input id="authPass" type="password" placeholder="Password" autocomplete="current-password" oninput="onPwdInput(this.value)">
           <span class="field-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+        </div>
+        <div class="pwd-reqs" id="pwdReqs">
+          <div class="pwd-req" id="req-len"><span class="rk"></span>12+ characters</div>
+          <div class="pwd-req" id="req-up"><span class="rk"></span>One uppercase letter</div>
+          <div class="pwd-req" id="req-num"><span class="rk"></span>One number</div>
+          <div class="pwd-req" id="req-sym"><span class="rk"></span>One special character (!@#$%^&amp;*…)</div>
         </div>
         <button class="submit-btn" id="submitBtn" onclick="doStep1()">Continue</button>
         <div class="divider" id="googleDivider" style="display:none;">
@@ -327,18 +344,6 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
           Continue with Google
         </button>
         <div class="switch-text" id="switchText">New here? <a onclick="toggleMode()">Create account</a></div>
-      </div>
-
-      <div id="step2" class="step hidden">
-        <div class="form-title">Check your messages.</div>
-        <div class="form-sub">Code sent to <span id="sentTo" style="color:var(--text);"></span></div>
-        <div class="form-err" id="err2"></div>
-        <div class="field">
-          <input id="authCode" type="text" placeholder="6-digit code" autocomplete="one-time-code" inputmode="numeric" maxlength="6">
-          <span class="field-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg></span>
-        </div>
-        <button class="submit-btn" onclick="doStep2()">Verify</button>
-        <div class="step-resend">Didn't get it? <a onclick="resend()">Resend code</a></div>
       </div>
 
       <div id="step3" class="step hidden">
@@ -360,13 +365,12 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
   </div>
 </div>
 
+<script src="assets/js/config.js"></script>
 <script>
-const API = 'https://api.brias.eu';
-let mode = 'login', contact = '', offlineTimer = null, googleClientId = '';
+let mode = 'login', offlineTimer = null, googleClientId = '';
 
 function api(path, opts = {}) {
-  const t = localStorage.getItem('brias_token');
-  return fetch(API + path, { ...opts, headers: { 'Content-Type': 'application/json', ...(t ? { 'Authorization': 'Bearer ' + t } : {}), ...(opts.headers || {}) } });
+  return fetch(API + path, { ...opts, credentials: 'include', headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) } });
 }
 
 // ── WebGL glow ──
@@ -428,7 +432,7 @@ function setOffline(off) {
 
 // ── Auth ──
 function showStep(n) {
-  ['step1','step2','step3'].forEach(s => document.getElementById(s)?.classList.add('hidden'));
+  ['step1','step3'].forEach(s => document.getElementById(s)?.classList.add('hidden'));
   document.getElementById('step'+n)?.classList.remove('hidden');
 }
 function showErr(n, msg) { const e = document.getElementById('err'+n); e.textContent = msg; e.classList.add('visible'); }
@@ -441,45 +445,57 @@ function toggleMode() {
   document.getElementById('switchText').innerHTML = mode === 'login'
     ? 'New here? <a onclick="toggleMode()">Create account</a>'
     : 'Already have one? <a onclick="toggleMode()">Sign in</a>';
+  const reqs = document.getElementById('pwdReqs');
+  if (reqs) reqs.classList.toggle('visible', mode === 'register');
+  if (mode === 'login') updatePwdReqs('');
   clearErr(1);
+}
+
+function onPwdInput(val) {
+  if (mode === 'register') updatePwdReqs(val);
+}
+
+function updatePwdReqs(pw) {
+  const checks = [
+    { id: 'req-len', ok: pw.length >= 12 },
+    { id: 'req-up',  ok: /[A-Z]/.test(pw) },
+    { id: 'req-num', ok: /[0-9]/.test(pw) },
+    { id: 'req-sym', ok: /[^A-Za-z0-9]/.test(pw) },
+  ];
+  checks.forEach(c => {
+    const el = document.getElementById(c.id);
+    if (el) el.className = 'pwd-req' + (c.ok ? ' ok' : '');
+  });
+}
+
+function _pwdValid(pw) {
+  return pw.length >= 12 && /[A-Z]/.test(pw) && /[0-9]/.test(pw) && /[^A-Za-z0-9]/.test(pw);
 }
 
 async function doStep1() {
   const c = document.getElementById('authContact').value.trim();
   const p = document.getElementById('authPass').value;
   if (!c || !p) { showErr(1, 'Please fill in all fields'); return; }
-  clearErr(1); contact = c;
+  if (mode === 'register') {
+    if (!_pwdValid(p)) {
+      showErr(1, 'Password does not meet all requirements below');
+      document.getElementById('pwdReqs').classList.add('visible');
+      updatePwdReqs(p);
+      return;
+    }
+  }
+  clearErr(1);
   try {
     const r = await api(mode === 'login' ? '/api/login' : '/api/register', { method:'POST', body:JSON.stringify({contact:c,password:p}) });
     const d = await r.json();
     if (!r.ok) { showErr(1, d.detail || 'Something went wrong'); return; }
-    if (d.token) {
-      localStorage.setItem('brias_token', d.token);
-      localStorage.setItem('brias_username', d.username);
-      localStorage.setItem('brias_email', c);
-      if (!d.profile_complete) { showStep(3); return; }
-      window.location.href = 'chat.html'; return;
-    }
-    document.getElementById('sentTo').textContent = c; showStep(2);
-  } catch { showErr(1, 'Could not reach the server'); }
-}
-
-async function doStep2() {
-  const code = document.getElementById('authCode').value.trim();
-  if (!code) { showErr(2, 'Please enter the code'); return; }
-  clearErr(2);
-  try {
-    const r = await api('/api/verify', { method:'POST', body:JSON.stringify({contact,code}) });
-    const d = await r.json();
-    if (!r.ok) { showErr(2, d.detail || 'Invalid code'); return; }
-    localStorage.setItem('brias_token',d.token); localStorage.setItem('brias_username',d.username);
-    localStorage.setItem('brias_email', contact);
+    // Token is set as httpOnly cookie by the server — not stored in localStorage
+    localStorage.setItem('brias_username', d.username);
+    localStorage.setItem('brias_email', c);
     if (!d.profile_complete) { showStep(3); return; }
     window.location.href = 'chat.html';
-  } catch { showErr(2, 'Could not reach the server'); }
+  } catch { showErr(1, 'Could not reach the server'); }
 }
-
-async function resend() { try { await api('/api/resend', { method:'POST', body:JSON.stringify({contact}) }); } catch {} }
 
 async function doStep3() {
   const name = document.getElementById('authName').value.trim();
@@ -496,6 +512,7 @@ async function doStep3() {
     window.location.href = 'chat.html';
   } catch { showErr(3, 'Could not reach the server'); }
 }
+
 
 // ── Google OAuth ──
 async function initGoogle() {
@@ -521,7 +538,7 @@ async function handleGoogleAuth(response) {
     const r = await api('/api/auth/google', { method: 'POST', body: JSON.stringify({ credential: response.credential }) });
     const d = await r.json();
     if (!r.ok) { showErr(1, d.detail || 'Google sign-in failed'); return; }
-    localStorage.setItem('brias_token', d.token);
+    // Token is set as httpOnly cookie by the server — not stored in localStorage
     localStorage.setItem('brias_username', d.username);
     if (d.email) localStorage.setItem('brias_email', d.email);
     if (d.display_name) localStorage.setItem('brias_display_name', d.display_name);
@@ -531,23 +548,19 @@ async function handleGoogleAuth(response) {
 }
 
 (async function() {
-  const token = localStorage.getItem('brias_token');
   const online = await checkOnline();
   if (!online) { setOffline(true); return; }
-  if (token) {
-    try {
-      const r = await api('/api/me');
-      const d = await r.json();
-      if (d.logged_in) {
-        if (d.email) localStorage.setItem('brias_email', d.email);
-        if (d.display_name) localStorage.setItem('brias_display_name', d.display_name);
-        if (d.age!=null) localStorage.setItem('brias_age', String(d.age));
-        if (d.profile_done === false) { showStep(3); initGoogle(); return; }
-        window.location.href = 'chat.html'; return;
-      }
-    } catch {}
-    localStorage.removeItem('brias_token'); localStorage.removeItem('brias_username');
-  }
+  try {
+    const r = await api('/api/me');
+    const d = await r.json();
+    if (d.logged_in) {
+      if (d.email) localStorage.setItem('brias_email', d.email);
+      if (d.display_name) localStorage.setItem('brias_display_name', d.display_name);
+      if (d.age!=null) localStorage.setItem('brias_age', String(d.age));
+      if (d.profile_done === false) { showStep(3); initGoogle(); return; }
+      window.location.href = 'chat.html'; return;
+    }
+  } catch {}
   document.getElementById('step1').classList.remove('hidden');
   initGoogle();
 })();

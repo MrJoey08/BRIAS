@@ -258,10 +258,9 @@ body.light .stop-sq{background:rgba(30,12,0,.4);}
 
 <!-- Settings shell handled by shell.js -->
 
+<script src="assets/js/config.js"></script>
 <script src="assets/js/shell.js"></script>
 <script>
-const API = 'https://api.brias.eu';
-let token = localStorage.getItem('brias_token');
 let activeChatId = null, isStreaming = false, meData = null;
 
 // Apply saved theme immediately
@@ -275,24 +274,23 @@ SHELL.init({
 }, { logout: doLogout });
 
 function api(path, opts={}) {
-  return fetch(API+path, {...opts, headers:{'Content-Type':'application/json',...(token?{'Authorization':'Bearer '+token}:{}),...(opts.headers||{})}});
+  return fetch(API+path, {...opts, credentials:'include', headers:{'Content-Type':'application/json',...(opts.headers||{})}});
 }
 
 async function init() {
   try {
-    const r = await fetch(API+'/api/me', {headers:token?{'Authorization':'Bearer '+token}:{}});
-    if (!r.ok && r.status !== 401) return;
-
-    if (!token || r.status === 401) { window.location.href='login.html'; return; }
+    const r = await fetch(API+'/api/me', {credentials:'include', headers:{'Content-Type':'application/json'}});
+    if (r.status === 401) { window.location.href='login.html'; return; }
+    if (!r.ok) return;
     meData = await r.json();
-    if (!meData.logged_in) { doLogout(); return; }
+    if (!meData.logged_in) { window.location.href='login.html'; return; }
+    if (meData.profile_done === false) { window.location.href='login.html'; return; }
     if (meData.email) localStorage.setItem('brias_email', meData.email);
     if (meData.display_name) localStorage.setItem('brias_display_name', meData.display_name);
     if (meData.age!=null) localStorage.setItem('brias_age', String(meData.age));
     if (meData.username) localStorage.setItem('brias_username', meData.username);
     SHELL.updateUser(meData);
   } catch(e) {
-    if (!token) { window.location.href='login.html'; }
     return;
   }
   try {
@@ -309,8 +307,9 @@ async function init() {
   } catch(e) {}
 }
 
-function doLogout() {
-  localStorage.removeItem('brias_token'); localStorage.removeItem('brias_username');
+async function doLogout() {
+  try { await api('/api/logout', {method:'POST'}); } catch {}
+  ['brias_username','brias_email','brias_display_name','brias_age'].forEach(k => localStorage.removeItem(k));
   window.location.href='login.html';
 }
 
