@@ -1,39 +1,21 @@
 {
   "headers": [
     {
-      "source": "/frontend/(.*\\.html)",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
-      ]
-    },
-    {
-      "source": "/",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
-      ]
-    },
-    {
-      "source": "/frontend/assets/js/(.*).js",
-      "headers": [
-        { "key": "Content-Type", "value": "application/javascript; charset=utf-8" }
-      ]
-    },
-    {
-      "source": "/frontend/assets/css/(.*).css",
-      "headers": [
-        { "key": "Content-Type", "value": "text/css; charset=utf-8" }
-      ]
-    },
-    {
       "source": "/logo/site.webmanifest",
       "headers": [
         { "key": "Content-Type", "value": "application/manifest+json; charset=utf-8" }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
       ]
     }
   ],
   "rewrites": [
     { "source": "/", "destination": "/frontend/index.html" },
-    { "source": "/assets/:path*", "destination": "/frontend/assets/:path*" },
+    { "source": "/assets/(.*)", "destination": "/frontend/assets/$1" },
     { "source": "/chat", "destination": "/frontend/chat.html" },
     { "source": "/login", "destination": "/frontend/login.html" },
     { "source": "/journal", "destination": "/frontend/journal.html" },
