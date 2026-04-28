@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 
 import numpy as np
 
-from brias.living_network import LivingNetwork, STATE_FILE
+from server.brias.living_network import LivingNetwork, STATE_FILE
 
 logger = logging.getLogger(__name__)
 

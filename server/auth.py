@@ -145,6 +145,47 @@ def update_profile(user_id: str, display_name: str, age: int | None) -> str:
     return display_name.strip()
 
 
+def change_password(user_id: str, old_password: str, new_password: str) -> bool:
+    """Wijzig wachtwoord. Geeft False als oude niet klopt of de gebruiker niet bestaat."""
+    with _conn() as c:
+        row = c.execute(
+            "SELECT password FROM users WHERE id=?", (user_id,)
+        ).fetchone()
+        if not row:
+            return False
+        if row["password"] != _hash(old_password):
+            return False
+        c.execute(
+            "UPDATE users SET password=? WHERE id=?",
+            (_hash(new_password), user_id),
+        )
+        # Invalidate all existing sessions for this user.
+        c.execute("DELETE FROM tokens WHERE user_id=?", (user_id,))
+    return True
+
+
+def delete_account(user_id: str, password: str) -> bool:
+    """Verwijder account en alle gekoppelde data. Geeft False bij verkeerd wachtwoord."""
+    with _conn() as c:
+        row = c.execute(
+            "SELECT password FROM users WHERE id=?", (user_id,)
+        ).fetchone()
+        if not row:
+            return False
+        # Google users have a placeholder password starting with 'google:' — let them through.
+        if not row["password"].startswith("google:") and row["password"] != _hash(password):
+            return False
+        c.execute(
+            "DELETE FROM messages WHERE chat_id IN (SELECT id FROM chats WHERE user_id=?)",
+            (user_id,),
+        )
+        c.execute("DELETE FROM chats WHERE user_id=?", (user_id,))
+        c.execute("DELETE FROM memories WHERE user_id=?", (user_id,))
+        c.execute("DELETE FROM tokens WHERE user_id=?", (user_id,))
+        c.execute("DELETE FROM users WHERE id=?", (user_id,))
+    return True
+
+
 def register_google(google_id: str, email: str, display_name: str) -> tuple[str, dict]:
     """Register a new Google user, or log in an existing one with the same email."""
     now = datetime.now(timezone.utc).isoformat()
