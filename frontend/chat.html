@@ -281,19 +281,18 @@ function api(path, opts={}) {
 async function init() {
   try {
     const r = await fetch(API+'/api/me', {headers:token?{'Authorization':'Bearer '+token}:{}});
-    if (!r.ok && r.status !== 401) return;
-
-    if (!token || r.status === 401) { window.location.href='login.html'; return; }
+    // Any error or missing/expired token → go to login
+    if (!r.ok || !token) { window.location.href='login.html'; return; }
     meData = await r.json();
-    if (!meData.logged_in) { doLogout(); return; }
+    if (!meData.logged_in) { window.location.href='login.html'; return; }
     if (meData.email) localStorage.setItem('brias_email', meData.email);
     if (meData.display_name) localStorage.setItem('brias_display_name', meData.display_name);
     if (meData.age!=null) localStorage.setItem('brias_age', String(meData.age));
     if (meData.username) localStorage.setItem('brias_username', meData.username);
     SHELL.updateUser(meData);
   } catch(e) {
-    if (!token) { window.location.href='login.html'; }
-    return;
+    // Server unreachable → go to login
+    window.location.href='login.html'; return;
   }
   try {
     const chats = await api('/api/chats').then(r=>r.json());
