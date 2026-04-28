@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 CONFIG_PATH = Path(__file__).parent.parent / "network_state" / "admin_config.json"
 
 DEFAULTS = {
-    "brias_active": True,          # reageert ze überhaupt?
+    "brias_active": False,         # reageert ze überhaupt? standaard uit tot bewust aangezet
     "allow_new_users": True,       # mogen nieuwe mensen zich registreren?
     "silent_mode": False,          # gebruikers kunnen inloggen maar BRIAS zwijgt
     "maintenance_message": "",     # bericht dat getoond wordt in silent mode
