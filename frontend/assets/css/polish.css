@@ -1,0 +1,51 @@
+/* ===== BRIAS · Polish ===== */
+
+/* iPhone zoom fix — inputs must be ≥16px or iOS Safari auto-zooms on focus */
+@media (max-width: 768px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Shake animation for error messages */
+@keyframes brShake {
+  0%,  100% { transform: translateX(0); }
+  15%        { transform: translateX(-6px); }
+  35%        { transform: translateX(6px); }
+  55%        { transform: translateX(-4px); }
+  75%        { transform: translateX(3px); }
+  92%        { transform: translateX(-2px); }
+}
+.shake { animation: brShake 0.36s cubic-bezier(.36,.07,.19,.97) both; }
+
+/* Click/active scale feedback on interactive elements */
+.submit-btn:active:not(:disabled),
+.save-btn:active:not(:disabled)    { transform: scale(0.97); transition-duration: 80ms; }
+.pmodal-save:active:not(:disabled) { transform: scale(0.97); transition-duration: 80ms; }
+.pmodal-cancel:active              { transform: scale(0.97); transition-duration: 80ms; }
+.google-btn:active                 { transform: scale(0.97); transition-duration: 80ms; }
+.sidebar-today:active              { transform: scale(0.98); transition-duration: 80ms; }
+.bn-today:active,
+.bn-btn:active                     { transform: scale(0.97); transition-duration: 80ms; }
+.send-btn:active:not(:disabled)    { transform: scale(0.97); transition-duration: 80ms; }
+
+/* Minimum 44×44px touch target for hamburger menu */
+.menu-btn { width: 44px; height: 44px; }
+
+/* Dynamic viewport height — prevents mobile browser chrome overlap */
+@supports (height: 100dvh) {
+  .app { height: 100dvh; }
+}
+
+/* Safe area insets for iPhone notch and home indicator */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .input-area  { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+  .bottom-nav  { bottom: calc(16px + env(safe-area-inset-bottom)); }
+}
+
+/* Improved line-height for message bubbles on mobile */
+@media (max-width: 767px) {
+  .msg-bubble { line-height: 1.65; }
+}

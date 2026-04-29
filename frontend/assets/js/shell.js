@@ -422,7 +422,9 @@ const SHELL = (() => {
   function _showErr(msg) {
     const err = document.getElementById('shellPmErr');
     err.textContent = msg;
-    err.classList.add('visible');
+    err.classList.remove('shake');
+    void err.offsetWidth;
+    err.classList.add('visible', 'shake');
   }
 
   async function submitProfileModal() {

@@ -11,8 +11,13 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/logo/apple-touch-icon.png">
 <link rel="manifest" href="/logo/site.webmanifest">
 <meta name="theme-color" content="#131013">
+<meta name="description" content="BRIAS Planner — organize your days with clarity and intention.">
+<meta property="og:title" content="BRIAS · Planner">
+<meta property="og:description" content="Your personal planner inside BRIAS. Clear, focused, structured.">
+<meta property="og:type" content="website">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=DM+Sans:wght@300;400;500&family=Bitter:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/shell.css">
+<link rel="stylesheet" href="assets/css/polish.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 button{outline:none!important;border:none;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent;}
@@ -1197,12 +1202,11 @@ async function doLogout(){
 
 (async function(){
   try{
-    const r=await api('/api/me');
-    if(r.status===401){window.location.href='login.html';return;}
-    if(!r.ok)return;
+    const r=await fetch(API+'/api/me',{credentials:'include',cache:'no-store'});
+    if(!r.ok){window.location.href='login.html';return;}
     const d=await r.json();
     if(!d.logged_in){window.location.href='login.html';return;}
-    if(d.profile_done===false){window.location.href='login.html';return;}
+    if(!d.profile_done){window.location.href='login.html?action=setup-profile';return;}
     meData=d;
     if(d.username)localStorage.setItem('brias_username',d.username);
     if(d.email)localStorage.setItem('brias_email',d.email);
