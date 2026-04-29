@@ -416,7 +416,7 @@ startTypewriter('twText');
 document.getElementById('twWrap').style.display = 'none';
 
 // ── Offline ──
-async function checkOnline() { try { await fetch(API+'/api/me', { method:'GET', signal:AbortSignal.timeout(3000) }); return true; } catch { return false; } }
+async function checkOnline() { try { await fetch(API+'/health', { method:'GET', signal:AbortSignal.timeout(3000) }); return true; } catch { return false; } }
 function setOffline(off) {
   const os = document.getElementById('offlineState');
   const steps = document.querySelectorAll('.step');
@@ -557,14 +557,19 @@ async function handleGoogleAuth(response) {
 (async function() {
   const online = await checkOnline();
   if (!online) { setOffline(true); return; }
+
+  // If chat.html redirected here for profile setup, skip the "go back to chat" check
+  const needsProfileSetup = new URLSearchParams(window.location.search).get('action') === 'setup-profile';
+  if (needsProfileSetup) { showStep(3); initGoogle(); return; }
+
   try {
-    const r = await api('/api/me');
+    const r = await fetch(API + '/api/me', { credentials: 'include', cache: 'no-store' });
     const d = await r.json();
     if (d.logged_in) {
       if (d.email) localStorage.setItem('brias_email', d.email);
       if (d.display_name) localStorage.setItem('brias_display_name', d.display_name);
       if (d.age!=null) localStorage.setItem('brias_age', String(d.age));
-      if (d.profile_done === false) { showStep(3); initGoogle(); return; }
+      if (!d.profile_done) { showStep(3); initGoogle(); return; }
       window.location.href = 'chat.html'; return;
     }
   } catch {}

@@ -284,12 +284,11 @@ function api(path, opts={}) {
 
 async function init() {
   try {
-    const r = await fetch(API+'/api/me', {credentials:'include', headers:{'Content-Type':'application/json'}});
-    if (r.status === 401) { window.location.href='login.html'; return; }
-    if (!r.ok) return;
+    const r = await fetch(API+'/api/me', {credentials:'include', cache:'no-store'});
+    if (!r.ok) { window.location.href='login.html'; return; }
     meData = await r.json();
     if (!meData.logged_in) { window.location.href='login.html'; return; }
-    if (meData.profile_done === false) { window.location.href='login.html'; return; }
+    if (!meData.profile_done) { window.location.href='login.html?action=setup-profile'; return; }
     if (meData.email) localStorage.setItem('brias_email', meData.email);
     if (meData.display_name) localStorage.setItem('brias_display_name', meData.display_name);
     if (meData.age!=null) localStorage.setItem('brias_age', String(meData.age));

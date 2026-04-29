@@ -1202,12 +1202,11 @@ async function doLogout(){
 
 (async function(){
   try{
-    const r=await api('/api/me');
-    if(r.status===401){window.location.href='login.html';return;}
-    if(!r.ok)return;
+    const r=await fetch(API+'/api/me',{credentials:'include',cache:'no-store'});
+    if(!r.ok){window.location.href='login.html';return;}
     const d=await r.json();
     if(!d.logged_in){window.location.href='login.html';return;}
-    if(d.profile_done===false){window.location.href='login.html';return;}
+    if(!d.profile_done){window.location.href='login.html?action=setup-profile';return;}
     meData=d;
     if(d.username)localStorage.setItem('brias_username',d.username);
     if(d.email)localStorage.setItem('brias_email',d.email);
