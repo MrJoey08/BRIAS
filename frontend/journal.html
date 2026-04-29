@@ -388,10 +388,11 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
   .s-row-label{font-size:14px;}
   .s-row-sub{font-size:12px;}
 }
-
+#connBanner{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;padding:10px 20px;background:rgba(160,30,30,.88);color:rgba(255,255,255,.9);font-size:13px;font-weight:300;letter-spacing:.02em;text-align:center;backdrop-filter:blur(8px);}
 </style>
 </head>
 <body>
+<div id="connBanner"></div>
 <canvas id="glow"></canvas>
 <div class="noise"></div>
 
@@ -498,7 +499,22 @@ if (localStorage.getItem('brias_theme') === 'light') document.body.classList.add
 
 let meData = null;
 
-function api(path, opts={}){return fetch(API+path,{...opts,credentials:'include',headers:{'Content-Type':'application/json',...(opts.headers||{})}});}
+function api(path, opts={}) {
+  const token = localStorage.getItem('brias_token');
+  return fetch(API+path, {
+    ...opts,
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? {'Authorization': `Bearer ${token}`} : {}),
+      ...(opts.headers||{}),
+    },
+  });
+}
+function showConnBanner(msg) {
+  const el = document.getElementById('connBanner');
+  if (el) { el.textContent = msg; el.style.display = 'block'; }
+}
 
 // Init shell with cached data so drawer shows immediately
 SHELL.init({
@@ -509,17 +525,28 @@ SHELL.init({
 
 async function doLogout() {
   try { await api('/api/logout', {method:'POST'}); } catch {}
-  ['brias_username','brias_email','brias_display_name','brias_age'].forEach(k => localStorage.removeItem(k));
+  ['brias_token','brias_username','brias_email','brias_display_name','brias_age'].forEach(k => localStorage.removeItem(k));
   window.location.href = 'login.html';
 }
 
 // ── Auth ──
 (async function() {
+  const token = localStorage.getItem('brias_token');
+  if (!token) { window.location.href = 'login.html'; return; }
   try {
-    const r = await fetch(API+'/api/me', {credentials:'include', cache:'no-store'});
-    if (!r.ok) { window.location.href = 'login.html'; return; }
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 8000);
+    const r = await fetch(API+'/api/me', {
+      headers: {'Authorization': `Bearer ${token}`},
+      credentials: 'include',
+      cache: 'no-store',
+      signal: ctrl.signal,
+    });
+    clearTimeout(tid);
+    if (r.status === 401) { localStorage.removeItem('brias_token'); window.location.href = 'login.html'; return; }
+    if (!r.ok) { showConnBanner('Server tijdelijk niet bereikbaar — probeer het zo opnieuw.'); return; }
     const d = await r.json();
-    if (!d.logged_in) { window.location.href = 'login.html'; return; }
+    if (!d.logged_in) { localStorage.removeItem('brias_token'); window.location.href = 'login.html'; return; }
     if (!d.profile_done) { window.location.href = 'login.html?action=setup-profile'; return; }
     meData = d;
     if(d.username) localStorage.setItem('brias_username', d.username);
@@ -527,7 +554,12 @@ async function doLogout() {
     if(d.display_name) localStorage.setItem('brias_display_name', d.display_name);
     if(d.age!=null) localStorage.setItem('brias_age', String(d.age));
     SHELL.updateUser(meData);
-  } catch(e) {}
+  } catch(e) {
+    const msg = e.name === 'AbortError'
+      ? 'Verbinding verbroken — controleer je internetverbinding.'
+      : 'Kan de server niet bereiken.';
+    showConnBanner(msg);
+  }
 })();
 
 // ── WebGL glow ──
