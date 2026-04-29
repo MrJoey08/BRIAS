@@ -211,7 +211,7 @@ async def register(body: LoginBody, response: Response):
         raise HTTPException(409, "This contact is already registered")
     token, u = auth.login(body.contact, body.password)
     _set_session_cookie(response, token)
-    return {"username": u["username"] or u["contact"], "profile_complete": u["profile_done"]}
+    return {"token": token, "username": u["username"] or u["contact"], "profile_complete": u["profile_done"]}
 
 
 @app.post("/api/login")
@@ -221,7 +221,7 @@ async def login(body: LoginBody, response: Response):
         raise HTTPException(401, "Wrong contact or password")
     token, user = result
     _set_session_cookie(response, token)
-    return {"username": user["username"] or user["contact"], "profile_complete": user["profile_done"]}
+    return {"token": token, "username": user["username"] or user["contact"], "profile_complete": user["profile_done"]}
 
 
 @app.post("/api/verify")

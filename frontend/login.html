@@ -371,7 +371,16 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
 let mode = 'login', offlineTimer = null, googleClientId = '';
 
 function api(path, opts = {}) {
-  return fetch(API + path, { ...opts, credentials: 'include', headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) } });
+  const token = localStorage.getItem('brias_token');
+  return fetch(API + path, {
+    ...opts,
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+      ...(opts.headers || {}),
+    },
+  });
 }
 
 // ── WebGL glow ──
@@ -496,7 +505,7 @@ async function doStep1() {
     const r = await api(mode === 'login' ? '/api/login' : '/api/register', { method:'POST', body:JSON.stringify({contact:c,password:p}) });
     const d = await r.json();
     if (!r.ok) { showErr(1, d.detail || 'Something went wrong'); return; }
-    // Token is set as httpOnly cookie by the server — not stored in localStorage
+    if (d.token) localStorage.setItem('brias_token', d.token);
     localStorage.setItem('brias_username', d.username);
     localStorage.setItem('brias_email', c);
     if (!d.profile_complete) { showStep(3); return; }
@@ -555,22 +564,41 @@ async function handleGoogleAuth(response) {
 }
 
 (async function() {
+  // Profile setup redirect from app pages — skip all auth checks
+  if (new URLSearchParams(window.location.search).get('action') === 'setup-profile') {
+    showStep(3); initGoogle(); return;
+  }
+
+  // Fast local check — no token means definitely not logged in
+  const token = localStorage.getItem('brias_token');
+  if (!token) {
+    document.getElementById('step1').classList.remove('hidden');
+    initGoogle(); return;
+  }
+
   const online = await checkOnline();
   if (!online) { setOffline(true); return; }
 
-  // If chat.html redirected here for profile setup, skip the "go back to chat" check
-  const needsProfileSetup = new URLSearchParams(window.location.search).get('action') === 'setup-profile';
-  if (needsProfileSetup) { showStep(3); initGoogle(); return; }
-
   try {
-    const r = await fetch(API + '/api/me', { credentials: 'include', cache: 'no-store' });
-    const d = await r.json();
-    if (d.logged_in) {
-      if (d.email) localStorage.setItem('brias_email', d.email);
-      if (d.display_name) localStorage.setItem('brias_display_name', d.display_name);
-      if (d.age!=null) localStorage.setItem('brias_age', String(d.age));
-      if (!d.profile_done) { showStep(3); initGoogle(); return; }
-      window.location.href = 'chat.html'; return;
+    const r = await fetch(API + '/api/me', {
+      headers: { 'Authorization': `Bearer ${token}` },
+      credentials: 'include',
+      cache: 'no-store',
+    });
+    if (r.status === 401) {
+      localStorage.removeItem('brias_token');
+      document.getElementById('step1').classList.remove('hidden');
+      initGoogle(); return;
+    }
+    if (r.ok) {
+      const d = await r.json();
+      if (d.logged_in) {
+        if (d.email) localStorage.setItem('brias_email', d.email);
+        if (d.display_name) localStorage.setItem('brias_display_name', d.display_name);
+        if (d.age != null) localStorage.setItem('brias_age', String(d.age));
+        if (!d.profile_done) { showStep(3); initGoogle(); return; }
+        window.location.href = 'chat.html'; return;
+      }
     }
   } catch {}
   document.getElementById('step1').classList.remove('hidden');
