@@ -861,11 +861,9 @@ body.light .sheet-arr{border-color:rgba(80,40,20,.12);color:var(--text-sub);}
 body.light .sheet-d.e{color:rgba(46,31,24,.1);}
 .sheet-d.tod{background:rgba(232,118,74,.1);color:var(--orange);font-weight:500;border:1px solid rgba(232,118,74,.2);}
 .sheet-d.sel{background:var(--grad)!important;color:#fff!important;font-weight:500;}
-#connBanner{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;padding:10px 20px;background:rgba(160,30,30,.88);color:rgba(255,255,255,.9);font-size:13px;font-weight:300;letter-spacing:.02em;text-align:center;backdrop-filter:blur(8px);}
 </style>
 </head>
 <body>
-<div id="connBanner"></div>
 <canvas id="glow"></canvas>
 <div class="noise"></div>
 
@@ -1197,10 +1195,6 @@ function api(path, opts={}) {
     },
   });
 }
-function showConnBanner(msg) {
-  const el = document.getElementById('connBanner');
-  if (el) { el.textContent = msg; el.style.display = 'block'; }
-}
 function profileName(){ return meData?.display_name || localStorage.getItem('brias_display_name') || ''; }
 
 // Init shell with cached data so drawer shows immediately
@@ -1230,7 +1224,7 @@ async function doLogout(){
     });
     clearTimeout(tid);
     if(r.status===401){localStorage.removeItem('brias_token');window.location.href='login.html';return;}
-    if(!r.ok){showConnBanner('Server tijdelijk niet bereikbaar — probeer het zo opnieuw.');return;}
+    if(!r.ok){window.location.href='login.html';return;}
     const d=await r.json();
     if(!d.logged_in){localStorage.removeItem('brias_token');window.location.href='login.html';return;}
     if(!d.profile_done){window.location.href='login.html?action=setup-profile';return;}
@@ -1241,9 +1235,7 @@ async function doLogout(){
     if(d.age!=null)localStorage.setItem('brias_age',String(d.age));
     SHELL.updateUser(meData);
   }catch(e){
-    showConnBanner(e.name==='AbortError'
-      ?'Verbinding verbroken — controleer je internetverbinding.'
-      :'Kan de server niet bereiken.');
+    window.location.href='login.html';
   }
 })();
 

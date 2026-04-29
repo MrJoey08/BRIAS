@@ -110,7 +110,6 @@ textarea::placeholder{color:var(--text-dim);}
 #msgContainer{position:relative;}
 #offlineCard{display:none;position:absolute;top:0;left:0;right:0;bottom:0;z-index:10;align-items:center;justify-content:center;padding:24px;background:var(--bg);}
 #offlineCard.visible{display:flex;}
-#connBanner{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;padding:10px 20px;background:rgba(160,30,30,.88);color:rgba(255,255,255,.9);font-size:13px;font-weight:300;letter-spacing:.02em;text-align:center;backdrop-filter:blur(8px);}
 .of-card{width:100%;max-width:460px;min-height:min(520px,78vh);display:flex;flex-direction:column;background:rgba(19,16,19,.96);border:1px solid rgba(255,255,255,.08);border-radius:24px;overflow:hidden;box-shadow:0 32px 96px rgba(0,0,0,.55),0 8px 32px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.05);animation:cardIn .9s cubic-bezier(.16,1,.3,1) both;}
 @keyframes cardIn{from{opacity:0;transform:translateY(28px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
 .of-top{flex:1;position:relative;overflow:hidden;padding:48px 44px 44px;border-bottom:1px solid rgba(255,255,255,.07);}
@@ -219,7 +218,6 @@ body.light .stop-sq{background:rgba(30,12,0,.4);}
 </style>
 </head>
 <body>
-<div id="connBanner"></div>
 <div class="noise"></div>
 <div class="app">
   <div class="topbar">
@@ -293,13 +291,7 @@ function api(path, opts={}) {
   });
 }
 
-function showConnBanner(msg) {
-  const el = document.getElementById('connBanner');
-  if (el) { el.textContent = msg; el.style.display = 'block'; }
-}
-
 async function init() {
-  // Fast local check — no token means definitely not logged in
   const token = localStorage.getItem('brias_token');
   if (!token) { window.location.href = 'login.html'; return; }
 
@@ -314,19 +306,10 @@ async function init() {
     });
     clearTimeout(tid);
 
-    if (r.status === 401) {
-      localStorage.removeItem('brias_token');
-      window.location.href = 'login.html'; return;
-    }
-    if (!r.ok) {
-      showConnBanner('Server tijdelijk niet bereikbaar — probeer het zo opnieuw.');
-      return;
-    }
+    if (r.status === 401) { localStorage.removeItem('brias_token'); window.location.href = 'login.html'; return; }
+    if (!r.ok) { window.location.href = 'login.html'; return; }
     meData = await r.json();
-    if (!meData.logged_in) {
-      localStorage.removeItem('brias_token');
-      window.location.href = 'login.html'; return;
-    }
+    if (!meData.logged_in) { localStorage.removeItem('brias_token'); window.location.href = 'login.html'; return; }
     if (!meData.profile_done) { window.location.href = 'login.html?action=setup-profile'; return; }
     if (meData.email) localStorage.setItem('brias_email', meData.email);
     if (meData.display_name) localStorage.setItem('brias_display_name', meData.display_name);
@@ -334,12 +317,7 @@ async function init() {
     if (meData.username) localStorage.setItem('brias_username', meData.username);
     SHELL.updateUser(meData);
   } catch(e) {
-    // Network error or timeout — stay on page, show banner; brias_active=false ≠ logged out
-    const msg = e.name === 'AbortError'
-      ? 'Verbinding verbroken — controleer je internetverbinding.'
-      : 'Kan de server niet bereiken.';
-    showConnBanner(msg);
-    return;
+    window.location.href = 'login.html'; return;
   }
 
   // Auth passed — load chats (brias_active=false just means the AI is offline, not the user)
