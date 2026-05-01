@@ -425,7 +425,25 @@ startTypewriter('twText');
 document.getElementById('twWrap').style.display = 'none';
 
 // ── Offline ──
-async function checkOnline() { try { await fetch(API+'/health', { method:'GET', signal:AbortSignal.timeout(3000) }); return true; } catch { return false; } }
+// ── Offline / polling ──
+async function checkOnline() {
+  const token = localStorage.getItem('brias_token');
+  try {
+    const r = await fetch(API + '/api/me', {
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      credentials: 'include',
+      cache: 'no-store',
+      signal: AbortSignal.timeout(4000),
+    });
+    if (r.status === 401) { localStorage.removeItem('brias_token'); return true; }
+    if (r.ok) {
+      const d = await r.json();
+      // Token still valid — auto-redirect without user interaction
+      if (d.logged_in) { window.location.href = 'chat.html'; return true; }
+    }
+    return true; // server reachable, not logged in
+  } catch { return false; }
+}
 function setOffline(off) {
   const os = document.getElementById('offlineState');
   const steps = document.querySelectorAll('.step');
@@ -437,6 +455,7 @@ function setOffline(off) {
     os.classList.remove('visible');
     document.getElementById('step1').classList.remove('hidden');
     if (offlineTimer) { clearInterval(offlineTimer); offlineTimer = null; }
+    initGoogle();
   }
 }
 
@@ -564,33 +583,20 @@ async function handleGoogleAuth(response) {
 }
 
 (async function() {
-  // Profile setup redirect from app pages — skip all auth checks
   if (new URLSearchParams(window.location.search).get('action') === 'setup-profile') {
     showStep(3); initGoogle(); return;
   }
 
-  // Fast local check — no token means definitely not logged in
   const token = localStorage.getItem('brias_token');
-  if (!token) {
-    document.getElementById('step1').classList.remove('hidden');
-    initGoogle(); return;
-  }
-
-  const online = await checkOnline();
-  if (!online) { setOffline(true); return; }
-
   try {
     const r = await fetch(API + '/api/me', {
-      headers: { 'Authorization': `Bearer ${token}` },
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {},
       credentials: 'include',
       cache: 'no-store',
+      signal: AbortSignal.timeout(5000),
     });
-    if (r.status === 401) {
-      localStorage.removeItem('brias_token');
-      document.getElementById('step1').classList.remove('hidden');
-      initGoogle(); return;
-    }
-    if (r.ok) {
+    if (r.status === 401) { localStorage.removeItem('brias_token'); }
+    else if (r.ok) {
       const d = await r.json();
       if (d.logged_in) {
         if (d.email) localStorage.setItem('brias_email', d.email);
@@ -600,9 +606,14 @@ async function handleGoogleAuth(response) {
         window.location.href = 'chat.html'; return;
       }
     }
-  } catch {}
-  document.getElementById('step1').classList.remove('hidden');
-  initGoogle();
+    // Server reachable, not logged in
+    document.getElementById('step1').classList.remove('hidden');
+    initGoogle();
+  } catch(e) {
+    // Server offline — show offline state and start polling
+    // checkOnline() will auto-redirect to chat.html when token is valid again
+    setOffline(true);
+  }
 })();
 </script>
 </body>
