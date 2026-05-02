@@ -22,14 +22,14 @@
 
 /* Click/active scale feedback on interactive elements */
 .submit-btn:active:not(:disabled),
-.save-btn:active:not(:disabled)    { transform: translateZ(0) scale(0.97); transition: transform 80ms cubic-bezier(0.4,0,1,1); }
-.pmodal-save:active:not(:disabled) { transform: translateZ(0) scale(0.97); transition: transform 80ms cubic-bezier(0.4,0,1,1); }
-.pmodal-cancel:active              { transform: translateZ(0) scale(0.97); transition: transform 80ms cubic-bezier(0.4,0,1,1); }
-.google-btn:active                 { transform: translateZ(0) scale(0.97); transition: transform 80ms cubic-bezier(0.4,0,1,1); }
-.sidebar-today:active              { transform: translateZ(0) scale(0.98); transition: transform 80ms cubic-bezier(0.4,0,1,1); }
+.save-btn:active:not(:disabled)    { transform: scale(0.97); transition-duration: 80ms; }
+.pmodal-save:active:not(:disabled) { transform: scale(0.97); transition-duration: 80ms; }
+.pmodal-cancel:active              { transform: scale(0.97); transition-duration: 80ms; }
+.google-btn:active                 { transform: scale(0.97); transition-duration: 80ms; }
+.sidebar-today:active              { transform: scale(0.98); transition-duration: 80ms; }
 .bn-today:active,
-.bn-btn:active                     { transform: translateZ(0) scale(0.97); transition: transform 80ms cubic-bezier(0.4,0,1,1); }
-.send-btn:active:not(:disabled)    { transform: translateZ(0) scale(0.97); transition: transform 80ms cubic-bezier(0.4,0,1,1); }
+.bn-btn:active                     { transform: scale(0.97); transition-duration: 80ms; }
+.send-btn:active:not(:disabled)    { transform: scale(0.97); transition-duration: 80ms; }
 
 /* Minimum 44×44px touch target for hamburger menu */
 .menu-btn { width: 44px; height: 44px; }
