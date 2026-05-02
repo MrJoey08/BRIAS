@@ -435,6 +435,9 @@ const EASE_DECELERATE = 'cubic-bezier(0, 0, 0.2, 1)';
 
 async function dismissOfflineCard() {
   offlineCardDismissed = true;
+  // §6.4 ensure fonts are loaded before we animate text out of view
+  if ('fonts' in document) await document.fonts.ready;
+
   const card = document.querySelector('.of-card');
   const overlay = document.getElementById('offlineCard');
   const typingBar = document.getElementById('inputBox');

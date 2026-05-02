@@ -21,6 +21,7 @@
 .input-box,
 .send-btn,
 .of-card,
+.of-dismiss,
 .offline-card-content {
   transform: translateZ(0);
   backface-visibility: hidden;
