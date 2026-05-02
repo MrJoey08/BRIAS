@@ -39,15 +39,27 @@ body{background:var(--bg);display:flex;flex-direction:column;align-items:center;
 <script src="assets/js/config.js"></script>
 <script>
 async function init() {
+  const token = localStorage.getItem('brias_token');
+  if (!token) { window.location.href = 'login.html'; return; }
   try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 5000);
     const r = await fetch(API + '/api/me', {
+      headers: { 'Authorization': `Bearer ${token}` },
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      signal: AbortSignal.timeout(3000),
+      cache: 'no-store',
+      signal: ctrl.signal,
     });
-    const d = await r.json();
-    if (d.logged_in) { window.location.href = 'chat.html'; return; }
-  } catch(e) {}
+    clearTimeout(tid);
+    if (r.status === 401) { localStorage.removeItem('brias_token'); window.location.href = 'login.html'; return; }
+    if (r.ok) {
+      const d = await r.json();
+      if (d.logged_in) { window.location.href = 'chat.html'; return; }
+    }
+  } catch(e) {
+    // Network error — token exists, so go to chat.html (handles connection errors gracefully)
+    window.location.href = 'chat.html'; return;
+  }
   window.location.href = 'login.html';
 }
 

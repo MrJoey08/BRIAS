@@ -862,7 +862,6 @@ body.light .sheet-arr{border-color:rgba(80,40,20,.12);color:var(--text-sub);}
 body.light .sheet-d.e{color:rgba(46,31,24,.1);}
 .sheet-d.tod{background:rgba(232,118,74,.1);color:var(--orange);font-weight:500;border:1px solid rgba(232,118,74,.2);}
 .sheet-d.sel{background:var(--grad)!important;color:#fff!important;font-weight:500;}
-
 </style>
 </head>
 <body>
@@ -1186,7 +1185,18 @@ body.light .sheet-d.e{color:rgba(46,31,24,.1);}
 
 // ── Auth + user profile ──
 let meData = null;
-function api(path, opts={}){return fetch(API+path,{...opts,credentials:'include',headers:{'Content-Type':'application/json',...(opts.headers||{})}});}
+function api(path, opts={}) {
+  const token = localStorage.getItem('brias_token');
+  return fetch(API+path, {
+    ...opts,
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? {'Authorization': `Bearer ${token}`} : {}),
+      ...(opts.headers||{}),
+    },
+  });
+}
 function profileName(){ return meData?.display_name || localStorage.getItem('brias_display_name') || ''; }
 
 // Init shell with cached data so drawer shows immediately
@@ -1198,16 +1208,27 @@ SHELL.init({
 
 async function doLogout(){
   try{ await api('/api/logout',{method:'POST'}); }catch{}
-  ['brias_username','brias_email','brias_display_name','brias_age'].forEach(k=>localStorage.removeItem(k));
+  ['brias_token','brias_username','brias_email','brias_display_name','brias_age'].forEach(k=>localStorage.removeItem(k));
   window.location.href='login.html';
 }
 
 (async function(){
+  const token = localStorage.getItem('brias_token');
+  if (!token) { window.location.href = 'login.html'; return; }
   try{
-    const r=await fetch(API+'/api/me',{credentials:'include',cache:'no-store'});
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 8000);
+    const r=await fetch(API+'/api/me',{
+      headers:{'Authorization':`Bearer ${token}`},
+      credentials:'include',
+      cache:'no-store',
+      signal:ctrl.signal,
+    });
+    clearTimeout(tid);
+    if(r.status===401){localStorage.removeItem('brias_token');window.location.href='login.html';return;}
     if(!r.ok){window.location.href='login.html';return;}
     const d=await r.json();
-    if(!d.logged_in){window.location.href='login.html';return;}
+    if(!d.logged_in){localStorage.removeItem('brias_token');window.location.href='login.html';return;}
     if(!d.profile_done){window.location.href='login.html?action=setup-profile';return;}
     meData=d;
     if(d.username)localStorage.setItem('brias_username',d.username);
@@ -1215,7 +1236,9 @@ async function doLogout(){
     if(d.display_name)localStorage.setItem('brias_display_name',d.display_name);
     if(d.age!=null)localStorage.setItem('brias_age',String(d.age));
     SHELL.updateUser(meData);
-  }catch(e){}
+  }catch(e){
+    window.location.href='login.html';
+  }
 })();
 
 

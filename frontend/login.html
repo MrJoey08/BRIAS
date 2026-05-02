@@ -373,7 +373,16 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
 let mode = 'login', offlineTimer = null, googleClientId = '';
 
 function api(path, opts = {}) {
-  return fetch(API + path, { ...opts, credentials: 'include', headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) } });
+  const token = localStorage.getItem('brias_token');
+  return fetch(API + path, {
+    ...opts,
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+      ...(opts.headers || {}),
+    },
+  });
 }
 
 // ── WebGL glow ──
@@ -417,8 +426,25 @@ function startTypewriter(elId) {
 startTypewriter('twText');
 document.getElementById('twWrap').style.display = 'none';
 
-// ── Offline ──
-async function checkOnline() { try { await fetch(API+'/health', { method:'GET', signal:AbortSignal.timeout(3000) }); return true; } catch { return false; } }
+// ── Offline / polling ──
+async function checkOnline() {
+  const token = localStorage.getItem('brias_token');
+  try {
+    const r = await fetch(API + '/api/me', {
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      credentials: 'include',
+      cache: 'no-store',
+      signal: AbortSignal.timeout(4000),
+    });
+    if (r.status === 401) { localStorage.removeItem('brias_token'); return true; }
+    if (r.ok) {
+      const d = await r.json();
+      // Token still valid — auto-redirect without user interaction
+      if (d.logged_in) { window.location.href = 'chat.html'; return true; }
+    }
+    return true; // server reachable, not logged in
+  } catch { return false; }
+}
 function setOffline(off) {
   const os = document.getElementById('offlineState');
   const steps = document.querySelectorAll('.step');
@@ -430,6 +456,7 @@ function setOffline(off) {
     os.classList.remove('visible');
     document.getElementById('step1').classList.remove('hidden');
     if (offlineTimer) { clearInterval(offlineTimer); offlineTimer = null; }
+    initGoogle();
   }
 }
 
@@ -498,7 +525,7 @@ async function doStep1() {
     const r = await api(mode === 'login' ? '/api/login' : '/api/register', { method:'POST', body:JSON.stringify({contact:c,password:p}) });
     const d = await r.json();
     if (!r.ok) { showErr(1, d.detail || 'Something went wrong'); return; }
-    // Token is set as httpOnly cookie by the server — not stored in localStorage
+    if (d.token) localStorage.setItem('brias_token', d.token);
     localStorage.setItem('brias_username', d.username);
     localStorage.setItem('brias_email', c);
     if (!d.profile_complete) { showStep(3); return; }
@@ -557,26 +584,37 @@ async function handleGoogleAuth(response) {
 }
 
 (async function() {
-  const online = await checkOnline();
-  if (!online) { setOffline(true); return; }
+  if (new URLSearchParams(window.location.search).get('action') === 'setup-profile') {
+    showStep(3); initGoogle(); return;
+  }
 
-  // If chat.html redirected here for profile setup, skip the "go back to chat" check
-  const needsProfileSetup = new URLSearchParams(window.location.search).get('action') === 'setup-profile';
-  if (needsProfileSetup) { showStep(3); initGoogle(); return; }
-
+  const token = localStorage.getItem('brias_token');
   try {
-    const r = await fetch(API + '/api/me', { credentials: 'include', cache: 'no-store' });
-    const d = await r.json();
-    if (d.logged_in) {
-      if (d.email) localStorage.setItem('brias_email', d.email);
-      if (d.display_name) localStorage.setItem('brias_display_name', d.display_name);
-      if (d.age!=null) localStorage.setItem('brias_age', String(d.age));
-      if (!d.profile_done) { showStep(3); initGoogle(); return; }
-      window.location.href = 'chat.html'; return;
+    const r = await fetch(API + '/api/me', {
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      credentials: 'include',
+      cache: 'no-store',
+      signal: AbortSignal.timeout(5000),
+    });
+    if (r.status === 401) { localStorage.removeItem('brias_token'); }
+    else if (r.ok) {
+      const d = await r.json();
+      if (d.logged_in) {
+        if (d.email) localStorage.setItem('brias_email', d.email);
+        if (d.display_name) localStorage.setItem('brias_display_name', d.display_name);
+        if (d.age != null) localStorage.setItem('brias_age', String(d.age));
+        if (!d.profile_done) { showStep(3); initGoogle(); return; }
+        window.location.href = 'chat.html'; return;
+      }
     }
-  } catch {}
-  document.getElementById('step1').classList.remove('hidden');
-  initGoogle();
+    // Server reachable, not logged in
+    document.getElementById('step1').classList.remove('hidden');
+    initGoogle();
+  } catch(e) {
+    // Server offline — show offline state and start polling
+    // checkOnline() will auto-redirect to chat.html when token is valid again
+    setOffline(true);
+  }
 })();
 </script>
 </body>

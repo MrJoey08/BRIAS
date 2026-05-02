@@ -253,11 +253,13 @@ const SHELL = (() => {
   }
 
   function _api(path, opts = {}) {
+    const token = localStorage.getItem('brias_token');
     return fetch(API + path, {
       ...opts,
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         ...(opts.headers || {}),
       },
     });
@@ -551,7 +553,7 @@ const SHELL = (() => {
   async function logout() {
     if (_logoutFn) { _logoutFn(); return; }
     try { await _api('/api/logout', { method: 'POST' }); } catch {}
-    ['brias_username','brias_email','brias_display_name','brias_age'].forEach(k => localStorage.removeItem(k));
+    ['brias_token','brias_username','brias_email','brias_display_name','brias_age'].forEach(k => localStorage.removeItem(k));
     window.location.href = 'login.html';
   }
 
