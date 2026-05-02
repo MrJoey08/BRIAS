@@ -687,7 +687,7 @@ delete.
 
 ## 12. When to break these rules
 
-Almost never. But three legitimate exceptions:
+Almost never. But four legitimate exceptions:
 
 - **Celebratory moments** (first message sent, milestone reached) may
   use `--ease-bounce-gentle` and brief tier-elevation for an element.
@@ -697,5 +697,10 @@ Almost never. But three legitimate exceptions:
 - **The first 500ms of a new user's first session** may use slightly
   more pronounced motion to communicate "this thing is alive". After
   that, return to normal restraint.
+- **Toggle components** may use tighter overshoot curves (1.2–1.4
+  range) than `--ease-snappy` when the standard curve feels too bouncy
+  for the click metaphor. The toggle knob (`cubic-bezier(0.34,1.4,0.6,1)`)
+  and theme-switch pill (`cubic-bezier(0.34,1.2,0.6,1)`) are the only
+  current instances. Do not extend this to other components.
 
-If you're considering a fourth exception, the answer is no.
+If you're considering a fifth exception, the answer is no.
