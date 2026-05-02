@@ -71,14 +71,16 @@ body.light .settings-overlay{background:rgba(228,214,199,.97);}
 /* Toggle */
 .toggle{width:42px;height:23px;border-radius:12px;background:rgba(255,255,255,.1);position:relative;transition:background .28s cubic-bezier(0.25,0.46,0.45,0.94);flex-shrink:0;}
 .toggle.on{background:var(--grad);}
-.toggle::after{content:'';position:absolute;width:17px;height:17px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .26s cubic-bezier(0.34,1.56,0.64,1),background .28s cubic-bezier(0.25,0.46,0.45,0.94),box-shadow .28s cubic-bezier(0.25,0.46,0.45,0.94);box-shadow:0 1px 4px rgba(0,0,0,.3);}
+/* Component-specific overshoot — intentional deviation from --ease-snappy for tactile toggle feel */
+.toggle::after{content:'';position:absolute;width:17px;height:17px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .26s cubic-bezier(0.34,1.4,0.6,1),background .28s cubic-bezier(0.25,0.46,0.45,0.94),box-shadow .28s cubic-bezier(0.25,0.46,0.45,0.94);box-shadow:0 1px 4px rgba(0,0,0,.3);}
 .toggle.on::after{left:22px;background:#1a161a;box-shadow:none;}
 body.light .toggle.on::after{left:22px;background:#ddc9b3;box-shadow:none;}
 
 /* Theme toggle */
 .theme-toggle{display:flex;position:relative;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:3px;gap:0;transition:background .45s cubic-bezier(0.32,0.72,0,1),border-color .45s cubic-bezier(0.32,0.72,0,1);}
 body.light .theme-toggle{background:rgba(80,40,20,.06);}
-.theme-toggle-pill{position:absolute;top:3px;left:3px;width:calc(50% - 3px);height:calc(100% - 6px);background:rgba(255,255,255,.08);border-radius:9px;transition:left .28s cubic-bezier(0.34,1.56,0.64,1);}
+/* Component-specific overshoot — intentional deviation from --ease-snappy for tactile toggle feel */
+.theme-toggle-pill{position:absolute;top:3px;left:3px;width:calc(50% - 3px);height:calc(100% - 6px);background:rgba(255,255,255,.08);border-radius:9px;transition:left .28s cubic-bezier(0.34,1.2,0.6,1);}
 body.light .theme-toggle-pill{background:rgba(80,40,20,.1);}
 .theme-toggle.pill-right .theme-toggle-pill{left:calc(50%);}
 .theme-opt{position:relative;z-index:1;display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:9px;font-size:12px;color:var(--text-muted);transition:color .22s cubic-bezier(0.25,0.46,0.45,0.94);white-space:nowrap;}

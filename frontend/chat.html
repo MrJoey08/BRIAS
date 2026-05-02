@@ -234,17 +234,22 @@ body.light .stop-sq{background:rgba(30,12,0,.4);}
   <div class="messages" id="msgContainer">
     <div id="offlineCard" class="visible">
       <div class="of-card">
-        <div class="of-top">
-          <div class="of-brand">BRIAS</div>
-          <div class="of-tagline">What's on your mind?</div>
-        </div>
-        <div class="of-bottom">
-          <div class="of-sweep"><div class="of-sweep-fill"></div></div>
-          <div class="of-msg">
-            <div class="of-msg-title">Unavailable right now</div>
-            <div class="of-msg-sub">BRIAS is having her moment.<br>She should be back soon.</div>
+        <button class="of-dismiss" onclick="dismissOfflineCard()" aria-label="Sluiten">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="1" y1="1" x2="9" y2="9"/><line x1="9" y1="1" x2="1" y2="9"/></svg>
+        </button>
+        <div class="offline-card-content">
+          <div class="of-top">
+            <div class="of-brand">BRIAS</div>
+            <div class="of-tagline">What's on your mind?</div>
           </div>
-          <div class="of-sweep"><div class="of-sweep-fill"></div></div>
+          <div class="of-bottom">
+            <div class="of-sweep"><div class="of-sweep-fill"></div></div>
+            <div class="of-msg">
+              <div class="of-msg-title">Unavailable right now</div>
+              <div class="of-msg-sub">BRIAS is having her moment.<br>She should be back soon.</div>
+            </div>
+            <div class="of-sweep"><div class="of-sweep-fill"></div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -272,7 +277,7 @@ body.light .stop-sq{background:rgba(30,12,0,.4);}
 <script src="assets/js/shell.js"></script>
 <script src="assets/js/interactions.js" defer></script>
 <script>
-let activeChatId = null, isStreaming = false, meData = null;
+let activeChatId = null, isStreaming = false, meData = null, offlineCardDismissed = false;
 
 // Apply saved theme immediately
 if (localStorage.getItem('brias_theme')==='light') document.body.classList.add('light');
@@ -285,7 +290,16 @@ SHELL.init({
 }, { logout: doLogout });
 
 function api(path, opts={}) {
-  return fetch(API+path, {...opts, credentials:'include', headers:{'Content-Type':'application/json',...(opts.headers||{})}});
+  const token = localStorage.getItem('brias_token');
+  return fetch(API+path, {
+    ...opts,
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? {'Authorization': `Bearer ${token}`} : {}),
+      ...(opts.headers||{}),
+    },
+  });
 }
 
 async function init() {
@@ -294,18 +308,28 @@ async function init() {
   if (!token) { window.location.href = 'login.html'; return; }
 
   try {
-    const r = await fetch(API+'/api/me', {credentials:'include', cache:'no-store'});
-    if (!r.ok) { window.location.href='login.html'; return; }
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 8000);
+    const r = await fetch(API+'/api/me', {
+      headers: {'Authorization': `Bearer ${token}`},
+      credentials: 'include',
+      cache: 'no-store',
+      signal: ctrl.signal,
+    });
+    clearTimeout(tid);
+
+    if (r.status === 401) { localStorage.removeItem('brias_token'); window.location.href = 'login.html'; return; }
+    if (!r.ok) { window.location.href = 'login.html'; return; }
     meData = await r.json();
-    if (!meData.logged_in) { window.location.href='login.html'; return; }
-    if (!meData.profile_done) { window.location.href='login.html?action=setup-profile'; return; }
+    if (!meData.logged_in) { localStorage.removeItem('brias_token'); window.location.href = 'login.html'; return; }
+    if (!meData.profile_done) { window.location.href = 'login.html?action=setup-profile'; return; }
     if (meData.email) localStorage.setItem('brias_email', meData.email);
     if (meData.display_name) localStorage.setItem('brias_display_name', meData.display_name);
     if (meData.age!=null) localStorage.setItem('brias_age', String(meData.age));
     if (meData.username) localStorage.setItem('brias_username', meData.username);
     SHELL.updateUser(meData);
   } catch(e) {
-    return;
+    window.location.href = 'login.html'; return;
   }
   try {
     const chats = await api('/api/chats').then(r=>r.json());
@@ -488,13 +512,19 @@ function setOffline(off) {
   const inp = document.getElementById('msgInput');
   const btn = document.getElementById('actionBtn');
   if (off) {
-    overlay.classList.add('visible');
-    if (inner) inner.style.display = 'none';
-    inp.disabled = true; inp.placeholder = '';
+    if (!offlineCardDismissed) {
+      overlay.classList.add('visible');
+      if (inner) inner.style.display = 'none';
+      inp.placeholder = '';
+    }
+    inp.disabled = true;
   } else {
-    overlay.classList.remove('visible');
+    if (!offlineCardDismissed) {
+      overlay.classList.remove('visible');
+    }
     if (inner) inner.style.display = '';
-    inp.disabled = false; inp.placeholder = "I'm here.";
+    inp.disabled = false;
+    inp.placeholder = "I'm here.";
     btn.disabled = false;
   }
 }
