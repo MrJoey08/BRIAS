@@ -226,6 +226,8 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
 .switch-text a:hover{text-decoration:underline;text-underline-offset:3px;}
 .step-resend{text-align:center;margin-top:14px;font-size:13px;font-weight:300;color:var(--text-muted);}
 .step-resend a{color:var(--orange);cursor:pointer;text-decoration:none;}
+/* Pass 8 wiring: T3 text link — underline hover matches .switch-text a */
+.step-resend a:hover{text-decoration:underline;text-underline-offset:3px;}
 
 .step{animation:fadeUp .3s cubic-bezier(0.32,0.72,0,1);}
 .hidden{display:none!important;}
@@ -260,13 +262,16 @@ canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
 .divider{display:flex;align-items:center;gap:10px;margin:18px 0 12px;}
 .divider-line{flex:1;height:1px;background:rgba(255,255,255,.07);}
 .divider-text{font-size:12px;font-weight:300;color:var(--text-muted);}
+/* Pass 8 wiring: §7.1 T1 lift pattern on google-btn */
 .google-btn{
   width:100%;padding:13px 16px;border:1px solid rgba(255,255,255,.1);border-radius:14px;
   background:rgba(255,255,255,.04);color:var(--text);font-family:var(--font);font-size:14px;font-weight:300;
   cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
-  transition:background .18s cubic-bezier(0.25,0.46,0.45,0.94),border-color .18s cubic-bezier(0.25,0.46,0.45,0.94);
+  transition:background .18s cubic-bezier(0.25,0.46,0.45,0.94),border-color .18s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft),box-shadow var(--duration-quick) var(--ease-spring-soft);
+  transform:translateZ(0);transform-origin:center;
 }
-.google-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);}
+.google-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);transform:translateZ(0) scale(1.02) translateY(-1px);box-shadow:0 4px 20px rgba(0,0,0,.22);}
+.google-btn:active{transform:translateZ(0) scale(.97);transition-duration:var(--duration-instant);box-shadow:none;}
 .google-btn svg{flex-shrink:0;}
 .pwd-reqs{
   margin:-4px 0 12px;padding:11px 14px;
@@ -629,6 +634,12 @@ document.addEventListener('DOMContentLoaded', () => {
   /* Pass 7 wiring: §7.3 ripple delegation on all .submit-btn clicks (tier-1 CTA) */
   document.addEventListener('click', e => {
     const btn = e.target.closest('.submit-btn');
+    if (btn) emitRipple(e, btn);
+  }, { passive: true });
+
+  /* Pass 8 wiring: §7.3 ripple on T1 google-btn */
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.google-btn');
     if (btn) emitRipple(e, btn);
   }, { passive: true });
 });
