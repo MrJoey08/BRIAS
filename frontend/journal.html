@@ -708,7 +708,7 @@ function renderYearSection(){
         <span>${y}</span>
         <div style="display:flex;align-items:center;gap:6px;">
           ${yearHasEntry?'<div class="year-dot"></div>':''}
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="transition:transform .2s;transform:rotate(${isOpen?'90':'0'}deg)"><polyline points="9 18 15 12 9 6"/></svg>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="transition:transform .2s cubic-bezier(0.25,0.46,0.45,0.94);transform:rotate(${isOpen?'90':'0'}deg)"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
       </div>`;
     if(isOpen){
