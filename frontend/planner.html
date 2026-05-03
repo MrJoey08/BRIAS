@@ -85,7 +85,6 @@ body.light canvas{opacity:0;}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 @keyframes contentSwap{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
-@keyframes modalIn{from{opacity:0;transform:translateY(16px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
 
 
 /* ── App shell ── */
@@ -331,6 +330,8 @@ body.light .bn-cal-btn{border-color:rgba(232,118,74,.25);background:rgba(232,118
 .history-list{padding:10px 14px 14px;}
 .history-item{padding:10px 12px;border-radius:10px;margin-bottom:5px;background:rgba(255,255,255,.03);}
 body.light .history-item{background:rgba(80,40,20,.04);}
+.scroll-reveal{opacity:0;transform:translateY(16px);transition:opacity 480ms var(--ease-smooth),transform 480ms var(--ease-smooth);}
+.scroll-reveal.revealed{opacity:1;transform:translateY(0);}
 .history-item-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
 .history-item-type{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim);font-weight:500;}
 .history-item-date{font-size:10.5px;color:var(--text-dim);}
@@ -500,16 +501,33 @@ body.light .cal-cell.today-col{background:rgba(232,118,74,.06);}
 /* ── Modal ── */
 .modal-backdrop{
   position:fixed;inset:0;z-index:60;background:rgba(8,6,8,.75);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  display:none;align-items:center;justify-content:center;padding:20px;
+  backdrop-filter:blur(0px);-webkit-backdrop-filter:blur(0px);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity 420ms var(--ease-smooth),backdrop-filter 420ms var(--ease-smooth),-webkit-backdrop-filter 420ms var(--ease-smooth);
 }
-.modal-backdrop.open{display:flex;}
+.modal-backdrop.open{
+  opacity:1;visibility:visible;pointer-events:all;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+.modal-backdrop.closing{
+  opacity:0;pointer-events:none;
+  backdrop-filter:blur(0px);-webkit-backdrop-filter:blur(0px);
+  transition:opacity 320ms var(--ease-accelerate),backdrop-filter 320ms var(--ease-accelerate),-webkit-backdrop-filter 320ms var(--ease-accelerate);
+}
 body.light .modal-backdrop{background:rgba(30,12,0,.4);}
+body.modal-open canvas{animation-play-state:paused;}
 .modal{
   background:var(--sidebar);border:1px solid var(--border2);border-radius:20px;
   width:100%;max-width:460px;display:flex;flex-direction:column;
-  animation:modalIn .3s cubic-bezier(0.32,0.72,0,1);
   max-height:90vh;overflow:hidden;
+  opacity:0;transform:scale(0.94);
+  transition:opacity 420ms var(--ease-snappy),transform 420ms var(--ease-snappy);
+}
+.modal-backdrop.open .modal{opacity:1;transform:scale(1);}
+.modal-backdrop.closing .modal{
+  opacity:0;transform:scale(0.94);
+  transition:opacity 320ms var(--ease-accelerate),transform 320ms var(--ease-accelerate);
 }
 .modal-header{padding:20px 22px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .modal-title{font-family:var(--font-display);font-size:20px;font-style:italic;font-weight:400;color:var(--text-sub);}
@@ -820,17 +838,27 @@ body.light .psc-d.e{color:rgba(46,31,24,.1);}
 .psc-all-chip.active{background:rgba(232,118,74,.06);border-color:rgba(232,118,74,.3);color:var(--orange);}
 
 /* ── Mobile calendar sheet ── */
-.cal-backdrop-m{display:none;position:fixed;inset:0;z-index:24;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);}
-.cal-backdrop-m.open{display:block;}
+.cal-backdrop-m{
+  position:fixed;inset:0;z-index:24;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity 320ms var(--ease-smooth);
+}
+.cal-backdrop-m.open{opacity:1;visibility:visible;pointer-events:all;}
+.cal-backdrop-m.closing{opacity:0;pointer-events:none;transition:opacity 240ms var(--ease-accelerate);}
 .cal-sheet{
-  display:none;position:fixed;bottom:88px;left:0;right:0;z-index:25;
+  position:fixed;bottom:88px;left:0;right:0;z-index:25;
   background:rgba(16,12,14,.98);backdrop-filter:blur(32px);-webkit-backdrop-filter:blur(32px);
   border:1px solid var(--border2);border-radius:20px 20px 0 0;
   padding:16px 16px 28px;
+  transform:translateY(100%);opacity:0;visibility:hidden;pointer-events:none;
+  transition:transform 320ms var(--ease-smooth),opacity 320ms var(--ease-smooth);
 }
 body.light .cal-sheet{background:var(--sidebar);}
-.cal-sheet.open{display:block;animation:slideUp .28s cubic-bezier(0.32,0.72,0,1);}
-@keyframes slideUp{from{transform:translateY(100%);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.cal-sheet.open{transform:translateY(0);opacity:1;visibility:visible;pointer-events:all;}
+.cal-sheet.closing{
+  transform:translateY(100%);opacity:0;pointer-events:none;
+  transition:transform 240ms var(--ease-accelerate),opacity 240ms var(--ease-accelerate);
+}
 .cal-sheet-handle{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,.15);margin:0 auto 16px;}
 body.light .cal-sheet-handle{background:rgba(80,40,20,.2);}
 .sheet-cal-header{
@@ -1385,6 +1413,29 @@ function filteredCards(){
   return cards;
 }
 
+// ── Scroll reveals (§7.8) ──
+let _sidebarRevealDone = false;
+function initScrollReveals(container, selector) {
+  const items = container.querySelectorAll(selector);
+  if (!items.length) return;
+  items.forEach((el, i) => {
+    el.classList.add('scroll-reveal');
+    el.style.transitionDelay = `${Math.round(60 * Math.sqrt(i))}ms`;
+  });
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        el.classList.add('revealed');
+        el.style.transitionDelay = '';
+        el.addEventListener('transitionend', () => el.classList.remove('scroll-reveal', 'revealed'), { once: true });
+        obs.unobserve(el);
+      }
+    });
+  }, { rootMargin: '-10% 0px', threshold: 0 });
+  items.forEach(el => obs.observe(el));
+}
+
 // ── Sidebar ──
 function renderSidebar(){
   const list=document.getElementById('cardList');
@@ -1410,6 +1461,7 @@ function renderSidebar(){
       </div>
     </div>`;
   }).join('');
+  if (!_sidebarRevealDone) { initScrollReveals(list, '.card-item'); _sidebarRevealDone = true; }
 }
 
 // ── Card detail ──
@@ -1568,6 +1620,22 @@ function deleteCard(id){
   );
 }
 
+// ── Modal helpers (§7.7) ──
+function openModal(id){
+  const el=document.getElementById(id);
+  el.classList.remove('closing');
+  el.classList.add('open');
+  document.body.classList.add('modal-open');
+}
+function closeModal(id){
+  const el=document.getElementById(id);
+  el.classList.add('closing');
+  el.addEventListener('transitionend',()=>{
+    el.classList.remove('open','closing');
+    if(!document.querySelector('.modal-backdrop.open'))document.body.classList.remove('modal-open');
+  },{once:true});
+}
+
 // ── Card Modal ──
 const PLACEHOLDERS={
   dream:'e.g. Start my own business',
@@ -1595,10 +1663,10 @@ function openCardModal(editId){
     titleEl.textContent='New card';
     saveBtn.textContent='Create card';
   }
-  modal.classList.add('open');
+  openModal('cardModal');
   setTimeout(()=>document.getElementById('cardTitleInput').focus(),100);
 }
-function closeCardModal(){document.getElementById('cardModal').classList.remove('open');}
+function closeCardModal(){closeModal('cardModal');}
 function selectType(t){
   activeCardType=t;
   document.getElementById('typeDream').classList.toggle('selected',t==='dream');
@@ -1643,10 +1711,10 @@ function saveCard(){
 function openEvalModal(id){
   evaluatingCardId=id;
   document.getElementById('evalTextInput').value='';
-  document.getElementById('evaluateModal').classList.add('open');
+  openModal('evaluateModal');
   setTimeout(()=>document.getElementById('evalTextInput').focus(),100);
 }
-function closeEvalModal(){document.getElementById('evaluateModal').classList.remove('open');}
+function closeEvalModal(){closeModal('evaluateModal');}
 function saveEvaluation(){
   const text=document.getElementById('evalTextInput').value.trim();
   if(!text)return;
@@ -1673,11 +1741,11 @@ function openEventModal(date,cardId){
   initPickers(dt.toISOString().slice(0,16));
   // Card link options
   populateCardSelect(cardId||'');
-  document.getElementById('eventModal').classList.add('open');
+  openModal('eventModal');
   setTimeout(()=>document.getElementById('evTitleInput').focus(),100);
 }
 function openEventModalForCard(cardId){openEventModal(null,cardId);}
-function closeEventModal(){document.getElementById('eventModal').classList.remove('open');}
+function closeEventModal(){closeModal('eventModal');}
 function selectEvColor(c){
   selectedEvColor=c;
   document.querySelectorAll('.color-opt').forEach(el=>el.classList.remove('selected'));
@@ -1838,15 +1906,15 @@ function briasConfirm(title, message, okLabel, cb){
   document.getElementById('confirmTitle').textContent=title;
   document.getElementById('confirmMessage').textContent=message;
   document.getElementById('confirmOkBtn').textContent=okLabel||'Delete';
-  document.getElementById('confirmModal').classList.add('open');
+  openModal('confirmModal');
 }
 function confirmOk(){
-  document.getElementById('confirmModal').classList.remove('open');
+  closeModal('confirmModal');
   if(confirmCallback)confirmCallback();
   confirmCallback=null;
 }
 function confirmCancel(){
-  document.getElementById('confirmModal').classList.remove('open');
+  closeModal('confirmModal');
   confirmCallback=null;
 }
 
@@ -2315,6 +2383,7 @@ function renderContent(){
     const card=cards.find(c=>c.id===activeCardId);
     if(card){
       scroll.innerHTML=renderCardDetail(card);
+      initScrollReveals(scroll, '.history-item');
       // Auto-resize plan textarea
       const ta=document.getElementById('planTa');
       if(ta){ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=Math.max(120,ta.scrollHeight)+'px';});if(ta.value)ta.style.height=Math.max(120,ta.scrollHeight)+'px';}
@@ -2460,13 +2529,19 @@ function toggleMobileCalSheet(){
   const btn=document.getElementById('bnCalSheet');
   if(mobileCalSheetOpen){
     sheetMonth=new Date(TODAY.getFullYear(),TODAY.getMonth(),1);
-    if(sheet)sheet.classList.add('open');
-    if(backdrop)backdrop.classList.add('open');
+    if(sheet){sheet.classList.remove('closing');sheet.classList.add('open');}
+    if(backdrop){backdrop.classList.remove('closing');backdrop.classList.add('open');}
     if(btn)btn.classList.add('active');
     renderSheetCal();
   } else {
-    if(sheet)sheet.classList.remove('open');
-    if(backdrop)backdrop.classList.remove('open');
+    if(sheet){
+      sheet.classList.add('closing');
+      sheet.addEventListener('transitionend',()=>sheet.classList.remove('open','closing'),{once:true});
+    }
+    if(backdrop){
+      backdrop.classList.add('closing');
+      backdrop.addEventListener('transitionend',()=>backdrop.classList.remove('open','closing'),{once:true});
+    }
     if(btn)btn.classList.remove('active');
   }
 }

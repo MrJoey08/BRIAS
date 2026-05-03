@@ -196,6 +196,8 @@ body.light .mini-d.e,body.light .mini-d.f{color:rgba(46,31,24,.1);}
 .year-label-btn:hover{background:var(--surface);color:var(--text-muted);}
 .year-label-btn.open{color:var(--text-sub);}
 .year-dot{width:4px;height:4px;border-radius:50%;background:rgba(232,118,74,.5);}
+.scroll-reveal{opacity:0;transform:translateY(16px);transition:opacity 480ms var(--ease-smooth),transform 480ms var(--ease-smooth);}
+.scroll-reveal.revealed{opacity:1;transform:translateY(0);}
 .month-chip{
   display:flex;align-items:center;justify-content:space-between;
   padding:7px 10px;border-radius:9px;cursor:pointer;
@@ -266,17 +268,27 @@ body.light .day-big{color:rgba(46,31,24,.08);}
 .save-btn:disabled{opacity:.25;cursor:default;transform:none;}
 
 /* ── Mobile calendar sheet ── */
-.cal-backdrop-m{display:none;position:fixed;inset:0;z-index:24;background:rgba(0,0,0,.4);}
-.cal-backdrop-m.open{display:block;}
+.cal-backdrop-m{
+  position:fixed;inset:0;z-index:24;background:rgba(0,0,0,.4);
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity 320ms var(--ease-smooth);
+}
+.cal-backdrop-m.open{opacity:1;visibility:visible;pointer-events:all;}
+.cal-backdrop-m.closing{opacity:0;pointer-events:none;transition:opacity 240ms var(--ease-accelerate);}
 .cal-sheet{
-  display:none;position:fixed;bottom:72px;left:0;right:0;z-index:25;
+  position:fixed;bottom:72px;left:0;right:0;z-index:25;
   background:rgba(16,12,14,.98);backdrop-filter:blur(32px);
   border-top:1px solid var(--border2);border-radius:20px 20px 0 0;
   padding:16px 16px 28px;
+  transform:translateY(100%);opacity:0;visibility:hidden;pointer-events:none;
+  transition:transform 320ms var(--ease-smooth),opacity 320ms var(--ease-smooth);
 }
 body.light .cal-sheet{background:var(--sidebar);}
-.cal-sheet.open{display:block;animation:slideUp .25s cubic-bezier(0.32,0.72,0,1);}
-@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.cal-sheet.open{transform:translateY(0);opacity:1;visibility:visible;pointer-events:all;}
+.cal-sheet.closing{
+  transform:translateY(100%);opacity:0;pointer-events:none;
+  transition:transform 240ms var(--ease-accelerate),opacity 240ms var(--ease-accelerate);
+}
 .cal-sheet-handle{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,.15);margin:0 auto 14px;cursor:grab;}
 body.light .cal-sheet-handle{background:rgba(80,40,20,.2);}
 
@@ -662,6 +674,28 @@ function renderSide(){
 
 let openYears = new Set([TODAY.getFullYear()]);
 
+// ── Scroll reveals (§7.8) ──
+function initScrollReveals(container, selector) {
+  const items = container.querySelectorAll(selector);
+  if (!items.length) return;
+  items.forEach((el, i) => {
+    el.classList.add('scroll-reveal');
+    el.style.transitionDelay = `${Math.round(60 * Math.sqrt(i))}ms`;
+  });
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        el.classList.add('revealed');
+        el.style.transitionDelay = '';
+        el.addEventListener('transitionend', () => el.classList.remove('scroll-reveal', 'revealed'), { once: true });
+        obs.unobserve(el);
+      }
+    });
+  }, { rootMargin: '-10% 0px', threshold: 0 });
+  items.forEach(el => obs.observe(el));
+}
+
 function renderYearSection(){
   const sec=document.getElementById('yearSection');
   const startYear=2025, endYear=TODAY.getFullYear();
@@ -690,6 +724,7 @@ function renderYearSection(){
     h+='</div>';
   }
   sec.innerHTML=h;
+  initScrollReveals(sec, '.month-chip');
 }
 
 function toggleYear(y){ if(openYears.has(y)) openYears.delete(y); else openYears.add(y); renderYearSection(); }
@@ -854,8 +889,20 @@ function toggleMobileCal(){
   mobileCalOpen = !mobileCalOpen;
   const sheet=document.getElementById('calSheet'), backdrop=document.getElementById('calBackdropM');
   const calBtn=document.getElementById('bnCal');
-  if(mobileCalOpen){ sheet.classList.add('open'); if(backdrop) backdrop.classList.add('open'); if(calBtn) calBtn.classList.add('cal-active'); renderSheetCal(); }
-  else { sheet.classList.remove('open'); if(backdrop) backdrop.classList.remove('open'); if(calBtn) calBtn.classList.remove('cal-active'); }
+  if(mobileCalOpen){
+    sheet.classList.remove('closing'); sheet.classList.add('open');
+    if(backdrop){backdrop.classList.remove('closing');backdrop.classList.add('open');}
+    if(calBtn)calBtn.classList.add('cal-active');
+    renderSheetCal();
+  } else {
+    sheet.classList.add('closing');
+    sheet.addEventListener('transitionend',()=>sheet.classList.remove('open','closing'),{once:true});
+    if(backdrop){
+      backdrop.classList.add('closing');
+      backdrop.addEventListener('transitionend',()=>backdrop.classList.remove('open','closing'),{once:true});
+    }
+    if(calBtn)calBtn.classList.remove('cal-active');
+  }
 }
 
 // Swipe down to close
