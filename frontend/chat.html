@@ -514,6 +514,7 @@ async function dismissOfflineCard() {
 
     resolve(m);
   }));
+  await morph.finished;
   card.style.willChange = '';
   overlay.classList.remove('visible');
 }
