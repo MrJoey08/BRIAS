@@ -94,7 +94,10 @@ body.light canvas{opacity:0;}
 .topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;transition:border-color .45s cubic-bezier(0.32,0.72,0,1);}
 .topbar-logo{font-family:var(--font-display);font-size:22px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.03em;}
 
-.menu-btn{position:absolute;left:8px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;}
+/* Pass 8 wiring: §7.1 T2 nav trigger — scale lift + active press */
+.menu-btn{position:absolute;left:8px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;transition:transform var(--duration-quick) var(--ease-spring-soft);transform:translateZ(0);}
+.menu-btn:hover{transform:translateZ(0) scale(1.05);}
+.menu-btn:active{transform:translateZ(0) scale(.92);transition-duration:var(--duration-instant);}
 .lns{display:flex;flex-direction:column;gap:5px;align-items:center;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
 .ln{display:block;width:26px;height:5px;border-radius:100px;background:var(--grad);flex-shrink:0;transition:transform .52s cubic-bezier(0.34,1.56,0.64,1),opacity .38s cubic-bezier(0.25,0.46,0.45,0.94);}
 .menu-btn.open .ln:nth-child(1){transform:translateY(5px) rotate(45deg);}
@@ -113,10 +116,13 @@ body.light canvas{opacity:0;}
   flex:1;padding:8px 4px;border-radius:10px;border:1px solid var(--border);
   display:flex;align-items:center;justify-content:center;gap:5px;
   font-family:var(--font);font-size:11px;font-weight:300;color:var(--text-muted);
-  transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94),border-color .15s cubic-bezier(0.25,0.46,0.45,0.94);
+  transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94),border-color .15s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-instant) var(--ease-spring-soft);
+  transform:translateZ(0);
 }
 .svt svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
 .svt:hover{background:var(--surface);color:var(--text-sub);}
+/* Pass 8 wiring: §7.1 T3 active press on view toggle */
+.svt:active{transform:translateZ(0) scale(.97);}
 .svt.active{background:rgba(232,118,74,.08);border-color:rgba(232,118,74,.25);color:var(--orange);}
 body.light .svt.active{background:rgba(232,118,74,.08);}
 
@@ -156,9 +162,12 @@ body.light .planner-sidebar{background:var(--sidebar);}
 .cft{
   flex:1;padding:6px 4px;border-radius:8px;
   font-family:var(--font);font-size:11px;font-weight:300;color:var(--text-muted);
-  transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94);text-align:center;
+  transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-instant) var(--ease-spring-soft);
+  text-align:center;transform:translateZ(0);
 }
 .cft:hover{background:var(--surface);color:var(--text-sub);}
+/* Pass 8 wiring: §7.1 T3 active press on card filter tab */
+.cft:active{transform:translateZ(0) scale(.97);}
 .cft.active{background:rgba(255,255,255,.06);color:var(--text);}
 body.light .cft.active{background:rgba(80,40,20,.08);color:var(--text);}
 
@@ -240,15 +249,17 @@ body.light .bn-btn{border-color:rgba(80,40,20,.12);}
 body.light .bn-today{border-color:rgba(80,40,20,.12);}
 .bn-today:hover{border-color:rgba(232,118,74,.3);color:var(--orange);}
 .bn-today.is-today{border-color:rgba(232,118,74,.35);color:var(--orange);}
+/* Pass 8 wiring: §7.1 T1 mobile new button — full lift pattern (was missing scale+shadow+translateZ) */
 .bn-new-btn{
   display:flex;align-items:center;gap:6px;
   padding:8px 18px;border-radius:13px;border:none;
   background:var(--grad);color:#fff;
   font-family:var(--font);font-size:13px;font-weight:500;
-  transition:opacity .15s cubic-bezier(0.25,0.46,0.45,0.94),transform .12s cubic-bezier(0.25,0.46,0.45,0.94);flex-shrink:0;cursor:pointer;
+  transition:opacity .15s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft),box-shadow var(--duration-quick) var(--ease-spring-soft);
+  flex-shrink:0;cursor:pointer;transform:translateZ(0);transform-origin:center;
 }
-.bn-new-btn:hover{opacity:.88;transform:translateY(-1px);}
-.bn-new-btn:active{transform:scale(.97);}
+.bn-new-btn:hover{opacity:.9;transform:translateZ(0) scale(1.02) translateY(-1px);box-shadow:0 4px 20px rgba(212,74,122,.3);}
+.bn-new-btn:active{transform:translateZ(0) scale(.97);transition-duration:var(--duration-instant);box-shadow:none;}
 .bn-cal-btn{
   width:38px;height:38px;border-radius:12px;border:1px solid rgba(232,118,74,.3);
   background:rgba(232,118,74,.08);cursor:pointer;display:flex;align-items:center;justify-content:center;
@@ -256,6 +267,8 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
 }
 body.light .bn-cal-btn{border-color:rgba(232,118,74,.25);background:rgba(232,118,74,.07);}
 .bn-cal-btn:hover{background:rgba(232,118,74,.14);border-color:rgba(232,118,74,.45);}
+/* Pass 8 wiring: §7.1 T3 active press on bottom-nav calendar toggle */
+.bn-cal-btn:active{transform:translateZ(0) scale(.95);transition:transform var(--duration-instant) var(--ease-spring-soft);}
 .bn-cal-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;}
 .bn-cal-btn.active{border-color:rgba(232,118,74,.5);background:rgba(232,118,74,.15);}
 
@@ -326,6 +339,8 @@ body.light .bn-cal-btn{border-color:rgba(232,118,74,.25);background:rgba(232,118
   transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 .linked-event-item:hover{background:rgba(255,255,255,.04);}
+/* Pass 8 wiring: §7.1 T3 active press on linked event row */
+.linked-event-item:active{transform:translateZ(0) scale(.99);transition:transform var(--duration-instant) var(--ease-spring-soft);}
 .ev-color-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .ev-color-dot.blue{background:var(--cal-blue);}
 .ev-color-dot.green{background:var(--cal-green);}
@@ -493,7 +508,9 @@ body.light .cal-cell.today-col{background:rgba(232,118,74,.06);}
   display:flex;flex-direction:column;justify-content:flex-start;gap:1px;
   border-left:3px solid;
 }
-.cal-event:hover{opacity:.85;filter:brightness(1.1);}
+.cal-event:hover{opacity:.85;filter:brightness(1.1);transform:translateZ(0) translateY(-1px);}
+/* Pass 8 wiring: §7.1 T3 active press on calendar event block */
+.cal-event:active{transform:translateZ(0) scale(.97);transition:transform var(--duration-instant) var(--ease-spring-soft);}
 .cal-event-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:400;}
 .cal-event-time{font-size:10px;opacity:.7;white-space:nowrap;}
 .cal-event.blue{background:var(--cal-blue-bg);border-left-color:var(--cal-blue);color:rgba(74,140,232,.95);}
@@ -508,8 +525,11 @@ body.light .cal-cell.today-col{background:rgba(232,118,74,.06);}
   width:20px;height:20px;border-radius:6px;background:var(--surface);
   display:none;align-items:center;justify-content:center;
   color:var(--text-dim);font-size:15px;font-weight:300;line-height:1;
+  transition:transform var(--duration-instant) var(--ease-spring-soft);
 }
 .cal-cell:hover .cal-cell-add{display:flex;}
+/* Pass 8 wiring: §7.1 T3 active press on add-event cell button */
+.cal-cell:active .cal-cell-add{transform:translate(-50%,-50%) scale(.88);}
 
 /* ── Modal ── */
 .modal-backdrop{
@@ -544,8 +564,10 @@ body.modal-open canvas{animation-play-state:paused;}
 }
 .modal-header{padding:20px 22px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .modal-title{font-family:var(--font-display);font-size:20px;font-style:italic;font-weight:400;color:var(--text-sub);}
-.modal-close{width:28px;height:28px;border-radius:9px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),color .15s cubic-bezier(0.25,0.46,0.45,0.94);}
-.modal-close:hover{background:rgba(255,255,255,.1);color:var(--text-sub);}
+/* Pass 8 wiring: §7.1 T3 modal close — scale lift hover + active press */
+.modal-close{width:28px;height:28px;border-radius:9px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),color .15s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);transform:translateZ(0);}
+.modal-close:hover{background:rgba(255,255,255,.1);color:var(--text-sub);transform:translateZ(0) scale(1.05);}
+.modal-close:active{transform:translateZ(0) scale(.88);transition-duration:var(--duration-instant);}
 .modal-close svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;}
 body.light .modal-close{background:rgba(80,40,20,.06);}
 body.light .modal-close:hover{background:rgba(80,40,20,.12);}
@@ -575,7 +597,8 @@ textarea.form-input{resize:none;line-height:1.7;font-family:var(--font-serif);}
 
 /* Custom date/time picker */
 .dt-row{display:flex;gap:5px;}
-.dt-btn{
+/* Pass 8 wiring: §7.1 T3 active press on dt-btn, dt-picker-arr, time-arr, time-preset, dur-adj, dur-preset */
+.dt-btn:active{transform:translateZ(0) scale(.97);}
   flex:1;display:flex;align-items:center;gap:5px;
   background:var(--input-bg);border:1px solid var(--input-border);
   border-radius:11px;padding:10px 14px;
@@ -594,9 +617,11 @@ textarea.form-input{resize:none;line-height:1.7;font-family:var(--font-serif);}
 .dt-picker-arr{
   width:28px;height:28px;border-radius:8px;background:transparent;border:none;
   display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-muted);
-  transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94);
+  transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-instant) var(--ease-spring-soft);
+  transform:translateZ(0);
 }
 .dt-picker-arr:hover{background:var(--surface);color:var(--text-sub);}
+.dt-picker-arr:active{transform:translateZ(0) scale(.88);}
 .dt-picker-arr svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;}
 .dt-picker-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
 .dp-lbl{font-size:9px;color:var(--text-dim);text-align:center;padding-bottom:6px;letter-spacing:.06em;text-transform:uppercase;}
@@ -615,9 +640,11 @@ textarea.form-input{resize:none;line-height:1.7;font-family:var(--font-serif);}
 .time-arr{
   width:32px;height:28px;border-radius:8px;background:transparent;border:1px solid var(--border);
   display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-muted);
-  transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94);
+  transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-instant) var(--ease-spring-soft);
+  transform:translateZ(0);
 }
 .time-arr:hover{background:var(--surface);color:var(--text-sub);}
+.time-arr:active{transform:translateZ(0) scale(.88);}
 .time-arr svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;}
 .time-val{
   font-family:var(--font-display);font-size:28px;font-weight:400;font-style:italic;
@@ -628,9 +655,11 @@ textarea.form-input{resize:none;line-height:1.7;font-family:var(--font-serif);}
 .time-preset{
   padding:5px 9px;border-radius:8px;border:1px solid var(--border);
   background:transparent;cursor:pointer;font-family:var(--font);font-size:11px;
-  font-weight:300;color:var(--text-muted);transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),border-color .15s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94);
+  font-weight:300;color:var(--text-muted);transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),border-color .15s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-instant) var(--ease-spring-soft);
+  transform:translateZ(0);
 }
 .time-preset:hover{background:var(--surface);color:var(--text-sub);border-color:var(--border2);}
+.time-preset:active{transform:translateZ(0) scale(.95);}
 .time-preset.active{background:rgba(232,118,74,.08);border-color:rgba(232,118,74,.3);color:var(--orange);}
 /* Duration picker */
 .dur-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
@@ -638,10 +667,11 @@ textarea.form-input{resize:none;line-height:1.7;font-family:var(--font-serif);}
   width:34px;height:34px;border-radius:10px;border:1px solid var(--border);
   background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;
   color:var(--text-muted);font-size:20px;font-weight:200;line-height:1;
-  transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),border-color .15s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94);flex-shrink:0;
-  font-family:var(--font);
+  transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),border-color .15s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-instant) var(--ease-spring-soft);
+  flex-shrink:0;font-family:var(--font);transform:translateZ(0);
 }
 .dur-adj:hover{background:var(--surface);color:var(--orange);border-color:rgba(232,118,74,.3);}
+.dur-adj:active{transform:translateZ(0) scale(.88);}
 .dur-val{
   flex:1;text-align:center;
   font-family:var(--font-display);font-size:22px;
@@ -653,9 +683,11 @@ textarea.form-input{resize:none;line-height:1.7;font-family:var(--font-serif);}
   flex:1;padding:6px 4px;border-radius:9px;border:1px solid var(--border);
   background:transparent;cursor:pointer;font-family:var(--font);font-size:11px;
   font-weight:300;color:var(--text-muted);text-align:center;
-  transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),border-color .15s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94);
+  transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),border-color .15s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-instant) var(--ease-spring-soft);
+  transform:translateZ(0);
 }
 .dur-preset:hover{background:var(--surface);color:var(--text-sub);}
+.dur-preset:active{transform:translateZ(0) scale(.95);}
 .dur-preset.active{background:rgba(232,118,74,.08);border-color:rgba(232,118,74,.3);color:var(--orange);}
 
 /* Custom card link picker in modal */
@@ -692,6 +724,8 @@ textarea.form-input{resize:none;line-height:1.7;font-family:var(--font-serif);}
 .card-link-option.selected .card-link-option-name{color:var(--orange);}
 body.light .card-link-dropdown{background:var(--sidebar);}
 .type-selector{display:flex;gap:5px;}
+/* Pass 8 wiring: §7.1 T3 active press on type selector (hover already has translateY) */
+.type-opt:active{transform:translateZ(0) scale(.97);}
 .type-opt{
   flex:1;padding:9px;border-radius:11px;border:1px solid var(--border);
   font-family:var(--font);font-size:12.5px;font-weight:300;color:var(--text-muted);
@@ -726,13 +760,16 @@ body.light .card-link-dropdown{background:var(--sidebar);}
 /* Pass 7 wiring: §7.1 press state on tier-1 primary button */
 .btn-primary:active{transform:translateZ(0) scale(.97);transition-duration:var(--duration-instant);box-shadow:none;}
 .btn-primary:disabled{opacity:.3;cursor:default;transform:none;}
+/* Pass 8 wiring: §7.1 T2 danger button — scale lift hover + active press */
 .btn-danger{
   padding:8px 20px;border-radius:11px;border:1px solid rgba(220,70,70,.3);
   background:rgba(220,70,70,.1);color:rgba(220,90,90,.9);
   font-family:var(--font);font-size:12.5px;font-weight:500;cursor:pointer;
-  transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),border-color .15s cubic-bezier(0.25,0.46,0.45,0.94);
+  transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),border-color .15s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);
+  transform:translateZ(0);transform-origin:center;
 }
-.btn-danger:hover{background:rgba(220,70,70,.18);border-color:rgba(220,70,70,.45);}
+.btn-danger:hover{background:rgba(220,70,70,.18);border-color:rgba(220,70,70,.45);transform:translateZ(0) scale(1.02) translateY(-1px);}
+.btn-danger:active{transform:translateZ(0) scale(.97);transition-duration:var(--duration-instant);}
 
 /* Event detail popup */
 .event-popup{
@@ -748,9 +785,12 @@ body.light .card-link-dropdown{background:var(--sidebar);}
 .ep-btn{
   flex:1;padding:6px;border-radius:8px;border:1px solid var(--border);
   font-family:var(--font);font-size:11px;font-weight:300;color:var(--text-muted);
-  transition:background var(--duration-instant) var(--ease-spring-soft),border-color var(--duration-instant) var(--ease-spring-soft),color var(--duration-instant) var(--ease-spring-soft);text-align:center;
+  transition:background var(--duration-instant) var(--ease-spring-soft),border-color var(--duration-instant) var(--ease-spring-soft),color var(--duration-instant) var(--ease-spring-soft),transform var(--duration-instant) var(--ease-spring-soft);
+  text-align:center;transform:translateZ(0);
 }
 .ep-btn:hover{border-color:var(--border2);color:var(--text-sub);}
+/* Pass 8 wiring: §7.1 T3 active press on event popup buttons */
+.ep-btn:active{transform:translateZ(0) scale(.95);}
 .ep-btn.danger:hover{border-color:rgba(232,74,74,.3);color:rgba(232,74,74,.8);}
 .ep-btn.jump:hover{border-color:rgba(232,118,74,.3);color:var(--orange);}
 
@@ -803,19 +843,25 @@ body.light .card-link-dropdown{background:var(--sidebar);}
 .psc-arr{
   width:28px;height:28px;border-radius:8px;border:none;background:transparent;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
-  color:var(--text-muted);transition:background .12s var(--ease-spring-soft),color .12s var(--ease-spring-soft);
+  color:var(--text-muted);transition:background .12s var(--ease-spring-soft),color .12s var(--ease-spring-soft),transform var(--duration-instant) var(--ease-spring-soft);
+  transform:translateZ(0);
 }
 .psc-arr:hover{background:var(--surface);color:var(--text-sub);}
+/* Pass 8 wiring: §7.1 T3 active press on PSC nav arrows */
+.psc-arr:active{transform:translateZ(0) scale(.88);}
 .psc-arr svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;}
 .psc-today-btn{
   display:flex;align-items:center;justify-content:center;
   margin:0 12px 12px;padding:7px 0;border-radius:10px;border:1px solid var(--border);
   background:transparent;cursor:pointer;font-family:var(--font);
   font-size:11.5px;font-weight:300;color:var(--text-muted);
-  transition:border-color .25s var(--ease-spring-soft),color .25s var(--ease-spring-soft);width:calc(100% - 24px);
+  /* Pass 8 wiring: §7.1 T3 — transform added for lift and press */
+  transition:border-color .25s var(--ease-spring-soft),color .25s var(--ease-spring-soft),transform var(--duration-quick) var(--ease-spring-soft);
+  width:calc(100% - 24px);transform:translateZ(0);
 }
 body.light .psc-today-btn{border-color:rgba(80,40,20,.1);}
-.psc-today-btn:hover{border-color:rgba(232,118,74,.3);color:var(--orange);}
+.psc-today-btn:hover{border-color:rgba(232,118,74,.3);color:var(--orange);transform:translateZ(0) translateY(-1px);}
+.psc-today-btn:active{transform:translateZ(0) scale(.97);}
 .psc-today-btn.active{border-color:rgba(232,118,74,.35);color:var(--orange);background:rgba(232,118,74,.05);}
 .psc-mini-cal{padding:0 12px 0;flex-shrink:0;}
 .psc-mini-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
@@ -841,10 +887,12 @@ body.light .psc-d.e{color:rgba(46,31,24,.1);}
 .psc-card-chip{
   display:flex;align-items:center;gap:5px;
   padding:8px 10px;border-radius:10px;border:1px solid transparent;
-  cursor:pointer;transition:background .12s var(--ease-spring-soft),border-color .15s var(--ease-spring-soft);margin-bottom:3px;
-  width:100%;text-align:left;
+  cursor:pointer;transition:background .12s var(--ease-spring-soft),border-color .15s var(--ease-spring-soft),transform var(--duration-instant) var(--ease-spring-soft);
+  margin-bottom:3px;width:100%;text-align:left;transform:translateZ(0);
 }
 .psc-card-chip:hover{background:var(--surface);}
+/* Pass 8 wiring: §7.1 T3 active press on card filter chip */
+.psc-card-chip:active{transform:translateZ(0) scale(.97);}
 .psc-card-chip.active{background:rgba(232,118,74,.07);border-color:rgba(232,118,74,.22);}
 .psc-card-chip-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--cal-blue);}
 .psc-card-chip.active .psc-card-chip-dot{background:var(--orange);}
@@ -855,9 +903,12 @@ body.light .psc-d.e{color:rgba(46,31,24,.1);}
   display:flex;align-items:center;justify-content:center;
   padding:7px 10px;border-radius:10px;border:1px solid var(--border);
   cursor:pointer;font-family:var(--font);font-size:11.5px;font-weight:300;color:var(--text-muted);
-  transition:background .12s var(--ease-spring-soft),border-color .15s var(--ease-spring-soft),color .12s var(--ease-spring-soft);margin:0 8px 10px;width:calc(100% - 16px);
+  transition:background .12s var(--ease-spring-soft),border-color .15s var(--ease-spring-soft),color .12s var(--ease-spring-soft),transform var(--duration-instant) var(--ease-spring-soft);
+  margin:0 8px 10px;width:calc(100% - 16px);transform:translateZ(0);
 }
 .psc-all-chip:hover{border-color:rgba(255,255,255,.14);color:var(--text-sub);}
+/* Pass 8 wiring: §7.1 T3 active press on all-events chip */
+.psc-all-chip:active{transform:translateZ(0) scale(.97);}
 .psc-all-chip.active{background:rgba(232,118,74,.06);border-color:rgba(232,118,74,.3);color:var(--orange);}
 
 /* ── Mobile calendar sheet ── */
@@ -896,9 +947,12 @@ body.light .cal-sheet-handle{background:rgba(80,40,20,.2);}
 .sheet-arr{
   width:40px;height:40px;border-radius:12px;border:1px solid var(--border);
   background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  color:var(--text-sub);transition:background .12s var(--ease-spring-soft),border-color .12s var(--ease-spring-soft),color .12s var(--ease-spring-soft);margin:0 auto;
+  color:var(--text-sub);transition:background .12s var(--ease-spring-soft),border-color .12s var(--ease-spring-soft),color .12s var(--ease-spring-soft),transform var(--duration-instant) var(--ease-spring-soft);
+  margin:0 auto;transform:translateZ(0);
 }
 .sheet-arr:hover{background:var(--surface);border-color:rgba(255,255,255,.12);color:var(--text);}
+/* Pass 8 wiring: §7.1 T3 active press on mobile sheet navigation arrows */
+.sheet-arr:active{transform:translateZ(0) scale(.88);}
 .sheet-arr svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
 body.light .sheet-arr{border-color:rgba(80,40,20,.12);color:var(--text-sub);}
 .sheet-mini-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
@@ -2709,6 +2763,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const card = e.target.closest('.card-item');
     if (card && !e.target.closest('.card-action-btn')) emitRipple(e, card);
   }, { passive: true });
+
+  /* Pass 8 wiring: §7.3 ripple on T2 menu button (primary nav entry) */
+  const menuBtn = document.getElementById('menuBtn');
+  if (menuBtn) menuBtn.addEventListener('click', e => emitRipple(e, menuBtn), { passive: true });
 });
 </script>
 
