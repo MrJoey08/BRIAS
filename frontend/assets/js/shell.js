@@ -549,6 +549,17 @@ const SHELL = (() => {
     }
   }
 
+  // ── Pass 8: Ripple wiring for shell elements ─────────────────────────────
+  // interactions.js is defer-loaded; guaranteed available by DOMContentLoaded
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof emitRipple !== 'function') return;
+    /* Pass 8 wiring: §7.3 ripple delegation on T2 nav items and s-btn (settings actions) */
+    document.addEventListener('click', e => {
+      const target = e.target.closest('.nav-item, .s-btn, .pmodal-save, .pmodal-cancel');
+      if (target) emitRipple(e, target);
+    }, { passive: true });
+  });
+
   // ── Logout ───────────────────────────────────────────────────────────────
   async function logout() {
     if (_logoutFn) { _logoutFn(); return; }

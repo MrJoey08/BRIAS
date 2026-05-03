@@ -13,8 +13,10 @@ body.light .drawer-panel{background:var(--sidebar);}
 .drawer-logo{font-family:var(--font-display);font-size:30px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .drawer-nav{flex:1;padding:0 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
 .nav-section-label{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--text-dim);padding:4px 12px 6px;font-weight:500;}
-.nav-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:16px;transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94);width:100%;text-align:left;}
-.nav-item:hover{background:rgba(255,255,255,.05);}
+/* Pass 8 wiring: §7.1 T2 nav items — transform lift + active press */
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:16px;transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);width:100%;text-align:left;transform:translateZ(0);}
+.nav-item:hover{background:rgba(255,255,255,.05);transform:translateZ(0) translateX(2px);}
+.nav-item:active{transform:translateZ(0) scale(.98);transition-duration:var(--duration-instant);}
 .nav-item.active{background:linear-gradient(135deg,rgba(232,118,74,.1),rgba(212,74,122,.08));}
 .nav-icon{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .nav-item:not(.active) .nav-icon{background:rgba(255,255,255,.04);}
@@ -31,8 +33,10 @@ body.light .drawer-panel{background:var(--sidebar);}
 .footer-info{flex:1;min-width:0;}
 .footer-name{font-size:13px;font-weight:400;color:var(--text-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .footer-handle{font-size:11px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.drawer-settings-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .18s cubic-bezier(0.25,0.46,0.45,0.94);}
-.drawer-settings-btn:hover{background:rgba(255,255,255,.08);}
+/* Pass 8 wiring: §7.1 T3 — scale hover + active press */
+.drawer-settings-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .18s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);transform:translateZ(0);}
+.drawer-settings-btn:hover{background:rgba(255,255,255,.08);transform:translateZ(0) scale(1.05);}
+.drawer-settings-btn:active{transform:translateZ(0) scale(.88);transition-duration:var(--duration-instant);}
 
 /* ── Settings overlay ── */
 .settings-overlay{
@@ -47,12 +51,16 @@ body.light .drawer-panel{background:var(--sidebar);}
 body.light .settings-overlay{background:rgba(228,214,199,.97);}
 .settings-header{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0;border-bottom:1px solid var(--border);}
 .settings-title{font-family:var(--font-display);font-size:22px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.settings-close-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94);}
-.settings-close-btn:hover{background:rgba(255,255,255,.1);}
+/* Pass 8 wiring: §7.1 T3 — scale hover + active press */
+.settings-close-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);transform:translateZ(0);}
+.settings-close-btn:hover{background:rgba(255,255,255,.1);transform:translateZ(0) scale(1.05);}
+.settings-close-btn:active{transform:translateZ(0) scale(.88);transition-duration:var(--duration-instant);}
 .settings-tabs{display:flex;gap:0;padding:0 24px;flex-shrink:0;border-bottom:1px solid var(--border);overflow-x:auto;}
 .settings-tabs::-webkit-scrollbar{display:none;}
-.stab{flex:1;padding:14px 6px 13px;min-width:0;border-radius:0;font-size:11px;font-weight:400;color:var(--text-muted);transition:color .2s cubic-bezier(0.25,0.46,0.45,0.94);white-space:nowrap;text-align:center;background:transparent;position:relative;border-bottom:2px solid transparent;margin-bottom:-1px;}
+/* Pass 8 wiring: §7.1 T3 settings tab — active press */
+.stab{flex:1;padding:14px 6px 13px;min-width:0;border-radius:0;font-size:11px;font-weight:400;color:var(--text-muted);transition:color .2s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-instant) var(--ease-spring-soft);white-space:nowrap;text-align:center;background:transparent;position:relative;border-bottom:2px solid transparent;margin-bottom:-1px;transform:translateZ(0);}
 .stab:hover{color:var(--text-sub);}
+.stab:active{transform:translateZ(0) scale(.97);}
 .stab.active{color:var(--orange);font-weight:500;border-bottom:2px solid var(--orange);}
 .settings-content{flex:1;overflow-y:auto;display:flex;justify-content:center;padding:28px 20px;}
 .settings-body{width:100%;max-width:560px;}
@@ -63,15 +71,21 @@ body.light .settings-overlay{background:rgba(228,214,199,.97);}
 .s-row-label{font-size:13.5px;color:var(--text-sub);font-weight:400;letter-spacing:.01em;}
 .s-row-sub{font-size:11.5px;color:var(--text-dim);margin-top:2px;line-height:1.4;}
 .s-row-val{font-size:13px;color:var(--text-muted);flex-shrink:0;}
-.s-btn{padding:7px 15px;border-radius:10px;font-size:12.5px;font-weight:400;color:var(--text-sub);background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.07);transition:background .18s cubic-bezier(0.25,0.46,0.45,0.94),color .18s cubic-bezier(0.25,0.46,0.45,0.94),border-color .18s cubic-bezier(0.25,0.46,0.45,0.94);white-space:nowrap;flex-shrink:0;letter-spacing:.01em;}
-.s-btn:hover{background:rgba(255,255,255,.09);color:var(--text);border-color:rgba(255,255,255,.11);}
+/* Pass 8 wiring: §7.1 T2 settings action buttons — translateY lift + active press */
+.s-btn{padding:7px 15px;border-radius:10px;font-size:12.5px;font-weight:400;color:var(--text-sub);background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.07);transition:background .18s cubic-bezier(0.25,0.46,0.45,0.94),color .18s cubic-bezier(0.25,0.46,0.45,0.94),border-color .18s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);white-space:nowrap;flex-shrink:0;letter-spacing:.01em;transform:translateZ(0);}
+.s-btn:hover{background:rgba(255,255,255,.09);color:var(--text);border-color:rgba(255,255,255,.11);transform:translateZ(0) translateY(-1px);}
+.s-btn:active{transform:translateZ(0) scale(.97);transition-duration:var(--duration-instant);}
 .s-btn.danger{color:rgba(220,90,90,.65);background:transparent;border-color:rgba(220,90,90,.15);}
 .s-btn.danger:hover{background:rgba(220,70,70,.07);color:rgba(220,90,90,.85);border-color:rgba(220,90,90,.25);}
 
 /* Toggle */
-.toggle{width:42px;height:23px;border-radius:12px;background:rgba(255,255,255,.1);position:relative;transition:background .28s cubic-bezier(0.25,0.46,0.45,0.94);flex-shrink:0;}
+/* Pass 8 wiring: §7.1 T3 — scale hover on outer container only; ::after slide is untouched */
+.toggle{width:42px;height:23px;border-radius:12px;background:rgba(255,255,255,.1);position:relative;transition:background .28s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);flex-shrink:0;transform:translateZ(0);}
+.toggle:hover{transform:translateZ(0) scale(1.05);}
+.toggle:active{transform:translateZ(0) scale(.95);transition-duration:var(--duration-instant);}
 .toggle.on{background:var(--grad);}
 /* Component-specific overshoot — intentional deviation from --ease-snappy for tactile toggle feel */
+/* DO NOT modify this transition — it's the thumb slide animation */
 .toggle::after{content:'';position:absolute;width:17px;height:17px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .26s cubic-bezier(0.34,1.4,0.6,1),background .28s cubic-bezier(0.25,0.46,0.45,0.94),box-shadow .28s cubic-bezier(0.25,0.46,0.45,0.94);box-shadow:0 1px 4px rgba(0,0,0,.3);}
 .toggle.on::after{left:22px;background:#1a161a;box-shadow:none;}
 body.light .toggle.on::after{left:22px;background:#ddc9b3;box-shadow:none;}
@@ -80,10 +94,13 @@ body.light .toggle.on::after{left:22px;background:#ddc9b3;box-shadow:none;}
 .theme-toggle{display:flex;position:relative;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:3px;gap:0;transition:background .45s cubic-bezier(0.32,0.72,0,1),border-color .45s cubic-bezier(0.32,0.72,0,1);}
 body.light .theme-toggle{background:rgba(80,40,20,.06);}
 /* Component-specific overshoot — intentional deviation from --ease-snappy for tactile toggle feel */
+/* DO NOT modify .theme-toggle-pill transition — it's the sliding indicator animation */
 .theme-toggle-pill{position:absolute;top:3px;left:3px;width:calc(50% - 3px);height:calc(100% - 6px);background:rgba(255,255,255,.08);border-radius:9px;transition:left .28s cubic-bezier(0.34,1.2,0.6,1);}
 body.light .theme-toggle-pill{background:rgba(80,40,20,.1);}
 .theme-toggle.pill-right .theme-toggle-pill{left:calc(50%);}
-.theme-opt{position:relative;z-index:1;display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:9px;font-size:12px;color:var(--text-muted);transition:color .22s cubic-bezier(0.25,0.46,0.45,0.94);white-space:nowrap;}
+/* Pass 8 wiring: §7.1 T3 — active press on theme option buttons only, not the pill */
+.theme-opt{position:relative;z-index:1;display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:9px;font-size:12px;color:var(--text-muted);transition:color .22s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-instant) var(--ease-spring-soft);white-space:nowrap;transform:translateZ(0);}
+.theme-opt:active{transform:translateZ(0) scale(.95);}
 .theme-opt.active{color:var(--text-sub);}
 
 /* Sub cards (Plan tab) */
@@ -117,12 +134,16 @@ body.light .pmodal-input:focus{border-color:rgba(232,118,74,.55);background:rgba
 .pmodal-err.visible{display:block;}
 .pmodal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end;}
 .pmodal-btn{padding:10px 18px;border-radius:11px;font-size:13px;font-weight:400;font-family:var(--font);cursor:pointer;transition:opacity .18s cubic-bezier(0.25,0.46,0.45,0.94),transform .15s cubic-bezier(0.25,0.46,0.45,0.94),background .18s cubic-bezier(0.25,0.46,0.45,0.94);letter-spacing:.02em;}
-.pmodal-cancel{color:var(--text-sub);background:transparent;border:1px solid rgba(255,255,255,.08);}
-.pmodal-cancel:hover{background:rgba(255,255,255,.05);}
+/* Pass 8 wiring: §7.1 T2 pmodal-cancel — translateY lift + active press */
+.pmodal-cancel{color:var(--text-sub);background:transparent;border:1px solid rgba(255,255,255,.08);transform:translateZ(0);}
+.pmodal-cancel:hover{background:rgba(255,255,255,.05);transform:translateZ(0) translateY(-1px);}
+.pmodal-cancel:active{transform:translateZ(0) scale(.97);transition-duration:var(--duration-instant);}
 body.light .pmodal-cancel{border-color:rgba(80,40,20,.12);}
 body.light .pmodal-cancel:hover{background:rgba(80,40,20,.06);}
-.pmodal-save{color:#fff;background:var(--grad);border:none;box-shadow:0 4px 20px rgba(212,74,122,.18);}
-.pmodal-save:hover{opacity:.92;transform:translateY(-1px);}
+/* Pass 8 wiring: §7.1 T1 pmodal-save — add scale(1.02) + active scale(.97) + ripple */
+.pmodal-save{color:#fff;background:var(--grad);border:none;box-shadow:0 4px 20px rgba(212,74,122,.18);transform:translateZ(0);transform-origin:center;}
+.pmodal-save:hover{opacity:.92;transform:translateZ(0) scale(1.02) translateY(-1px);box-shadow:0 6px 24px rgba(212,74,122,.28);}
+.pmodal-save:active{transform:translateZ(0) scale(.97);transition-duration:var(--duration-instant);box-shadow:none;}
 .pmodal-save:disabled{opacity:.5;cursor:default;transform:none;}
 
 /* ── Desktop responsive ── */
