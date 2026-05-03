@@ -537,6 +537,8 @@ function setOffline(off) {
     btn.disabled = false;
   }
 }
+/* Pass 6 audit: setTimeout defers the scrollHeight read+write to next macrotask, avoiding forced
+   reflow in the same frame as DOM mutations. The 30ms gap is intentional — do not collapse to 0. */
 function scrollBottom(){const c=document.getElementById('msgContainer');setTimeout(()=>c.scrollTop=c.scrollHeight,30);}
 function autoResize(el){el.style.height='24px';el.style.height=Math.min(el.scrollHeight,140)+'px';}
 function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleActionBtn();}}

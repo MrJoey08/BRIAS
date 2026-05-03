@@ -21,6 +21,8 @@ function warmUpAnimations() {
   ).onfinish = () => warmer.remove();
 }
 
+// Pass 6 audit: loaded with `defer` on all pages → executes before DOMContentLoaded fires,
+// so this listener always registers in time. Confirmed correct on chat.html, planner.html, journal.html.
 document.addEventListener('DOMContentLoaded', warmUpAnimations);
 
 // ── §7.3 Ripple ──
