@@ -263,9 +263,13 @@ body.light .day-big{color:rgba(46,31,24,.08);}
 .save-btn{
   padding:7px 20px;border-radius:10px;border:none;background:var(--grad);
   color:#fff;font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;
-  transition:opacity .15s cubic-bezier(0.25,0.46,0.45,0.94),transform .12s cubic-bezier(0.25,0.46,0.45,0.94);
+  /* Pass 7 wiring: §7.1 tier-1 save button — full lift pattern */
+  transition:opacity .15s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft),box-shadow var(--duration-quick) var(--ease-spring-soft);
+  transform:translateZ(0);transform-origin:center;
 }
-.save-btn:hover{opacity:.85;transform:translateY(-1px);}
+.save-btn:hover{opacity:.9;transform:translateZ(0) scale(1.02) translateY(-1px);box-shadow:0 4px 20px rgba(212,74,122,.3);}
+/* Pass 7 wiring: §7.1 press state on tier-1 save button */
+.save-btn:active{transform:translateZ(0) scale(.97);transition-duration:var(--duration-instant);box-shadow:none;}
 .save-btn:disabled{opacity:.25;cursor:default;transform:none;}
 
 /* ── Mobile calendar sheet ── */
@@ -951,6 +955,15 @@ window.briasDiaryWrite=function(text){
 
 // ── Init ──
 renderAll();
+
+/* Pass 7 wiring: emitRipple on tier-1 journal save button */
+document.addEventListener('DOMContentLoaded', () => {
+  /* Pass 7 wiring: §7.3 ripple delegation on all .save-btn elements (tier-1 CTA) */
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.save-btn');
+    if (btn && !btn.disabled) emitRipple(e, btn);
+  }, { passive: true });
+});
 </script>
 
 <script defer src="/_vercel/insights/script.js"></script>
