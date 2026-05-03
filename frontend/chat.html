@@ -136,11 +136,22 @@ textarea::placeholder{color:var(--text-dim);}
 .input-box textarea{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:var(--font-serif);font-size:14px;font-weight:300;line-height:24px;resize:none;height:24px;max-height:140px;align-self:center;caret-color:transparent;}
 .input-box textarea:focus{caret-color:var(--orange);}
 .input-footer{text-align:center;font-size:11px;color:var(--text-dim);margin-top:10px;font-weight:300;letter-spacing:.02em;max-width:700px;margin:10px auto 0;opacity:.4;}
-.send-btn{width:32px;height:32px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),box-shadow .15s cubic-bezier(0.25,0.46,0.45,0.94),opacity .15s cubic-bezier(0.25,0.46,0.45,0.94);}
+/* Pass 7 wiring: §7.1 tier-1 button lift pattern */
+.send-btn{width:32px;height:32px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:background var(--duration-quick) var(--ease-spring-soft),box-shadow var(--duration-quick) var(--ease-spring-soft),opacity var(--duration-quick) var(--ease-spring-soft),transform var(--duration-quick) var(--ease-spring-soft);
+  transform:translateZ(0);transform-origin:center;}
 .send-btn.active{background:var(--grad);box-shadow:0 2px 16px rgba(212,74,122,.2);}
 .send-btn.inactive{background:var(--surface);opacity:.3;cursor:default;}
-.stop-btn{width:32px;height:32px;border-radius:12px;border:1px solid rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+/* Pass 7 wiring: §7.1 hover lift only when active; §7.1 press-state */
+.send-btn.active:hover{transform:translateZ(0) scale(1.08) translateY(-1px);box-shadow:0 4px 20px rgba(212,74,122,.35);}
+.send-btn.active:active{transform:translateZ(0) scale(.92);transition-duration:var(--duration-instant);}
+/* Pass 7 wiring: §7.1 stop button press */
+.stop-btn{width:32px;height:32px;border-radius:12px;border:1px solid rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background var(--duration-quick) var(--ease-spring-soft),transform var(--duration-instant) var(--ease-spring-soft);transform:translateZ(0);}
+.stop-btn:hover{background:rgba(255,255,255,.06);transform:translateZ(0) scale(1.05);}
+.stop-btn:active{transform:translateZ(0) scale(.92);transition-duration:var(--duration-instant);}
 .stop-sq{width:9px;height:9px;border-radius:3px;background:rgba(255,255,255,.4);}
+/* Pass 7 wiring: §7.5 topbar logo = BRIAS presence indicator — GPU-promoted for breathing */
+.topbar-logo{will-change:transform,opacity;}
 
 
 /* Light mode — comprehensive overrides */
@@ -545,6 +556,22 @@ function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handle
 function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 
 init();
+
+/* Pass 7 wiring: interactions.js is defer-loaded — functions available by DOMContentLoaded */
+document.addEventListener('DOMContentLoaded', () => {
+  const actionBtn = document.getElementById('actionBtn');
+  if (actionBtn) {
+    /* Pass 7 wiring: §7.2 magnetic pull on tier-1 send button (desktop only) */
+    attachMagnetic(actionBtn, { radius: 60, strength: 0.3 });
+    /* Pass 7 wiring: §7.3 ripple on send — only fires when active (has content) */
+    actionBtn.addEventListener('click', e => {
+      if (actionBtn.classList.contains('active')) emitRipple(e, actionBtn);
+    }, { passive: true });
+  }
+  /* Pass 7 wiring: §7.5 breathing on topbar logo — the persistent BRIAS presence indicator */
+  const logo = document.querySelector('.topbar-logo');
+  if (logo) breathingIdle(logo);
+});
 </script>
 
 <script defer src="/_vercel/insights/script.js"></script>
