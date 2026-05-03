@@ -142,9 +142,13 @@ body.light .planner-sidebar{background:var(--sidebar);}
   padding:5px 10px;border-radius:8px;border:1px solid rgba(232,118,74,.25);
   background:rgba(232,118,74,.06);color:var(--orange);
   font-family:var(--font);font-size:11px;font-weight:400;
-  transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),border-color .15s cubic-bezier(0.25,0.46,0.45,0.94);
+  /* Pass 7 wiring: §7.1 tier-2 button lift pattern — transform added */
+  transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),border-color .15s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);
+  transform:translateZ(0);
 }
-.new-card-btn:hover{background:rgba(232,118,74,.12);border-color:rgba(232,118,74,.4);}
+.new-card-btn:hover{background:rgba(232,118,74,.12);border-color:rgba(232,118,74,.4);transform:translateZ(0) scale(1.04) translateY(-1px);}
+/* Pass 7 wiring: §7.1 press state on tier-2 new-card button */
+.new-card-btn:active{transform:translateZ(0) scale(.96);transition-duration:var(--duration-instant);}
 .new-card-btn svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;}
 
 /* Card filter tabs */
@@ -165,10 +169,14 @@ body.light .cft.active{background:rgba(80,40,20,.08);color:var(--text);}
 .card-list{flex:1;overflow-y:auto;padding:8px 8px 20px;}
 .card-item{
   border:1px solid var(--border);border-radius:13px;margin-bottom:5px;
-  padding:11px 13px;cursor:pointer;transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),border-color .15s cubic-bezier(0.25,0.46,0.45,0.94);
-  animation:fadeUp .2s cubic-bezier(0,0,0.2,1);
+  padding:11px 13px;cursor:pointer;
+  /* Pass 7 wiring: §7.1 tier-2 card surface — transform added for lift */
+  transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),border-color .15s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);
+  animation:fadeUp .2s cubic-bezier(0,0,0.2,1);transform:translateZ(0);
 }
-.card-item:hover{background:var(--surface);}
+.card-item:hover{background:var(--surface);transform:translateZ(0) translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.18);}
+/* Pass 7 wiring: §7.1 press state on card surface */
+.card-item:active{transform:translateZ(0) scale(.98);transition-duration:var(--duration-instant);}
 .card-item.active{background:rgba(232,118,74,.07);border-color:rgba(232,118,74,.22);}
 body.light .card-item.active{background:rgba(232,118,74,.07);}
 .card-item-top{display:flex;align-items:center;gap:7px;margin-bottom:5px;}
@@ -345,9 +353,13 @@ body.light .history-item{background:rgba(80,40,20,.04);}
   display:flex;align-items:center;gap:7px;
   padding:8px 16px;border-radius:11px;border:1px solid var(--border);
   font-family:var(--font);font-size:12px;font-weight:300;color:var(--text-muted);
-  transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),border-color .15s cubic-bezier(0.25,0.46,0.45,0.94),color .15s cubic-bezier(0.25,0.46,0.45,0.94);
+  /* Pass 7 wiring: §7.1 tier-2 action buttons — transform added */
+  transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),border-color .15s cubic-bezier(0.25,0.46,0.45,0.94),color .15s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);
+  transform:translateZ(0);
 }
-.card-action-btn:hover{border-color:var(--border2);color:var(--text-sub);}
+.card-action-btn:hover{border-color:var(--border2);color:var(--text-sub);transform:translateZ(0) translateY(-1px);}
+/* Pass 7 wiring: §7.1 press state on tier-2 action buttons */
+.card-action-btn:active{transform:translateZ(0) scale(.97);transition-duration:var(--duration-instant);}
 .card-action-btn.evaluate{border-color:rgba(232,118,74,.25);color:var(--orange);}
 .card-action-btn.evaluate:hover{background:rgba(232,118,74,.07);border-color:rgba(232,118,74,.4);}
 .card-action-btn.achieve{border-color:rgba(74,192,128,.2);color:rgba(74,192,128,.8);}
@@ -696,15 +708,23 @@ body.light .card-link-dropdown{background:var(--sidebar);}
 .btn-cancel{
   padding:8px 18px;border-radius:11px;border:1px solid var(--border);
   font-family:var(--font);font-size:12.5px;font-weight:300;color:var(--text-muted);
-  transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),color .15s cubic-bezier(0.25,0.46,0.45,0.94);
+  /* Pass 7 wiring: §7.1 secondary button — transform added */
+  transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),color .15s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);
+  transform:translateZ(0);
 }
-.btn-cancel:hover{background:var(--surface);color:var(--text-sub);}
+.btn-cancel:hover{background:var(--surface);color:var(--text-sub);transform:translateZ(0) translateY(-1px);}
+/* Pass 7 wiring: §7.1 press state on cancel button */
+.btn-cancel:active{transform:translateZ(0) scale(.97);transition-duration:var(--duration-instant);}
 .btn-primary{
   padding:8px 20px;border-radius:11px;border:none;background:var(--grad);
   font-family:var(--font);font-size:12.5px;font-weight:500;color:#fff;
-  transition:opacity .15s cubic-bezier(0.25,0.46,0.45,0.94),transform .12s cubic-bezier(0.25,0.46,0.45,0.94);
+  /* Pass 7 wiring: §7.1 tier-1 primary button — full lift pattern */
+  transition:opacity .15s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft),box-shadow var(--duration-quick) var(--ease-spring-soft);
+  transform:translateZ(0);transform-origin:center;
 }
-.btn-primary:hover{opacity:.85;transform:translateY(-1px);}
+.btn-primary:hover{opacity:.9;transform:translateZ(0) scale(1.02) translateY(-1px);box-shadow:0 4px 20px rgba(212,74,122,.3);}
+/* Pass 7 wiring: §7.1 press state on tier-1 primary button */
+.btn-primary:active{transform:translateZ(0) scale(.97);transition-duration:var(--duration-instant);box-shadow:none;}
 .btn-primary:disabled{opacity:.3;cursor:default;transform:none;}
 .btn-danger{
   padding:8px 20px;border-radius:11px;border:1px solid rgba(220,70,70,.3);
@@ -2663,6 +2683,33 @@ window.briasPlannerSuggestCard=function(card){
   renderSidebar();
   renderContent();
 };
+
+/* Pass 7 wiring: emitRipple + hover/active on tier-1/2 planner surfaces */
+document.addEventListener('DOMContentLoaded', () => {
+  /* Pass 7 wiring: §7.3 ripple on sidebar new-card button (tier-2) */
+  const newCardBtn = document.querySelector('.new-card-btn');
+  if (newCardBtn) {
+    newCardBtn.addEventListener('click', e => emitRipple(e, newCardBtn), { passive: true });
+  }
+
+  /* Pass 7 wiring: §7.3 ripple delegation on modal primary/cancel buttons (tier-1/2) */
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.btn-primary, .btn-cancel, .btn-danger');
+    if (btn) emitRipple(e, btn);
+  }, { passive: true });
+
+  /* Pass 7 wiring: §7.3 ripple delegation on card action buttons (tier-2) */
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.card-action-btn');
+    if (btn) emitRipple(e, btn);
+  }, { passive: true });
+
+  /* Pass 7 wiring: §7.3 ripple delegation on card surfaces (tier-2 clickable) */
+  document.addEventListener('click', e => {
+    const card = e.target.closest('.card-item');
+    if (card && !e.target.closest('.card-action-btn')) emitRipple(e, card);
+  }, { passive: true });
+});
 </script>
 
 <script defer src="/_vercel/insights/script.js"></script>
