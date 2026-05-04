@@ -189,9 +189,9 @@ const SHELL = (() => {
     () => `
       <p class="sub-intro"></p>
       <div class="sub-cards">
-        <div class="sub-card"><div class="sub-card-name">Standard</div><div class="sub-card-price">€— <span>/ month</span></div><ul class="sub-card-perks"><li></li><li></li><li></li></ul></div>
-        <div class="sub-card"><div class="sub-card-name">Supportive</div><div class="sub-card-price">€— <span>/ month</span></div><ul class="sub-card-perks"><li></li><li></li><li></li></ul></div>
-        <div class="sub-card"><div class="sub-card-name">Advanced</div><div class="sub-card-price">€— <span>/ month</span></div><ul class="sub-card-perks"><li></li><li></li><li></li></ul></div>
+        <div class="sub-card"><div class="sub-card-name">Standard</div><div class="sub-card-price">€0— <span>/ month</span></div><ul class="sub-card-perks"><li>123</li><li></li><li></li></ul></div>
+        <div class="sub-card"><div class="sub-card-name">Supportive</div><div class="sub-card-price">€8— <span>/ month</span></div><ul class="sub-card-perks"><li></li><li></li><li></li></ul></div>
+        <div class="sub-card"><div class="sub-card-name">Advanced</div><div class="sub-card-price">23— <span>/ month</span></div><ul class="sub-card-perks"><li></li><li></li><li></li></ul></div>
       </div>`,
     // 2 — Permissions
     () => `
