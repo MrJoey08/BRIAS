@@ -228,7 +228,6 @@ const SHELL = (() => {
     () => `
   <span class="about-logo">BRIAS</span>
   <div class="s-section">
-    <div class="s-section-title">About</div>
     <div class="s-row">
       <div class="s-row-left">
         <div class="s-row-label">test</div>
