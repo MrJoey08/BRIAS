@@ -115,7 +115,7 @@ body.light .theme-toggle-pill{background:rgba(80,40,20,.1);}
 .sub-card-perks li::before{content:'·';position:absolute;left:0;}
 
 /* About tab */
-.about-logo{font-family:var(--font-display);font-size:48px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:block;text-align:left;margin-top:40px;}
+.about-logo{font-family:var(--font-display);font-size:48px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:inline-block;text-align:left;margin-top:0;}
 
 /* ── Profile modal ── */
 .pmodal{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:rgba(8,6,8,.7);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);opacity:0;pointer-events:none;transition:opacity .28s cubic-bezier(0,0,0.2,1);}
