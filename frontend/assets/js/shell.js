@@ -189,9 +189,9 @@ const SHELL = (() => {
     () => `
       <p class="sub-intro"></p>
       <div class="sub-cards">
-        <div class="sub-card"><div class="sub-card-name">Standard</div><div class="sub-card-price">€0— <span>/ month</span></div><ul class="sub-card-perks"><li>123</li><li></li><li></li></ul></div>
-        <div class="sub-card"><div class="sub-card-name">Supportive</div><div class="sub-card-price">€8— <span>/ month</span></div><ul class="sub-card-perks"><li></li><li></li><li></li></ul></div>
-        <div class="sub-card"><div class="sub-card-name">Advanced</div><div class="sub-card-price">23— <span>/ month</span></div><ul class="sub-card-perks"><li></li><li></li><li></li></ul></div>
+        <div class="sub-card"><div class="sub-card-name">Standard</div><div class="sub-card-price">€0— <span>/ month</span></div><ul class="sub-card-perks"><li>Free version of BRIAS</li><li>Has everything you need</li><li>Standard messaging limit</li></ul></div>
+        <div class="sub-card"><div class="sub-card-name">Supportive</div><div class="sub-card-price">€8— <span>/ month</span></div><ul class="sub-card-perks"><li>Supporting me for BRIAS</li><li>Increased messaging limit</li><li>Acces to more BRIAS features</li></ul></div>
+        <div class="sub-card"><div class="sub-card-name">Advanced</div><div class="sub-card-price">€23— <span>/ month</span></div><ul class="sub-card-perks"><li>Most advanced BRIAS experience</li><li>Highest messaging limit and Priority access at high traffic</li><li>Early acces to new BRIAS features (To improve BRIAS before full release</li></ul></div>
       </div>`,
     // 2 — Permissions
     () => `
