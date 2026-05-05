@@ -114,7 +114,7 @@ body.light canvas{opacity:0;}
   background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;
   padding:3px;overflow:hidden;margin:10px 10px 0;flex-shrink:0;
 }
-.svt-pill{position:absolute;top:3px;left:3px;width:calc(50% - 3px);height:calc(100% - 6px);background:rgba(255,255,255,.08);border-radius:9px;transition:left 280ms cubic-bezier(0.34,1.2,0.6,1);pointer-events:none;}
+.svt-pill{position:absolute;top:3px;left:3px;width:calc(50% - 3px);height:calc(100% - 6px);background:var(--bg-selected-active);border-radius:9px;transition:left 280ms cubic-bezier(0.34,1.2,0.6,1);pointer-events:none;}
 .sidebar-view-toggle.calendar .svt-pill{left:calc(50%);}
 .svt{
   flex:1;padding:8px 4px;border-radius:9px;
@@ -171,8 +171,8 @@ body.light .planner-sidebar{background:var(--sidebar);}
 .cft:hover{background:var(--surface);color:var(--text-sub);}
 /* Pass 8 wiring: §7.1 T3 active press on card filter tab */
 .cft:active{transform:translateZ(0) scale(.97);}
-.cft.active{background:rgba(255,255,255,.06);color:var(--text);}
-body.light .cft.active{background:rgba(80,40,20,.08);color:var(--text);}
+.cft.active{background:var(--bg-selected-hover);color:var(--text);}
+body.light .cft.active{background:var(--bg-selected-hover);color:var(--text);}
 
 /* Content scroll */
 .content-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
@@ -228,7 +228,7 @@ body.light .bottom-nav{background:rgba(237,224,213,.96);border-color:rgba(80,40,
 .bn-spacer{flex:1;}
 .bn-who{display:flex;border-radius:13px;border:1px solid var(--border);background:rgba(255,255,255,.03);overflow:hidden;flex-shrink:0;position:relative;padding:3px;}
 body.light .bn-who{border-color:rgba(80,40,20,.1);background:rgba(80,40,20,.04);}
-.bn-who-pill{position:absolute;top:3px;left:3px;width:calc(50% - 3px);height:calc(100% - 6px);background:rgba(255,255,255,.08);border-radius:10px;transition:left 280ms cubic-bezier(0.34,1.2,0.6,1);pointer-events:none;}
+.bn-who-pill{position:absolute;top:3px;left:3px;width:calc(50% - 3px);height:calc(100% - 6px);background:var(--bg-selected-active);border-radius:10px;transition:left 280ms cubic-bezier(0.34,1.2,0.6,1);pointer-events:none;}
 .bn-who.calendar .bn-who-pill{left:calc(50%);}
 .bn-who-btn{padding:7px 14px;border:none;background:transparent;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:300;color:var(--text-muted);position:relative;z-index:1;transition:color .15s cubic-bezier(0.25,0.46,0.45,0.94);white-space:nowrap;}
 .bn-who-btn.active{color:var(--text);}

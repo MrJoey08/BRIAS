@@ -98,7 +98,7 @@ body.light .toggle.on::after{left:22px;background:#ddc9b3;box-shadow:none;}
 body.light .theme-toggle{background:rgba(80,40,20,.06);}
 /* Component-specific overshoot — intentional deviation from --ease-snappy for tactile toggle feel */
 /* DO NOT modify .theme-toggle-pill transition — it's the sliding indicator animation */
-.theme-toggle-pill{position:absolute;top:3px;left:3px;width:calc(50% - 3px);height:calc(100% - 6px);background:rgba(255,255,255,.08);border-radius:9px;transition:left .28s cubic-bezier(0.34,1.2,0.6,1);}
+.theme-toggle-pill{position:absolute;top:3px;left:3px;width:calc(50% - 3px);height:calc(100% - 6px);background:var(--bg-selected-active);border-radius:9px;transition:left .28s cubic-bezier(0.34,1.2,0.6,1);}
 body.light .theme-toggle-pill{background:rgba(80,40,20,.1);}
 .theme-toggle.pill-right .theme-toggle-pill{left:calc(50%);}
 /* Pass 8 wiring: §7.1 T3 — active press on theme option buttons only, not the pill */
