@@ -187,11 +187,11 @@ const SHELL = (() => {
       </div>`,
     // 1 — Plan
     () => `
-      <p class="sub-intro"></p>
+      <p class="sub-intro">BRIAS is free for everyone. However I can't pay BRIAS all on my own. Every paid subscription helps me keep BRIAS free and available for as many people as possible. Because support should be available for everyone, and I'll do everything I can to make that come true!</p>
       <div class="sub-cards">
-        <div class="sub-card"><div class="sub-card-name">Standard</div><div class="sub-card-price">€0— <span>/ month</span></div><ul class="sub-card-perks"><li>Free version of BRIAS</li><li>Has everything you need</li><li>Standard messaging limit</li></ul></div>
-        <div class="sub-card"><div class="sub-card-name">Supportive</div><div class="sub-card-price">€8— <span>/ month</span></div><ul class="sub-card-perks"><li>Supporting me for BRIAS</li><li>Increased messaging limit</li><li>Acces to more BRIAS features</li></ul></div>
-        <div class="sub-card"><div class="sub-card-name">Advanced</div><div class="sub-card-price">€23— <span>/ month</span></div><ul class="sub-card-perks"><li>Most advanced BRIAS experience</li><li>Highest messaging limit and Priority access at high traffic</li><li>Early acces to new BRIAS features (To improve BRIAS before full release</li></ul></div>
+        <div class="sub-card"><div class="sub-card-name">Standard</div><div class="sub-card-price">€0— <span>/ month</span></div><ul class="sub-card-perks"><li>Always free, for everyone</li><li>Everything you need to get started</li><li>Because support shouldn't have a price</li></ul></div>
+        <div class="sub-card"><div class="sub-card-name">Supportive</div><div class="sub-card-price">€8— <span>/ month</span></div><ul class="sub-card-perks"><li>All BRIAS features unlocked</li><li>More room to talk, whenever you need it</li><li>Directly helps keep BRIAS free for those who need her the most</li></ul></div>
+        <div class="sub-card"><div class="sub-card-name">Connected</div><div class="sub-card-price">€23— <span>/ month</span></div><ul class="sub-card-perks"><li>Be part of BRIAS's journey</li><li>Early access to everything new, help improve them before they're released to everyone who truly needs them</li><li>Priority access when it's busy</li><li>Almost no limits, experience every moment together</li></ul></div>
       </div>`,
     // 2 — Permissions
     () => `
