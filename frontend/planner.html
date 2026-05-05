@@ -108,23 +108,26 @@ body.light canvas{opacity:0;}
 .topbar-right{display:none;}
 .topbar-icon-btn{display:none;}
 
-/* Sidebar view toggle icons */
+/* Sidebar view toggle — sliding pill segmented control */
 .sidebar-view-toggle{
-  display:flex;gap:4px;padding:10px 10px 0;flex-shrink:0;
+  display:flex;position:relative;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;
+  padding:3px;overflow:hidden;margin:10px 10px 0;flex-shrink:0;
 }
+.svt-pill{position:absolute;top:3px;left:3px;width:calc(50% - 3px);height:calc(100% - 6px);background:rgba(255,255,255,.08);border-radius:9px;transition:left 280ms cubic-bezier(0.34,1.2,0.6,1);pointer-events:none;}
+.sidebar-view-toggle.calendar .svt-pill{left:calc(50%);}
 .svt{
-  flex:1;padding:8px 4px;border-radius:10px;border:1px solid var(--border);
+  flex:1;padding:8px 4px;border-radius:9px;
   display:flex;align-items:center;justify-content:center;gap:5px;
   font-family:var(--font);font-size:11px;font-weight:300;color:var(--text-muted);
-  transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94),border-color .15s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-instant) var(--ease-spring-soft);
+  position:relative;z-index:1;
+  transition:color .12s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-instant) var(--ease-spring-soft);
   transform:translateZ(0);
 }
 .svt svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
-.svt:hover{background:var(--surface);color:var(--text-sub);}
-/* Pass 8 wiring: §7.1 T3 active press on view toggle */
+.svt:hover{color:var(--text-sub);}
 .svt:active{transform:translateZ(0) scale(.97);}
-.svt.active{background:rgba(232,118,74,.08);border-color:rgba(232,118,74,.25);color:var(--orange);}
-body.light .svt.active{background:rgba(232,118,74,.08);}
+.svt.active{color:var(--orange);}
 
 /* ── Main layout ── */
 .main-body{flex:1;display:flex;overflow:hidden;}
@@ -223,11 +226,13 @@ body.light .card-item.active{background:rgba(232,118,74,.07);}
 }
 body.light .bottom-nav{background:rgba(237,224,213,.96);border-color:rgba(80,40,20,.1);box-shadow:0 4px 24px rgba(80,40,20,.08),inset 0 1px 0 rgba(255,255,255,.7);}
 .bn-spacer{flex:1;}
-.bn-who{display:flex;border-radius:13px;border:1px solid var(--border);background:rgba(255,255,255,.03);overflow:hidden;flex-shrink:0;}
+.bn-who{display:flex;border-radius:13px;border:1px solid var(--border);background:rgba(255,255,255,.03);overflow:hidden;flex-shrink:0;position:relative;padding:3px;}
 body.light .bn-who{border-color:rgba(80,40,20,.1);background:rgba(80,40,20,.04);}
-.bn-who-btn{padding:7px 14px;border:none;background:transparent;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:300;color:var(--text-muted);transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),color .15s cubic-bezier(0.25,0.46,0.45,0.94);white-space:nowrap;}
-.bn-who-btn.active{background:rgba(255,255,255,.07);color:var(--text);}
-body.light .bn-who-btn.active{background:rgba(80,40,20,.08);color:var(--text);}
+.bn-who-pill{position:absolute;top:3px;left:3px;width:calc(50% - 3px);height:calc(100% - 6px);background:rgba(255,255,255,.08);border-radius:10px;transition:left 280ms cubic-bezier(0.34,1.2,0.6,1);pointer-events:none;}
+.bn-who.calendar .bn-who-pill{left:calc(50%);}
+.bn-who-btn{padding:7px 14px;border:none;background:transparent;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:300;color:var(--text-muted);position:relative;z-index:1;transition:color .15s cubic-bezier(0.25,0.46,0.45,0.94);white-space:nowrap;}
+.bn-who-btn.active{color:var(--text);}
+body.light .bn-who-btn.active{color:var(--text);}
 .bn-btn{
   display:flex;align-items:center;gap:7px;
   padding:7px 13px;border-radius:13px;border:1px solid var(--border);
@@ -998,6 +1003,7 @@ body.light .sheet-d.e{color:rgba(46,31,24,.1);}
 
       <!-- View toggle: Cards / Calendar -->
       <div class="sidebar-view-toggle">
+        <div class="svt-pill" id="svtPill"></div>
         <button class="svt active" id="svtCards" onclick="setMainView('cards')">
           <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>
           Cards
@@ -1074,6 +1080,7 @@ body.light .sheet-d.e{color:rgba(46,31,24,.1);}
 <div class="bottom-nav" id="bottomNav">
   <!-- View toggle left -->
   <div class="bn-who">
+    <div class="bn-who-pill" id="bnWhoPill"></div>
     <button class="bn-who-btn active" id="bnCards" onclick="setMobileView('cards')">Cards</button>
     <button class="bn-who-btn" id="bnCalendar" onclick="setMobileView('calendar')">Calendar</button>
   </div>
@@ -1452,6 +1459,8 @@ function setMainView(v){
   const sc=document.getElementById('svtCards'),sk=document.getElementById('svtCalendar');
   if(sc)sc.classList.toggle('active',v==='cards');
   if(sk)sk.classList.toggle('active',v==='calendar');
+  const svt=document.querySelector('.sidebar-view-toggle');
+  if(svt) svt.classList.toggle('calendar',v==='calendar');
   // Toggle cal-mode on sidebar
   const sidebar=document.querySelector('.planner-sidebar');
   if(sidebar)sidebar.classList.toggle('cal-mode',v==='calendar');
@@ -1470,6 +1479,8 @@ function setMobileView(v){
   const bc=document.getElementById('bnCards'),bk=document.getElementById('bnCalendar');
   if(bc)bc.classList.toggle('active',v==='cards');
   if(bk)bk.classList.toggle('active',v==='calendar');
+  const bw=document.querySelector('.bn-who');
+  if(bw) bw.classList.toggle('calendar',v==='calendar');
   updateMobileCalBtn();
   renderContent();
 }
