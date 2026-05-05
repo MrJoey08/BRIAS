@@ -11,13 +11,16 @@
 body.light .drawer-panel{background:var(--sidebar);}
 .drawer-top{padding:28px 20px 18px;flex-shrink:0;}
 .drawer-logo{font-family:var(--font-display);font-size:30px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+/* Pass 10 Part 1: drawer nav list container + sliding pill indicator */
 .drawer-nav{flex:1;padding:0 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
 .nav-section-label{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--text-dim);padding:4px 12px 6px;font-weight:500;}
-/* Pass 8 wiring: §7.1 T2 nav items — transform lift + active press */
-.nav-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:16px;transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);width:100%;text-align:left;transform:translateZ(0);}
-.nav-item:hover{background:rgba(255,255,255,.05);transform:translateZ(0) translateX(2px);}
+.nav-list{position:relative;display:flex;flex-direction:column;}
+.nav-pill{position:absolute;top:0;left:0;width:100%;height:25%;background:var(--bg-selected-warm,rgba(255,240,230,.05));border-radius:16px;pointer-events:none;z-index:0;transition:transform 280ms cubic-bezier(0.34,1.2,0.6,1);}
+body.light .nav-pill{background:var(--bg-selected-light,rgba(120,60,30,.05));}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:16px;transition:transform var(--duration-quick) var(--ease-spring-soft);width:100%;text-align:left;transform:translateZ(0);position:relative;z-index:1;}
+.nav-item:hover{transform:translateZ(0) translateX(2px);}
 .nav-item:active{transform:translateZ(0) scale(.98);transition-duration:var(--duration-instant);}
-.nav-item.active{background:linear-gradient(135deg,rgba(232,118,74,.1),rgba(212,74,122,.08));}
+.nav-item.active{background:none;}
 .nav-icon{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .nav-item:not(.active) .nav-icon{background:rgba(255,255,255,.04);}
 .nav-item.active .nav-icon{background:linear-gradient(135deg,rgba(232,118,74,.18),rgba(212,74,122,.16));}
@@ -95,7 +98,7 @@ body.light .toggle.on::after{left:22px;background:#ddc9b3;box-shadow:none;}
 body.light .theme-toggle{background:rgba(80,40,20,.06);}
 /* Component-specific overshoot — intentional deviation from --ease-snappy for tactile toggle feel */
 /* DO NOT modify .theme-toggle-pill transition — it's the sliding indicator animation */
-.theme-toggle-pill{position:absolute;top:3px;left:3px;width:calc(50% - 3px);height:calc(100% - 6px);background:rgba(255,255,255,.08);border-radius:9px;transition:left .28s cubic-bezier(0.34,1.2,0.6,1);}
+.theme-toggle-pill{position:absolute;top:3px;left:3px;width:calc(50% - 3px);height:calc(100% - 6px);background:var(--bg-selected-active);border-radius:9px;transition:left .28s cubic-bezier(0.34,1.2,0.6,1);}
 body.light .theme-toggle-pill{background:rgba(80,40,20,.1);}
 .theme-toggle.pill-right .theme-toggle-pill{left:calc(50%);}
 /* Pass 8 wiring: §7.1 T3 — active press on theme option buttons only, not the pill */
@@ -162,8 +165,6 @@ body.light .pmodal-cancel:hover{background:rgba(80,40,20,.06);}
   .nav-sub{font-size:11.5px;}
 }
 /* ── Light mode overrides for shell elements ── */
-body.light .nav-item:hover{background:rgba(80,40,20,.06);}
-body.light .nav-item.active{background:linear-gradient(135deg,rgba(232,118,74,.12),rgba(212,74,122,.09));}
 body.light .nav-item:not(.active) .nav-icon{background:rgba(80,40,20,.06);}
 body.light .nav-item:not(.active) .nav-icon svg{stroke:rgba(80,40,20,.4)!important;}
 body.light .drawer-settings-btn svg{stroke:rgba(80,40,20,.45)!important;}
