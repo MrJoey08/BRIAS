@@ -123,20 +123,22 @@ body.light .diary-sidebar{background:var(--sidebar);}
 /* Who toggle */
 .who-toggle{
   display:flex;border-radius:10px;border:1px solid var(--border);
-  background:rgba(255,255,255,.02);overflow:hidden;
+  background:rgba(255,255,255,.02);overflow:hidden;position:relative;padding:3px;
 }
 body.light .who-toggle{background:rgba(80,40,20,.04);border-color:rgba(80,40,20,.1);}
+.who-pill{position:absolute;top:3px;left:3px;width:calc(50% - 3px);height:calc(100% - 6px);background:rgba(255,255,255,.08);border-radius:7px;transition:left 280ms cubic-bezier(0.34,1.2,0.6,1);pointer-events:none;}
+.who-toggle.brias .who-pill{left:calc(50%);}
 .who-btn{
   flex:1;padding:7px 0;border:none;background:transparent;cursor:pointer;
   font-family:var(--font);font-size:12px;font-weight:300;color:var(--text-muted);
-  /* Pass 8 wiring: §7.1 T3 toggle — opacity hover + active press */
-  transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),color .15s cubic-bezier(0.25,0.46,0.45,0.94),opacity var(--duration-instant) var(--ease-spring-soft);
+  position:relative;z-index:1;
+  transition:color .15s cubic-bezier(0.25,0.46,0.45,0.94),opacity var(--duration-instant) var(--ease-spring-soft);
 }
 .who-btn:hover{opacity:.8;}
 .who-btn:active{opacity:.6;transition-duration:var(--duration-instant);}
-.who-btn.active{background:rgba(255,255,255,.06);color:var(--text);}
-body.light .who-btn.active{background:rgba(80,40,20,.08);color:var(--text);}
-.who-btn.active.brias-active{background:rgba(232,118,74,.08);color:var(--orange);}
+.who-btn.active{color:var(--text);}
+body.light .who-btn.active{color:var(--text);}
+.who-btn.active.brias-active{color:var(--orange);}
 
 /* Month nav */
 .month-nav{
@@ -354,21 +356,23 @@ body.light .bottom-nav{background:rgba(237,224,213,.96);border-color:rgba(80,40,
 
 .bn-who{
   display:flex;border-radius:13px;border:1px solid var(--border);
-  background:rgba(255,255,255,.03);overflow:hidden;flex-shrink:0;
+  background:rgba(255,255,255,.03);overflow:hidden;flex-shrink:0;position:relative;padding:3px;
 }
 body.light .bn-who{border-color:rgba(80,40,20,.1);background:rgba(80,40,20,.04);}
+.bn-who-pill{position:absolute;top:3px;left:3px;width:calc(50% - 3px);height:calc(100% - 6px);background:rgba(255,255,255,.08);border-radius:10px;transition:left 280ms cubic-bezier(0.34,1.2,0.6,1);pointer-events:none;}
+.bn-who.brias .bn-who-pill{left:calc(50%);}
 .bn-who-btn{
   padding:7px 14px;border:none;background:transparent;cursor:pointer;
   font-family:var(--font);font-size:12px;font-weight:300;color:var(--text-muted);
-  /* Pass 8 wiring: §7.1 T3 bottom-nav author toggle */
-  transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),color .15s cubic-bezier(0.25,0.46,0.45,0.94),opacity var(--duration-instant) var(--ease-spring-soft);
+  position:relative;z-index:1;
+  transition:color .15s cubic-bezier(0.25,0.46,0.45,0.94),opacity var(--duration-instant) var(--ease-spring-soft);
   white-space:nowrap;
 }
 .bn-who-btn:hover{opacity:.8;}
 .bn-who-btn:active{opacity:.6;}
-.bn-who-btn.active{background:rgba(255,255,255,.07);color:var(--text);}
-body.light .bn-who-btn.active{background:rgba(80,40,20,.08);color:var(--text);}
-.bn-who-btn.active.ba{background:rgba(232,118,74,.1);color:var(--orange);}
+.bn-who-btn.active{color:var(--text);}
+body.light .bn-who-btn.active{color:var(--text);}
+.bn-who-btn.active.ba{color:var(--orange);}
 
 .bn-spacer{flex:1;}
 
@@ -406,11 +410,6 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
   animation:todayPulse 2.8s cubic-bezier(0.25,0.46,0.45,0.94) infinite;
 }
 
-.mobile-who{display:none;}
-/* Pass 8 wiring: §7.1 T3 mobile author toggle — opacity feedback */
-.mobile-who-btn{transition:opacity var(--duration-instant) var(--ease-spring-soft);}
-.mobile-who-btn:hover{opacity:.8;}
-.mobile-who-btn:active{opacity:.6;}
 
 /* ── Responsive ── */
 /* ── Responsive ── */
@@ -421,7 +420,6 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
   .topbar{padding:0 12px;}
   .content-inner{padding:0 16px;}
   .content-scroll{padding-top:24px;padding-bottom:96px;}
-  #mobileWhoWrap{display:none!important;}
 }
 @media(min-width:701px){
   .cal-sheet{display:none!important;}
@@ -487,6 +485,7 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
       <div class="sidebar-top">
         <div class="sidebar-top-label">View</div>
         <div class="who-toggle">
+          <div class="who-pill" id="whoPill"></div>
           <button class="who-btn active" id="btnUser" onclick="setWho('user')"></button>
           <button class="who-btn" id="btnBrias" onclick="setWho('brias')">BRIAS</button>
         </div>
@@ -509,12 +508,6 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
 
     <!-- Content -->
     <div class="content-area">
-
-      <!-- Mobile who toggle (in topbar on mobile) -->
-      <div class="mobile-who" id="mobileWhoWrap" style="margin:10px 14px 0;">
-        <button class="mobile-who-btn active" id="mBtnUser" onclick="setWho('user')"></button>
-        <button class="mobile-who-btn" id="mBtnBrias" onclick="setWho('brias')">BRIAS</button>
-      </div>
 
       <!-- Mobile calendar backdrop -->
       <div class="cal-backdrop-m" id="calBackdropM" onclick="toggleMobileCal()"></div>
@@ -548,6 +541,7 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
 <div class="bottom-nav" id="bottomNav">
   <!-- Who toggle: left -->
   <div class="bn-who">
+    <div class="bn-who-pill" id="bnWhoPill"></div>
     <button class="bn-who-btn active" id="bnUser" onclick="setWho('user')"></button>
     <button class="bn-who-btn" id="bnBrias" onclick="setWho('brias')">BRIAS</button>
   </div>
@@ -677,10 +671,12 @@ function setWho(w){
   const bu=document.getElementById('btnUser'); const bb=document.getElementById('btnBrias');
   if(bu){ bu.textContent=uname; bu.className='who-btn'+(w==='user'?' active':''); }
   if(bb) bb.className='who-btn'+(w==='brias'?' active brias-active':'');
+  const wt=document.querySelector('.who-toggle'); if(wt) wt.classList.toggle('brias',w==='brias');
   // Bottom bar who-toggle
   const bnu=document.getElementById('bnUser'); const bnb=document.getElementById('bnBrias');
   if(bnu){ bnu.textContent=uname; bnu.className='bn-who-btn'+(w==='user'?' active':''); }
   if(bnb) bnb.className='bn-who-btn'+(w==='brias'?' active ba':'');
+  const bw=document.querySelector('.bn-who'); if(bw) bw.classList.toggle('brias',w==='brias');
   renderContent();
 }
 
@@ -875,11 +871,13 @@ function renderAll(){
   const uname=getUsername();
   // Desktop sidebar
   const bu=document.getElementById('btnUser'); if(bu)bu.textContent=uname;
+  const wt=document.querySelector('.who-toggle'); if(wt) wt.classList.toggle('brias',who==='brias');
   // Bottom bar — sync who labels and today-glow
   const bnu=document.getElementById('bnUser'); if(bnu)bnu.textContent=uname;
   const bnb=document.getElementById('bnBrias');
   if(bnu) bnu.className='bn-who-btn'+(who==='user'?' active':'');
   if(bnb) bnb.className='bn-who-btn'+(who==='brias'?' active ba':'');
+  const bw=document.querySelector('.bn-who'); if(bw) bw.classList.toggle('brias',who==='brias');
   updateTodayGlow();
   renderContent();
   renderSide();
