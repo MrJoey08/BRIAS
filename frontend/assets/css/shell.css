@@ -104,7 +104,17 @@ body.light .theme-toggle-pill{background:rgba(80,40,20,.1);}
 .theme-opt.active{color:var(--text-sub);}
 
 /* Sub cards (Plan tab) */
-.sub-intro{font-family:var(--font-serif,Georgia);font-size:14px;font-weight:300;color:var(--text-muted);line-height:1.65;margin-bottom:20px;}
+.sub-intro {
+  font-family: var(--font-serif, Georgia);
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--text-muted);
+  line-height: 1.65;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(to right, rgba(232,118,74,.4), rgba(212,74,122,.3)) 1;
+}
 .sub-cards{display:flex;flex-direction:column;gap:10px;}
 .sub-card{padding:16px 18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;}
 .sub-card-name{font-size:13px;font-weight:500;color:var(--text-sub);margin-bottom:4px;}
