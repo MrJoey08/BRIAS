@@ -51,26 +51,6 @@
   pointer-events: none;
 }
 
-/* ── §10 Selection-state tokens (Pass 10 Part 2) ── */
-/* Dark mode defaults */
-:root {
-  --bg-selected:             rgba(255, 255, 255, 0.04);
-  --bg-selected-hover:       rgba(255, 255, 255, 0.07);
-  --bg-selected-active:      rgba(255, 255, 255, 0.10);
-  --bg-selected-warm:        rgba(255, 240, 230, 0.05);
-  --bg-selected-warm-hover:  rgba(255, 240, 230, 0.08);
-  --bg-selected-light:       rgba(0, 0, 0, 0.04);
-  --bg-selected-light-hover: rgba(0, 0, 0, 0.07);
-}
-/* Light mode overrides */
-body.light {
-  --bg-selected:            rgba(0, 0, 0, 0.04);
-  --bg-selected-hover:      rgba(0, 0, 0, 0.07);
-  --bg-selected-active:     rgba(0, 0, 0, 0.10);
-  --bg-selected-warm:       rgba(120, 60, 30, 0.05);
-  --bg-selected-warm-hover: rgba(120, 60, 30, 0.08);
-}
-
 /* ── §9 Accessibility: prefers-reduced-motion ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
