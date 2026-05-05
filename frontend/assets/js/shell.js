@@ -16,6 +16,29 @@ const SHELL = (() => {
   const _filename = location.pathname.split('/').pop() || 'chat.html';
   let activePage = PAGE_MAP[_filename] || 'chat';
 
+  // ── Nav pill ─────────────────────────────────────────────────────────────
+  function _setupNavPill() {
+    const list = document.getElementById('shellNavList');
+    const pill = document.getElementById('shellNavPill');
+    if (!list || !pill) return;
+    const PAGE_INDEX = { chat: 0, journal: 1, planner: 2, mindspace: 3 };
+    const activeIndex = PAGE_INDEX[activePage] ?? 0;
+    pill.style.transition = 'none';
+    pill.style.transform = `translateY(${activeIndex * 100}%)`;
+    const items = list.querySelectorAll('.nav-item');
+    items.forEach((item, i) => {
+      item.addEventListener('pointerenter', () => {
+        const target = i === activeIndex ? activeIndex : activeIndex + 0.3 * (i - activeIndex);
+        pill.style.transition = 'transform 200ms cubic-bezier(0.34,1.2,0.6,1)';
+        pill.style.transform = `translateY(${target * 100}%)`;
+      });
+    });
+    list.addEventListener('pointerleave', () => {
+      pill.style.transition = 'transform 280ms cubic-bezier(0.34,1.2,0.6,1)';
+      pill.style.transform = `translateY(${activeIndex * 100}%)`;
+    });
+  }
+
   // ── HTML injecteren ──────────────────────────────────────────────────────
   function _inject() {
     // Voeg drawer + settings + modal toe aan de body als ze er nog niet zijn
@@ -28,6 +51,8 @@ const SHELL = (() => {
     if (!document.getElementById('shellProfileModal')) {
       document.body.insertAdjacentHTML('beforeend', _profileModalHTML());
     }
+
+    _setupNavPill();
 
     // Escape sluit settings/modal
     document.addEventListener('keydown', e => {
@@ -107,7 +132,10 @@ const SHELL = (() => {
     <div class="drawer-top"><div class="drawer-logo">BRIAS</div></div>
     <div class="drawer-nav">
       <div class="nav-section-label">Spaces</div>
-      ${navItems}
+      <div class="nav-list" id="shellNavList">
+        <div class="nav-pill" id="shellNavPill"></div>
+        ${navItems}
+      </div>
     </div>
     <div class="drawer-divider"></div>
     <div class="drawer-footer">
