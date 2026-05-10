@@ -19,8 +19,8 @@ body.light .drawer-panel{background:var(--sidebar);}
 .nav-item.active{background:rgba(232,118,74,.06);transform:translateZ(0) translateX(5px);}
 .nav-item.active:active{transform:translateZ(0) translateX(5px) scale(.94);transition-duration:var(--duration-instant);}
 .nav-icon{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.nav-item:not(.active) .nav-icon{background:rgba(255,255,255,.04);}
-.nav-item.active .nav-icon{background:linear-gradient(135deg,rgba(232,118,74,.18),rgba(212,74,122,.16));}
+.nav-item:not(.active) .nav-icon{background:rgba(40,28,24,.5);box-shadow:0 1px 2px rgba(0,0,0,.2),inset 0 0 0 1px rgba(232,118,74,.07);}
+.nav-item.active .nav-icon{background:linear-gradient(135deg,rgba(232,118,74,.18),rgba(212,74,122,.16));box-shadow:0 1px 2px rgba(0,0,0,.2),inset 0 0 0 1px rgba(232,118,74,.14);}
 .nav-texts{flex:1;min-width:0;}
 .nav-name{font-size:13px;font-weight:400;color:var(--text-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .nav-item.active .nav-name{font-weight:500;color:var(--orange);}
@@ -33,10 +33,9 @@ body.light .drawer-panel{background:var(--sidebar);}
 .footer-info{flex:1;min-width:0;}
 .footer-name{font-size:13px;font-weight:400;color:var(--text-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .footer-handle{font-size:11px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-/* Pass 8 wiring: §7.1 T3 — scale hover + active press */
-.drawer-settings-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .18s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);transform:translateZ(0);}
-.drawer-settings-btn:hover{background:rgba(255,255,255,.08);transform:translateZ(0) scale(1.05);}
-.drawer-settings-btn:active{transform:translateZ(0) scale(.88);transition-duration:var(--duration-instant);}
+.drawer-settings-btn{width:30px;height:30px;border-radius:10px;background:rgba(40,28,24,.5);box-shadow:0 1px 2px rgba(0,0,0,.22),inset 0 0 0 1px rgba(232,118,74,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .18s cubic-bezier(0.25,0.46,0.45,0.94),transform 280ms cubic-bezier(0.34,1.56,0.64,1);transform:translateZ(0);}
+.drawer-settings-btn:hover{background:rgba(60,40,32,.6);transform:translateZ(0) scale(1.02);}
+.drawer-settings-btn:active{transform:translateZ(0) scale(.94);transition-duration:var(--duration-instant);}
 
 /* ── Settings overlay ── */
 .settings-overlay{
@@ -51,10 +50,9 @@ body.light .drawer-panel{background:var(--sidebar);}
 body.light .settings-overlay{background:rgba(228,214,199,.97);}
 .settings-header{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0;border-bottom:1px solid var(--border);}
 .settings-title{font-family:var(--font-display);font-size:22px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-/* Pass 8 wiring: §7.1 T3 — scale hover + active press */
-.settings-close-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);transform:translateZ(0);}
-.settings-close-btn:hover{background:rgba(255,255,255,.1);transform:translateZ(0) scale(1.05);}
-.settings-close-btn:active{transform:translateZ(0) scale(.88);transition-duration:var(--duration-instant);}
+.settings-close-btn{width:30px;height:30px;border-radius:10px;background:rgba(40,28,24,.5);box-shadow:0 1px 2px rgba(0,0,0,.22),inset 0 0 0 1px rgba(232,118,74,.08);display:flex;align-items:center;justify-content:center;transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),transform 280ms cubic-bezier(0.34,1.56,0.64,1);transform:translateZ(0);}
+.settings-close-btn:hover{background:rgba(60,40,32,.6);transform:translateZ(0) scale(1.02);}
+.settings-close-btn:active{transform:translateZ(0) scale(.94);transition-duration:var(--duration-instant);}
 .settings-tabs{display:flex;gap:0;padding:0 24px;flex-shrink:0;border-bottom:1px solid var(--border);overflow-x:auto;}
 .settings-tabs::-webkit-scrollbar{display:none;}
 /* Pass 8 wiring: §7.1 T3 settings tab — active press */
@@ -164,7 +162,8 @@ body.light .pmodal-cancel:hover{background:rgba(80,40,20,.06);}
 /* ── Light mode overrides for shell elements ── */
 body.light .nav-item:not(.active):hover{background:rgba(80,40,20,.05);}
 body.light .nav-item.active{background:rgba(232,118,74,.07);}
-body.light .nav-item:not(.active) .nav-icon{background:rgba(80,40,20,.06);}
+body.light .nav-item:not(.active) .nav-icon{background:rgba(80,40,20,.08);box-shadow:0 1px 2px rgba(80,40,20,.1),inset 0 0 0 1px rgba(80,40,20,.07);}
+body.light .nav-item.active .nav-icon{box-shadow:0 1px 2px rgba(80,40,20,.12),inset 0 0 0 1px rgba(232,118,74,.14);}
 /* Part 2 icon tints — hover and active override the inline stroke */
 .nav-item:not(.active):hover .nav-icon svg{stroke:rgba(255,200,180,.85)!important;}
 .nav-item.active .nav-icon svg{stroke:var(--orange)!important;}
@@ -180,8 +179,8 @@ body.light .settings-close-btn svg{stroke:rgba(80,40,20,.5)!important;}
 body.light .settings-close-btn:hover svg{stroke:rgba(80,40,20,.75)!important;}
 body.light .drawer-divider{background:rgba(80,40,20,.1);}
 body.light .drawer-backdrop{background:rgba(30,12,0,.38);backdrop-filter:blur(10px);}
-body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}
-body.light .drawer-settings-btn:hover{background:rgba(80,40,20,.12);}
+body.light .drawer-settings-btn{background:rgba(80,40,20,.08);box-shadow:0 1px 2px rgba(80,40,20,.12),inset 0 0 0 1px rgba(80,40,20,.07);}
+body.light .drawer-settings-btn:hover{background:rgba(80,40,20,.14);}
 body.light .soon-badge{background:rgba(80,40,20,.07);color:var(--text-dim);-webkit-text-fill-color:var(--text-dim);}
 body.light .s-row{background:rgba(80,40,20,.05);}
 body.light .s-btn{color:var(--text-sub);background:rgba(80,40,20,.07);border-color:rgba(80,40,20,.1);}
@@ -192,8 +191,8 @@ body.light .toggle{background:rgba(80,40,20,.16);}
 body.light .toggle.on{background:var(--grad);}
 body.light .toggle::after{background:#fff;}
 body.light .toggle.on::after{background:#ddc9b3;}
-body.light .settings-close-btn{background:rgba(80,40,20,.07);}
-body.light .settings-close-btn:hover{background:rgba(80,40,20,.13);}
+body.light .settings-close-btn{background:rgba(80,40,20,.08);box-shadow:0 1px 2px rgba(80,40,20,.12),inset 0 0 0 1px rgba(80,40,20,.07);}
+body.light .settings-close-btn:hover{background:rgba(80,40,20,.14);}
 body.light .sub-card{background:rgba(80,40,20,.05);border-color:rgba(80,40,20,.1);}
 body.light .sub-card-perks{border-top-color:rgba(80,40,20,.1);}
 body.light .theme-toggle{background:rgba(80,40,20,.06);border-color:rgba(80,40,20,.1);}
