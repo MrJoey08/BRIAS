@@ -165,9 +165,19 @@ body.light .pmodal-cancel:hover{background:rgba(80,40,20,.06);}
 body.light .nav-item:not(.active):hover{background:rgba(80,40,20,.05);}
 body.light .nav-item.active{background:rgba(232,118,74,.07);}
 body.light .nav-item:not(.active) .nav-icon{background:rgba(80,40,20,.06);}
+/* Part 2 icon tints — hover and active override the inline stroke */
+.nav-item:not(.active):hover .nav-icon svg{stroke:rgba(255,200,180,.85)!important;}
+.nav-item.active .nav-icon svg{stroke:var(--orange)!important;}
+.drawer-settings-btn:hover svg{stroke:rgba(255,200,180,.85)!important;}
+.settings-close-btn svg{stroke:rgba(255,200,180,.55)!important;}
+.settings-close-btn:hover svg{stroke:rgba(255,200,180,.85)!important;}
 body.light .nav-item:not(.active) .nav-icon svg{stroke:rgba(80,40,20,.4)!important;}
+body.light .nav-item:not(.active):hover .nav-icon svg{stroke:rgba(80,40,20,.7)!important;}
+body.light .nav-item.active .nav-icon svg{stroke:var(--orange)!important;}
 body.light .drawer-settings-btn svg{stroke:rgba(80,40,20,.45)!important;}
+body.light .drawer-settings-btn:hover svg{stroke:rgba(80,40,20,.7)!important;}
 body.light .settings-close-btn svg{stroke:rgba(80,40,20,.5)!important;}
+body.light .settings-close-btn:hover svg{stroke:rgba(80,40,20,.75)!important;}
 body.light .drawer-divider{background:rgba(80,40,20,.1);}
 body.light .drawer-backdrop{background:rgba(30,12,0,.38);backdrop-filter:blur(10px);}
 body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}

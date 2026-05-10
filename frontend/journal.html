@@ -150,13 +150,14 @@ body.light .who-btn.active{color:var(--text);}
 .arr-btn{
   width:28px;height:28px;border-radius:8px;border:none;background:transparent;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
-  color:var(--text-muted);transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-instant) var(--ease-spring-soft);
+  color:rgba(255,200,180,.55);transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94),transform 280ms cubic-bezier(0.34,1.56,0.64,1);
   transform:translateZ(0);
 }
-.arr-btn:hover:not(:disabled){background:var(--surface);color:var(--text-sub);}
-/* Pass 8 wiring: §7.1 T3 press state on sidebar nav arrows */
-.arr-btn:active:not(:disabled){transform:translateZ(0) scale(.88);}
-.arr-btn:disabled{opacity:.2;cursor:default;}
+.arr-btn:hover:not(:disabled){background:rgba(255,200,180,.06);color:rgba(255,200,180,.85);}
+.arr-btn:active:not(:disabled){transform:translateZ(0) scale(.94);transition-duration:var(--duration-instant);}
+.arr-btn:disabled{opacity:.25;cursor:default;}
+body.light .arr-btn{color:rgba(80,40,20,.4);}
+body.light .arr-btn:hover:not(:disabled){background:rgba(80,40,20,.06);color:rgba(80,40,20,.7);}
 
 /* Sidebar Today button */
 .sidebar-today{
@@ -334,15 +335,15 @@ body.light .sheet-cal-label:hover{background:rgba(80,40,20,.06);}
 .sheet-arr{
   width:40px;height:40px;border-radius:12px;border:1px solid var(--border);
   background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  color:var(--text-sub);transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),border-color .12s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-instant) var(--ease-spring-soft);
+  color:rgba(255,200,180,.55);transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),border-color .12s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94),transform 280ms cubic-bezier(0.34,1.56,0.64,1);
   margin:0 auto;transform:translateZ(0);
 }
-.sheet-arr:hover:not(:disabled){background:var(--surface);border-color:rgba(255,255,255,.12);color:var(--text);}
-/* Pass 8 wiring: §7.1 T3 active press on sheet navigation arrows */
-.sheet-arr:active:not(:disabled){transform:translateZ(0) scale(.88);}
+.sheet-arr:hover:not(:disabled){background:rgba(255,200,180,.04);border-color:rgba(255,200,180,.18);color:rgba(255,200,180,.85);}
+.sheet-arr:active:not(:disabled){transform:translateZ(0) scale(.94);transition-duration:var(--duration-instant);}
 .sheet-arr:disabled{opacity:.18;cursor:default;}
 .sheet-arr svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
-body.light .sheet-arr{border-color:rgba(80,40,20,.12);color:var(--text-sub);}
+body.light .sheet-arr{border-color:rgba(80,40,20,.12);color:rgba(80,40,20,.4);}
+body.light .sheet-arr:hover:not(:disabled){background:rgba(80,40,20,.05);border-color:rgba(80,40,20,.2);color:rgba(80,40,20,.7);}
 
 /* ── Mobile bottom bar (journal-specific) ── */
 .bottom-nav{
