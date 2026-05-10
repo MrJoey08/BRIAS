@@ -167,9 +167,7 @@ body.light .arr-btn:hover:not(:disabled){background:rgba(80,40,20,.14);color:rgb
   border-radius:10px;border:1px solid var(--border);
   background:transparent;cursor:pointer;font-family:var(--font);
   font-size:11.5px;font-weight:300;color:var(--text-muted);
-  /* Pass 6 perf: box-shadow removed from transition — triggers paint */
-  /* Pass 8 wiring: §7.1 T3 — transform added for lift */
-  transition:border-color .25s cubic-bezier(0.25,0.46,0.45,0.94),color .25s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);width:calc(100% - 24px);
+  transition:border-color .25s cubic-bezier(0.25,0.46,0.45,0.94),color .25s cubic-bezier(0.25,0.46,0.45,0.94),transform 280ms cubic-bezier(0.34,1.56,0.64,1);width:calc(100% - 24px);
   transform:translateZ(0);
 }
 body.light .sidebar-today{border-color:rgba(80,40,20,.1);}
@@ -383,8 +381,7 @@ body.light .bn-who-btn.active{color:var(--text);}
   padding:7px 13px;border-radius:13px;border:1px solid var(--border);
   background:transparent;cursor:pointer;font-family:var(--font);
   font-size:12px;font-weight:300;color:var(--text-muted);
-  /* Pass 8 wiring: §7.1 T3 bottom-nav calendar button — transform added */
-  transition:border-color .25s cubic-bezier(0.25,0.46,0.45,0.94),color .25s cubic-bezier(0.25,0.46,0.45,0.94),background .15s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);
+  transition:border-color .25s cubic-bezier(0.25,0.46,0.45,0.94),color .25s cubic-bezier(0.25,0.46,0.45,0.94),background .15s cubic-bezier(0.25,0.46,0.45,0.94),transform 280ms cubic-bezier(0.34,1.56,0.64,1);
   flex-shrink:0;transform:translateZ(0);
 }
 body.light .bn-btn{border-color:rgba(80,40,20,.12);}
@@ -397,9 +394,7 @@ body.light .bn-btn{border-color:rgba(80,40,20,.12);}
   padding:7px 14px;border-radius:13px;border:1px solid var(--border);
   background:transparent;cursor:pointer;font-family:var(--font);
   font-size:12px;font-weight:300;color:var(--text-muted);
-  /* Pass 6 perf: box-shadow removed from transition — triggers paint */
-  /* Pass 8 wiring: §7.1 T3 — transform added for active press */
-  transition:border-color .25s cubic-bezier(0.25,0.46,0.45,0.94),color .25s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-instant) var(--ease-spring-soft);
+  transition:border-color .25s cubic-bezier(0.25,0.46,0.45,0.94),color .25s cubic-bezier(0.25,0.46,0.45,0.94),transform 280ms cubic-bezier(0.34,1.56,0.64,1);
   flex-shrink:0;margin-left:4px;transform:translateZ(0);
 }
 body.light .bn-today{border-color:rgba(80,40,20,.12);}
