@@ -95,7 +95,7 @@ const SHELL = (() => {
         ? (isActive ? `SHELL.closeDrawer()` : `window.location.href='${n.href}'`)
         : '';
       return `<button class="nav-item${isActive ? ' active' : ''}"${onclick ? ` onclick="${onclick}"` : ''}>
-        <div class="nav-icon gel-btn gel-sm" style="--gel-radius:11px">${n.icon}</div>
+        <div class="nav-icon">${n.icon}</div>
         <div class="nav-texts">
           <div class="nav-name">${n.label}${n.soon ? ' <span class="soon-badge">soon</span>' : ''}</div>
           <div class="nav-sub">${n.sub}</div>
