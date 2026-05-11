@@ -84,9 +84,7 @@ body.light canvas{opacity:0;}
 
 /* Hamburger */
 /* Pass 8 wiring: §7.1 T2 nav trigger — scale lift + active press */
-.menu-btn{position:absolute;left:8px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;transition:transform 280ms cubic-bezier(0.34,1.56,0.64,1);transform:translateZ(0);}
-.menu-btn:hover{transform:translateZ(0) scale(1.02);}
-.menu-btn:active{transform:translateZ(0) scale(.94);transition-duration:var(--duration-instant);}
+.menu-btn{position:absolute;left:8px;width:40px;height:40px;--gel-radius:12px;}
 .lns{display:flex;flex-direction:column;gap:5px;align-items:center;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
 .ln{display:block;width:26px;height:5px;border-radius:100px;background:var(--grad);flex-shrink:0;transition:transform .52s cubic-bezier(0.34,1.56,0.64,1),opacity .38s cubic-bezier(0.25,0.46,0.45,0.94);}
 .menu-btn.open .ln:nth-child(1){transform:translateY(5px) rotate(45deg);}
@@ -147,17 +145,10 @@ body.light .who-btn.active{color:var(--text);}
 }
 .month-label{font-family:var(--font-display);font-size:16px;font-weight:500;font-style:italic;color:var(--text-sub);text-align:center;cursor:default;letter-spacing:.01em;}
 .month-arrows{display:contents;}
-.arr-btn{
-  width:28px;height:28px;border-radius:8px;border:none;background:transparent;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  color:rgba(255,170,150,.65);transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94),transform 280ms cubic-bezier(0.34,1.56,0.64,1);
-  transform:translateZ(0);
-}
-.arr-btn:hover:not(:disabled){background:rgba(255,255,255,.05);color:rgba(255,180,165,.9);}
-.arr-btn:active:not(:disabled){transform:translateZ(0) scale(.94);transition-duration:var(--duration-instant);}
+.arr-btn{width:28px;height:28px;--gel-radius:9px;}
+.arr-btn svg{stroke:url(#brias-warm);}
 .arr-btn:disabled{opacity:.25;cursor:default;}
-body.light .arr-btn{background:transparent;color:rgba(232,118,74,.55);}
-body.light .arr-btn:hover:not(:disabled){background:rgba(80,40,20,.05);color:rgba(232,118,74,.85);}
+body.light .arr-btn svg{stroke:rgba(232,118,74,.7)!important;}
 
 /* Sidebar Today button */
 .sidebar-today{
@@ -329,19 +320,10 @@ body.light .cal-sheet-handle{background:rgba(80,40,20,.2);}
 }
 .sheet-cal-label:hover{background:rgba(255,255,255,.05);}
 body.light .sheet-cal-label:hover{background:rgba(80,40,20,.06);}
-.sheet-arr{
-  width:40px;height:40px;border-radius:12px;border:1px solid var(--border);
-  background:transparent;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  color:rgba(255,170,150,.65);transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),border-color .12s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94),transform 280ms cubic-bezier(0.34,1.56,0.64,1);
-  margin:0 auto;transform:translateZ(0);
-}
-.sheet-arr:hover:not(:disabled){background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12);color:rgba(255,180,165,.9);}
-.sheet-arr:active:not(:disabled){transform:translateZ(0) scale(.94);transition-duration:var(--duration-instant);}
+.sheet-arr{width:40px;height:40px;--gel-radius:12px;margin:0 auto;}
 .sheet-arr:disabled{opacity:.18;cursor:default;}
-.sheet-arr svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
-body.light .sheet-arr{border-color:rgba(80,40,20,.1);background:transparent;color:rgba(232,118,74,.55);}
-body.light .sheet-arr:hover:not(:disabled){background:rgba(80,40,20,.06);border-color:rgba(80,40,20,.2);color:rgba(232,118,74,.85);}
+.sheet-arr svg{width:16px;height:16px;stroke:url(#brias-warm);fill:none;stroke-width:2;stroke-linecap:round;}
+body.light .sheet-arr svg{stroke:rgba(232,118,74,.7)!important;}
 
 /* ── Mobile bottom bar (journal-specific) ── */
 .bottom-nav{
@@ -466,7 +448,7 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
 
   <!-- Topbar -->
   <div class="topbar">
-    <button class="menu-btn" id="menuBtn" onclick="SHELL.toggleDrawer()">
+    <button class="menu-btn gel-btn" id="menuBtn" onclick="SHELL.toggleDrawer()">
       <div class="lns"><span class="ln"></span><span class="ln"></span></div>
     </button>
     <div class="topbar-logo">Journal</div>
@@ -488,11 +470,11 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
       </div>
 
       <div class="month-nav">
-        <button class="arr-btn" id="sidePrevBtn" onclick="sideNav(-1)">
+        <button class="arr-btn gel-btn gel-sm" id="sidePrevBtn" onclick="sideNav(-1)">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
         <div class="month-label" id="sideMonthLabel"></div>
-        <button class="arr-btn" id="sideNextBtn" onclick="sideNav(1)">
+        <button class="arr-btn gel-btn gel-sm" id="sideNextBtn" onclick="sideNav(1)">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
       </div>
@@ -514,11 +496,11 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
         <div id="sheetPicker" style="display:none;"><div id="sheetPickerInner"></div></div>
         <div id="sheetCalView">
           <div class="sheet-cal-header">
-            <button class="sheet-arr" id="sheetPrevBtn" onclick="sheetNav(-1)">
+            <button class="sheet-arr gel-btn gel-sm" id="sheetPrevBtn" onclick="sheetNav(-1)">
               <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
             <div class="sheet-cal-label" id="sheetMonthLabel" onclick="openSheetPicker()"></div>
-            <button class="sheet-arr" id="sheetNextBtn" onclick="sheetNav(1)">
+            <button class="sheet-arr gel-btn gel-sm" id="sheetNextBtn" onclick="sheetNav(1)">
               <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
           </div>
