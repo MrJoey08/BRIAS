@@ -94,7 +94,10 @@ body.light canvas{opacity:0;}
 .topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;transition:border-color .45s cubic-bezier(0.32,0.72,0,1);}
 .topbar-logo{font-family:var(--font-display);font-size:22px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.03em;}
 
-.menu-btn{position:absolute;left:8px;width:40px;height:40px;--gel-radius:12px;}
+/* Pass 8 wiring: §7.1 T2 nav trigger — scale lift + active press */
+.menu-btn{position:absolute;left:8px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;transition:transform var(--duration-quick) var(--ease-spring-soft);transform:translateZ(0);}
+.menu-btn:hover{transform:translateZ(0) scale(1.05);}
+.menu-btn:active{transform:translateZ(0) scale(.92);transition-duration:var(--duration-instant);}
 .lns{display:flex;flex-direction:column;gap:5px;align-items:center;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
 .ln{display:block;width:26px;height:5px;border-radius:100px;background:var(--grad);flex-shrink:0;transition:transform .52s cubic-bezier(0.34,1.56,0.64,1),opacity .38s cubic-bezier(0.25,0.46,0.45,0.94);}
 .menu-btn.open .ln:nth-child(1){transform:translateY(5px) rotate(45deg);}
@@ -265,11 +268,12 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
 .bn-cal-btn{
   width:38px;height:38px;border-radius:12px;border:1px solid rgba(232,118,74,.3);
   background:rgba(232,118,74,.08);cursor:pointer;display:flex;align-items:center;justify-content:center;
-  color:var(--orange);transition:border-color .25s cubic-bezier(0.25,0.46,0.45,0.94),color .25s cubic-bezier(0.25,0.46,0.45,0.94),background .15s cubic-bezier(0.25,0.46,0.45,0.94),transform 280ms cubic-bezier(0.34,1.56,0.64,1);flex-shrink:0;transform:translateZ(0);
+  color:var(--orange);transition:border-color .25s cubic-bezier(0.25,0.46,0.45,0.94),color .25s cubic-bezier(0.25,0.46,0.45,0.94),background .15s cubic-bezier(0.25,0.46,0.45,0.94);flex-shrink:0;
 }
 body.light .bn-cal-btn{border-color:rgba(232,118,74,.25);background:rgba(232,118,74,.07);}
-.bn-cal-btn:hover{background:rgba(232,118,74,.14);border-color:rgba(232,118,74,.45);transform:translateZ(0) scale(1.02);}
-.bn-cal-btn:active{transform:translateZ(0) scale(.94);transition-duration:var(--duration-instant);}
+.bn-cal-btn:hover{background:rgba(232,118,74,.14);border-color:rgba(232,118,74,.45);}
+/* Pass 8 wiring: §7.1 T3 active press on bottom-nav calendar toggle */
+.bn-cal-btn:active{transform:translateZ(0) scale(.95);transition:transform var(--duration-instant) var(--ease-spring-soft);}
 .bn-cal-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;}
 .bn-cal-btn.active{border-color:rgba(232,118,74,.5);background:rgba(232,118,74,.15);}
 
@@ -412,9 +416,18 @@ body.light .history-item{background:rgba(80,40,20,.04);}
   font-family:var(--font);font-size:11px;font-weight:300;color:var(--text-dim);
   letter-spacing:.04em;
 }
-.cal-nav-btn{width:32px;height:32px;--gel-radius:10px;}
-.cal-nav-btn svg{width:12px;height:12px;stroke:url(#brias-warm);fill:none;stroke-width:2.2;stroke-linecap:round;}
-body.light .cal-nav-btn svg{stroke:rgba(232,118,74,.7)!important;}
+.cal-nav-btn{
+  width:32px;height:32px;border-radius:10px;border:1px solid rgba(232,118,74,.08);
+  background:rgba(40,28,24,.5);box-shadow:0 1px 2px rgba(0,0,0,.2),inset 0 0 0 1px rgba(232,118,74,.07);
+  display:flex;align-items:center;justify-content:center;color:rgba(255,200,180,.55);
+  transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),color .15s cubic-bezier(0.25,0.46,0.45,0.94),border-color .15s cubic-bezier(0.25,0.46,0.45,0.94),transform 280ms cubic-bezier(0.34,1.56,0.64,1);
+  transform:translateZ(0);
+}
+.cal-nav-btn:hover{background:rgba(255,200,180,.04);border-color:rgba(255,200,180,.18);color:rgba(255,200,180,.85);}
+.cal-nav-btn:active{transform:translateZ(0) scale(.94);transition-duration:var(--duration-instant);}
+.cal-nav-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;}
+body.light .cal-nav-btn{background:rgba(80,40,20,.08);border-color:rgba(80,40,20,.1);box-shadow:0 1px 2px rgba(80,40,20,.1),inset 0 0 0 1px rgba(80,40,20,.07);color:rgba(80,40,20,.4);}
+body.light .cal-nav-btn:hover{background:rgba(80,40,20,.14);border-color:rgba(80,40,20,.2);color:rgba(80,40,20,.7);}
 .cal-today-btn{
   padding:7px 16px;border-radius:10px;border:1px solid var(--border);
   font-family:var(--font);font-size:12px;font-weight:300;color:var(--text-muted);
@@ -563,9 +576,12 @@ body.modal-open canvas{animation-play-state:paused;}
 }
 .modal-header{padding:20px 22px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .modal-title{font-family:var(--font-display);font-size:20px;font-style:italic;font-weight:400;color:var(--text-sub);}
-.modal-close{width:28px;height:28px;--gel-radius:9px;}
-.modal-close svg{width:13px;height:13px;stroke:url(#brias-warm);fill:none;stroke-width:2.2;stroke-linecap:round;}
-body.light .modal-close svg{stroke:rgba(232,118,74,.7)!important;}
+.modal-close{width:28px;height:28px;border-radius:9px;background:rgba(40,28,24,.5);display:flex;align-items:center;justify-content:center;color:rgba(255,200,180,.55);transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),color .15s cubic-bezier(0.25,0.46,0.45,0.94),transform 280ms cubic-bezier(0.34,1.56,0.64,1);transform:translateZ(0);box-shadow:0 1px 2px rgba(0,0,0,.25),inset 0 0 0 1px rgba(232,118,74,.08);}
+.modal-close:hover{background:rgba(60,40,32,.6);color:rgba(255,200,180,.85);transform:translateZ(0) scale(1.02);}
+.modal-close:active{transform:translateZ(0) scale(.94);transition-duration:var(--duration-instant);}
+.modal-close svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;}
+body.light .modal-close{background:rgba(80,40,20,.07);color:rgba(80,40,20,.45);box-shadow:0 1px 2px rgba(80,40,20,.1),inset 0 0 0 1px rgba(80,40,20,.07);}
+body.light .modal-close:hover{background:rgba(80,40,20,.12);color:rgba(80,40,20,.75);}
 .modal-body{padding:20px 22px;overflow-y:auto;}
 .modal-footer{padding:14px 22px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:5px;}
 
@@ -972,7 +988,7 @@ body.light .sheet-d.e{color:rgba(46,31,24,.1);}
 
   <!-- Topbar -->
   <div class="topbar">
-    <button class="menu-btn gel-btn" id="menuBtn" onclick="SHELL.toggleDrawer()">
+    <button class="menu-btn" id="menuBtn" onclick="SHELL.toggleDrawer()">
       <div class="lns"><span class="ln"></span><span class="ln"></span></div>
     </button>
     <div class="topbar-logo">Planner</div>
@@ -1091,7 +1107,7 @@ body.light .sheet-d.e{color:rgba(46,31,24,.1);}
   <div class="modal" style="max-width:380px;">
     <div class="modal-header" style="border-bottom:none;padding-bottom:8px;">
       <div class="modal-title" id="confirmTitle">Are you sure?</div>
-      <button class="modal-close gel-btn gel-sm" onclick="confirmCancel()">
+      <button class="modal-close" onclick="confirmCancel()">
         <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -1110,7 +1126,7 @@ body.light .sheet-d.e{color:rgba(46,31,24,.1);}
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title" id="cardModalTitle">New card</div>
-      <button class="modal-close gel-btn gel-sm" onclick="closeCardModal()">
+      <button class="modal-close" onclick="closeCardModal()">
         <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -1146,7 +1162,7 @@ body.light .sheet-d.e{color:rgba(46,31,24,.1);}
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title" id="eventModalTitle">Add event</div>
-      <button class="modal-close gel-btn gel-sm" onclick="closeEventModal()">
+      <button class="modal-close" onclick="closeEventModal()">
         <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -1248,7 +1264,7 @@ body.light .sheet-d.e{color:rgba(46,31,24,.1);}
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title">Evaluate</div>
-      <button class="modal-close gel-btn gel-sm" onclick="closeEvalModal()">
+      <button class="modal-close" onclick="closeEvalModal()">
         <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -2244,14 +2260,14 @@ function renderMobileCalendar(scroll){
   const calHtml=`<div class="calendar-view">
     <div class="cal-header">
       <div class="cal-week-nav">
-        <button class="cal-nav-btn gel-btn gel-sm" onclick="mobileDayNav(-1)">
+        <button class="cal-nav-btn" onclick="mobileDayNav(-1)">
           <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
         <div class="cal-week-label">
           <div class="cal-week-label-month">${mobileMonthStr}</div>
           <div class="cal-week-label-range">${mobileRangeStr}</div>
         </div>
-        <button class="cal-nav-btn gel-btn gel-sm" onclick="mobileDayNav(1)">
+        <button class="cal-nav-btn" onclick="mobileDayNav(1)">
           <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
       </div>
@@ -2396,14 +2412,14 @@ function renderWeekCalendar(scroll){
   const calHtml=`<div class="calendar-view">
     <div class="cal-header">
       <div class="cal-week-nav">
-        <button class="cal-nav-btn gel-btn gel-sm" onclick="weekNav(-1)">
+        <button class="cal-nav-btn" onclick="weekNav(-1)">
           <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
         <div class="cal-week-label">
           <div class="cal-week-label-month">${monthStr}</div>
           <div class="cal-week-label-range">${rangeStr}</div>
         </div>
-        <button class="cal-nav-btn gel-btn gel-sm" onclick="weekNav(1)">
+        <button class="cal-nav-btn" onclick="weekNav(1)">
           <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
       </div>

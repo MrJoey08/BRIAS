@@ -18,10 +18,6 @@ const SHELL = (() => {
 
   // ── HTML injecteren ──────────────────────────────────────────────────────
   function _inject() {
-    // Inject warm gradient once — referenced by all icon SVGs via stroke="url(#brias-warm)"
-    if (!document.getElementById('briasWarmGrad')) {
-      document.body.insertAdjacentHTML('afterbegin', `<svg id="briasWarmGrad" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true"><defs><linearGradient id="brias-warm" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFA770"/><stop offset="100%" stop-color="#FF5A8C"/></linearGradient></defs></svg>`);
-    }
     // Voeg drawer + settings + modal toe aan de body als ze er nog niet zijn
     if (!document.getElementById('shellDrawer')) {
       document.body.insertAdjacentHTML('beforeend', _drawerHTML());
@@ -60,8 +56,9 @@ const SHELL = (() => {
         href: 'chat.html',
         label: 'Chat',
         sub: 'Your conversation with BRIAS',
-        icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="url(#brias-warm)"/>
+        icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
+          <defs><linearGradient id="shellNg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e8764a"/><stop offset="100%" stop-color="#d44a7a"/></linearGradient></defs>
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="url(#shellNg)"/>
         </svg>`,
         activeIcon: true,
       },
@@ -70,14 +67,14 @@ const SHELL = (() => {
         href: 'journal.html',
         label: 'Journal',
         sub: 'You and BRIAS write here together',
-        icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="url(#brias-warm)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
+        icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,200,180,.55)" stroke-width="1.8" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
       },
       {
         id: 'planner',
         href: 'planner.html',
         label: 'Planner',
         sub: 'Keep track of mental steps',
-        icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="url(#brias-warm)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+        icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,200,180,.55)" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
       },
       {
         id: 'mindspace',
@@ -85,7 +82,7 @@ const SHELL = (() => {
         label: 'Mindspace',
         sub: 'Dump it here, sort later',
         soon: true,
-        icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="url(#brias-warm)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>`,
+        icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,200,180,.55)" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>`,
       },
     ];
 
@@ -119,12 +116,10 @@ const SHELL = (() => {
         <div class="footer-name" id="shellDrawerName">—</div>
         <div class="footer-handle" id="shellDrawerHandle">—</div>
       </div>
-      <button class="drawer-settings-btn gel-btn" onclick="SHELL.openSettings();SHELL.closeDrawer();" title="Settings">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
-          <g stroke="url(#brias-warm)" stroke-width="1.6">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-          </g>
+      <button class="drawer-settings-btn" onclick="SHELL.openSettings();SHELL.closeDrawer();" title="Settings">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,200,180,.55)" stroke-width="1.5" stroke-linecap="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
         </svg>
       </button>
     </div>
@@ -138,8 +133,8 @@ const SHELL = (() => {
 <div class="settings-overlay" id="shellSettings">
   <div class="settings-header">
     <div class="settings-title">Settings</div>
-    <button class="settings-close-btn gel-btn gel-sm" onclick="SHELL.closeSettings()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="url(#brias-warm)" stroke-width="2.5" stroke-linecap="round">
+    <button class="settings-close-btn" onclick="SHELL.closeSettings()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,200,180,.55)" stroke-width="2.5" stroke-linecap="round">
         <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
       </svg>
     </button>
