@@ -67,14 +67,14 @@ const SHELL = (() => {
         href: 'journal.html',
         label: 'Journal',
         sub: 'You and BRIAS write here together',
-        icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="url(#shellNg)" stroke-width="1.8" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
+        icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><defs><linearGradient id="shellNgJ" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e8764a"/><stop offset="100%" stop-color="#d44a7a"/></linearGradient></defs><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" stroke="url(#shellNgJ)"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" stroke="url(#shellNgJ)"/></svg>`,
       },
       {
         id: 'planner',
         href: 'planner.html',
         label: 'Planner',
         sub: 'Keep track of mental steps',
-        icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="url(#shellNg)" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+        icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><defs><linearGradient id="shellNgP" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e8764a"/><stop offset="100%" stop-color="#d44a7a"/></linearGradient></defs><rect x="3" y="4" width="18" height="18" rx="2" stroke="url(#shellNgP)"/><line x1="16" y1="2" x2="16" y2="6" stroke="url(#shellNgP)"/><line x1="8" y1="2" x2="8" y2="6" stroke="url(#shellNgP)"/><line x1="3" y1="10" x2="21" y2="10" stroke="url(#shellNgP)"/></svg>`,
       },
       {
         id: 'mindspace',
@@ -82,7 +82,7 @@ const SHELL = (() => {
         label: 'Mindspace',
         sub: 'Dump it here, sort later',
         soon: true,
-        icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="url(#shellNg)" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>`,
+        icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><defs><linearGradient id="shellNgM" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e8764a"/><stop offset="100%" stop-color="#d44a7a"/></linearGradient></defs><circle cx="12" cy="12" r="10" stroke="url(#shellNgM)"/><path d="M12 8v4l3 3" stroke="url(#shellNgM)"/></svg>`,
       },
     ];
 
@@ -117,9 +117,10 @@ const SHELL = (() => {
         <div class="footer-handle" id="shellDrawerHandle">—</div>
       </div>
       <button class="drawer-settings-btn" onclick="SHELL.openSettings();SHELL.closeDrawer();" title="Settings">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="url(#shellNg)" stroke-width="1.5" stroke-linecap="round">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round">
+          <defs><linearGradient id="shellNgS" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e8764a"/><stop offset="100%" stop-color="#d44a7a"/></linearGradient></defs>
+          <circle cx="12" cy="12" r="3" stroke="url(#shellNgS)"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="url(#shellNgS)"/>
         </svg>
       </button>
     </div>
@@ -134,8 +135,9 @@ const SHELL = (() => {
   <div class="settings-header">
     <div class="settings-title">Settings</div>
     <button class="settings-close-btn" onclick="SHELL.closeSettings()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="url(#shellNg)" stroke-width="2.5" stroke-linecap="round">
-        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round">
+        <defs><linearGradient id="shellNgX" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e8764a"/><stop offset="100%" stop-color="#d44a7a"/></linearGradient></defs>
+        <line x1="18" y1="6" x2="6" y2="18" stroke="url(#shellNgX)"/><line x1="6" y1="6" x2="18" y2="18" stroke="url(#shellNgX)"/>
       </svg>
     </button>
   </div>
@@ -377,22 +379,4 @@ const SHELL = (() => {
 
   function _openProfileModal(field) {
     _pmField = field;
-    const title  = document.getElementById('shellPmTitle');
-    const sub    = document.getElementById('shellPmSub');
-    const fields = document.getElementById('shellPmFields');
-    const err    = document.getElementById('shellPmErr');
-    const btn    = document.getElementById('shellPmSaveBtn');
-    err.textContent = ''; err.classList.remove('visible');
-    btn.disabled = false;
-    btn.classList.remove('danger');
-    btn.textContent = 'Save';
-
-    if (field === 'name') {
-      title.textContent = 'Your name';
-      sub.textContent   = 'What should BRIAS call you?';
-      fields.innerHTML  = `<input class="pmodal-input" id="shellPmIn1" type="text" placeholder="Name" value="${_esc(_pName())}" />`;
-    } else if (field === 'age') {
-      title.textContent = 'Your age';
-      sub.textContent   = 'Optional. Helps BRIAS understand context.';
-      const a = _pAge();
-      fields.innerHTML  = `<input class="pmodal-input" id="shellPmIn1" type="number" min="10" max="120" placeholder="Age" value="${a == null ? '' : _esc(String(a))}" />`
+  
