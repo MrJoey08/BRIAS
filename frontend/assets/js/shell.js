@@ -93,9 +93,8 @@ const SHELL = (() => {
         sub: 'Dump it here, sort later',
         soon: true,
         icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
-          <defs><linearGradient id="shellNgM" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e8764a"/><stop offset="100%" stop-color="#d44a7a"/></linearGradient></defs>
-          <circle cx="12" cy="12" r="10" stroke="url(#shellNgM)"/>
-          <path d="M12 8v4l3 3" stroke="url(#shellNgM)"/>
+          <defs><linearGradient id="shellNgM" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#e8764a"/><stop offset="100%" stop-color="#d44a7a"/></linearGradient></defs>
+          <path d="M7 18 A 3.5 3.5 0 0 1 7 11 A 4 4 0 0 1 11 8 A 4 4 0 0 1 15 11 A 3.5 3.5 0 0 1 17 18 Z" stroke="url(#shellNgM)" fill="none"/>
         </svg>`,
       },
     ];
