@@ -74,9 +74,9 @@ textarea::placeholder{color:var(--text-dim);}
 .topbar-logo{font-family:var(--font-display);font-size:22px;font-weight:600;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.03em;}
 
 /* Pass 8 wiring: §7.1 T2 nav trigger — scale lift + active press */
-.menu-btn{position:absolute;left:8px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;transition:transform var(--duration-quick) var(--ease-spring-soft);transform:translateZ(0);}
-.menu-btn:hover{transform:translateZ(0) scale(1.05);}
-.menu-btn:active{transform:translateZ(0) scale(.92);transition-duration:var(--duration-instant);}
+.menu-btn{position:absolute;left:8px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;transition:transform 280ms cubic-bezier(0.34,1.56,0.64,1);transform:translateZ(0);}
+.menu-btn:hover{transform:translateZ(0) scale(1.02);}
+.menu-btn:active{transform:translateZ(0) scale(.94);transition-duration:var(--duration-instant);}
 .lns{display:flex;flex-direction:column;gap:5px;align-items:center;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
 .ln{display:block;width:26px;height:5px;border-radius:100px;background:var(--grad);flex-shrink:0;transition:transform .52s cubic-bezier(0.34,1.56,0.64,1),opacity .38s cubic-bezier(0.25,0.46,0.45,0.94);}
 .menu-btn.open .ln:nth-child(1){transform:translateY(5px) rotate(45deg);}
