@@ -84,7 +84,9 @@ body.light canvas{opacity:0;}
 
 /* Hamburger */
 /* Pass 8 wiring: §7.1 T2 nav trigger — scale lift + active press */
-.menu-btn{position:absolute;left:8px;width:40px;height:40px;--gel-radius:12px;}
+.menu-btn{position:absolute;left:8px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;transition:transform var(--duration-quick) var(--ease-spring-soft);transform:translateZ(0);}
+.menu-btn:hover{transform:translateZ(0) scale(1.05);}
+.menu-btn:active{transform:translateZ(0) scale(.92);transition-duration:var(--duration-instant);}
 .lns{display:flex;flex-direction:column;gap:5px;align-items:center;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
 .ln{display:block;width:26px;height:5px;border-radius:100px;background:var(--grad);flex-shrink:0;transition:transform .52s cubic-bezier(0.34,1.56,0.64,1),opacity .38s cubic-bezier(0.25,0.46,0.45,0.94);}
 .menu-btn.open .ln:nth-child(1){transform:translateY(5px) rotate(45deg);}
@@ -145,10 +147,16 @@ body.light .who-btn.active{color:var(--text);}
 }
 .month-label{font-family:var(--font-display);font-size:16px;font-weight:500;font-style:italic;color:var(--text-sub);text-align:center;cursor:default;letter-spacing:.01em;}
 .month-arrows{display:contents;}
-.arr-btn{width:28px;height:28px;--gel-radius:9px;}
-.arr-btn svg{stroke:url(#brias-warm);}
-.arr-btn:disabled{opacity:.25;cursor:default;}
-body.light .arr-btn svg{stroke:rgba(232,118,74,.7)!important;}
+.arr-btn{
+  width:28px;height:28px;border-radius:8px;border:none;background:transparent;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--text-muted);transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-instant) var(--ease-spring-soft);
+  transform:translateZ(0);
+}
+.arr-btn:hover:not(:disabled){background:var(--surface);color:var(--text-sub);}
+/* Pass 8 wiring: §7.1 T3 press state on sidebar nav arrows */
+.arr-btn:active:not(:disabled){transform:translateZ(0) scale(.88);}
+.arr-btn:disabled{opacity:.2;cursor:default;}
 
 /* Sidebar Today button */
 .sidebar-today{
@@ -157,12 +165,15 @@ body.light .arr-btn svg{stroke:rgba(232,118,74,.7)!important;}
   border-radius:10px;border:1px solid var(--border);
   background:transparent;cursor:pointer;font-family:var(--font);
   font-size:11.5px;font-weight:300;color:var(--text-muted);
-  transition:border-color .25s cubic-bezier(0.25,0.46,0.45,0.94),color .25s cubic-bezier(0.25,0.46,0.45,0.94),transform 280ms cubic-bezier(0.34,1.56,0.64,1);width:calc(100% - 24px);
+  /* Pass 6 perf: box-shadow removed from transition — triggers paint */
+  /* Pass 8 wiring: §7.1 T3 — transform added for lift */
+  transition:border-color .25s cubic-bezier(0.25,0.46,0.45,0.94),color .25s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);width:calc(100% - 24px);
   transform:translateZ(0);
 }
 body.light .sidebar-today{border-color:rgba(80,40,20,.1);}
-.sidebar-today:hover{border-color:rgba(232,118,74,.3);color:var(--orange);transform:translateZ(0) scale(1.02);}
-.sidebar-today:active{transform:translateZ(0) scale(.94);transition-duration:var(--duration-instant);}
+.sidebar-today:hover{border-color:rgba(232,118,74,.3);color:var(--orange);transform:translateZ(0) translateY(-1px);}
+/* Pass 8 wiring: §7.1 T3 active press on sidebar today */
+.sidebar-today:active{transform:translateZ(0) scale(.97);transition-duration:var(--duration-instant);}
 @keyframes sidebarTodayPulse{0%,100%{box-shadow:0 0 0 0 rgba(232,118,74,.0);}50%{box-shadow:0 0 14px 2px rgba(232,118,74,.18);}}
 .sidebar-today.is-today{
   border-color:rgba(232,118,74,.3);color:var(--orange);
@@ -320,10 +331,18 @@ body.light .cal-sheet-handle{background:rgba(80,40,20,.2);}
 }
 .sheet-cal-label:hover{background:rgba(255,255,255,.05);}
 body.light .sheet-cal-label:hover{background:rgba(80,40,20,.06);}
-.sheet-arr{width:40px;height:40px;--gel-radius:12px;margin:0 auto;}
+.sheet-arr{
+  width:40px;height:40px;border-radius:12px;border:1px solid var(--border);
+  background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--text-sub);transition:background .12s cubic-bezier(0.25,0.46,0.45,0.94),border-color .12s cubic-bezier(0.25,0.46,0.45,0.94),color .12s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-instant) var(--ease-spring-soft);
+  margin:0 auto;transform:translateZ(0);
+}
+.sheet-arr:hover:not(:disabled){background:var(--surface);border-color:rgba(255,255,255,.12);color:var(--text);}
+/* Pass 8 wiring: §7.1 T3 active press on sheet navigation arrows */
+.sheet-arr:active:not(:disabled){transform:translateZ(0) scale(.88);}
 .sheet-arr:disabled{opacity:.18;cursor:default;}
-.sheet-arr svg{width:16px;height:16px;stroke:url(#brias-warm);fill:none;stroke-width:2;stroke-linecap:round;}
-body.light .sheet-arr svg{stroke:rgba(232,118,74,.7)!important;}
+.sheet-arr svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+body.light .sheet-arr{border-color:rgba(80,40,20,.12);color:var(--text-sub);}
 
 /* ── Mobile bottom bar (journal-specific) ── */
 .bottom-nav{
@@ -362,12 +381,13 @@ body.light .bn-who-btn.active{color:var(--text);}
   padding:7px 13px;border-radius:13px;border:1px solid var(--border);
   background:transparent;cursor:pointer;font-family:var(--font);
   font-size:12px;font-weight:300;color:var(--text-muted);
-  transition:border-color .25s cubic-bezier(0.25,0.46,0.45,0.94),color .25s cubic-bezier(0.25,0.46,0.45,0.94),background .15s cubic-bezier(0.25,0.46,0.45,0.94),transform 280ms cubic-bezier(0.34,1.56,0.64,1);
+  /* Pass 8 wiring: §7.1 T3 bottom-nav calendar button — transform added */
+  transition:border-color .25s cubic-bezier(0.25,0.46,0.45,0.94),color .25s cubic-bezier(0.25,0.46,0.45,0.94),background .15s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);
   flex-shrink:0;transform:translateZ(0);
 }
 body.light .bn-btn{border-color:rgba(80,40,20,.12);}
-.bn-btn:hover{border-color:rgba(255,255,255,.14);color:var(--text-sub);transform:translateZ(0) scale(1.02);}
-.bn-btn:active{transform:translateZ(0) scale(.94);transition-duration:var(--duration-instant);}
+.bn-btn:hover{border-color:rgba(255,255,255,.14);color:var(--text-sub);transform:translateZ(0) translateY(-1px);}
+.bn-btn:active{transform:translateZ(0) scale(.97);transition-duration:var(--duration-instant);}
 .bn-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;flex-shrink:0;}
 .bn-btn.cal-active{border-color:rgba(232,118,74,.35);color:var(--orange);}
 
@@ -375,12 +395,14 @@ body.light .bn-btn{border-color:rgba(80,40,20,.12);}
   padding:7px 14px;border-radius:13px;border:1px solid var(--border);
   background:transparent;cursor:pointer;font-family:var(--font);
   font-size:12px;font-weight:300;color:var(--text-muted);
-  transition:border-color .25s cubic-bezier(0.25,0.46,0.45,0.94),color .25s cubic-bezier(0.25,0.46,0.45,0.94),transform 280ms cubic-bezier(0.34,1.56,0.64,1);
+  /* Pass 6 perf: box-shadow removed from transition — triggers paint */
+  /* Pass 8 wiring: §7.1 T3 — transform added for active press */
+  transition:border-color .25s cubic-bezier(0.25,0.46,0.45,0.94),color .25s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-instant) var(--ease-spring-soft);
   flex-shrink:0;margin-left:4px;transform:translateZ(0);
 }
 body.light .bn-today{border-color:rgba(80,40,20,.12);}
 .bn-today:hover{border-color:rgba(232,118,74,.3);color:var(--orange);}
-.bn-today:active{transform:translateZ(0) scale(.94);transition-duration:var(--duration-instant);}
+.bn-today:active{transform:translateZ(0) scale(.97);}
 @keyframes todayPulse{0%,100%{box-shadow:0 0 0 0 rgba(232,118,74,.0);}50%{box-shadow:0 0 12px 2px rgba(232,118,74,.22);}}
 .bn-today.is-today{
   border-color:rgba(232,118,74,.35);color:var(--orange);
@@ -448,7 +470,7 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
 
   <!-- Topbar -->
   <div class="topbar">
-    <button class="menu-btn gel-btn" id="menuBtn" onclick="SHELL.toggleDrawer()">
+    <button class="menu-btn" id="menuBtn" onclick="SHELL.toggleDrawer()">
       <div class="lns"><span class="ln"></span><span class="ln"></span></div>
     </button>
     <div class="topbar-logo">Journal</div>
@@ -470,11 +492,11 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
       </div>
 
       <div class="month-nav">
-        <button class="arr-btn gel-btn gel-sm" id="sidePrevBtn" onclick="sideNav(-1)">
+        <button class="arr-btn" id="sidePrevBtn" onclick="sideNav(-1)">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
         <div class="month-label" id="sideMonthLabel"></div>
-        <button class="arr-btn gel-btn gel-sm" id="sideNextBtn" onclick="sideNav(1)">
+        <button class="arr-btn" id="sideNextBtn" onclick="sideNav(1)">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
       </div>
@@ -496,11 +518,11 @@ body.light .bn-today{border-color:rgba(80,40,20,.12);}
         <div id="sheetPicker" style="display:none;"><div id="sheetPickerInner"></div></div>
         <div id="sheetCalView">
           <div class="sheet-cal-header">
-            <button class="sheet-arr gel-btn gel-sm" id="sheetPrevBtn" onclick="sheetNav(-1)">
+            <button class="sheet-arr" id="sheetPrevBtn" onclick="sheetNav(-1)">
               <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
             <div class="sheet-cal-label" id="sheetMonthLabel" onclick="openSheetPicker()"></div>
-            <button class="sheet-arr gel-btn gel-sm" id="sheetNextBtn" onclick="sheetNav(1)">
+            <button class="sheet-arr" id="sheetNextBtn" onclick="sheetNav(1)">
               <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
           </div>
