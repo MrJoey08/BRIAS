@@ -67,14 +67,14 @@ const SHELL = (() => {
         href: 'journal.html',
         label: 'Journal',
         sub: 'You and BRIAS write here together',
-        icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e8764a" stroke-width="1.8" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
+        icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
       },
       {
         id: 'planner',
         href: 'planner.html',
         label: 'Planner',
         sub: 'Keep track of mental steps',
-        icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e8764a" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+        icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
       },
       {
         id: 'mindspace',
@@ -82,7 +82,7 @@ const SHELL = (() => {
         label: 'Mindspace',
         sub: 'Dump it here, sort later',
         soon: true,
-        icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e8764a" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>`,
+        icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.25)" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>`,
       },
     ];
 
@@ -117,7 +117,7 @@ const SHELL = (() => {
         <div class="footer-handle" id="shellDrawerHandle">—</div>
       </div>
       <button class="drawer-settings-btn" onclick="SHELL.openSettings();SHELL.closeDrawer();" title="Settings">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e8764a" stroke-width="1.5" stroke-linecap="round">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.3)" stroke-width="1.5" stroke-linecap="round">
           <circle cx="12" cy="12" r="3"/>
           <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
         </svg>
@@ -134,7 +134,7 @@ const SHELL = (() => {
   <div class="settings-header">
     <div class="settings-title">Settings</div>
     <button class="settings-close-btn" onclick="SHELL.closeSettings()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#e8764a" stroke-width="2.5" stroke-linecap="round">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(228,224,227,.5)" stroke-width="2.5" stroke-linecap="round">
         <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
       </svg>
     </button>
@@ -396,4 +396,205 @@ const SHELL = (() => {
       sub.textContent   = 'Optional. Helps BRIAS understand context.';
       const a = _pAge();
       fields.innerHTML  = `<input class="pmodal-input" id="shellPmIn1" type="number" min="10" max="120" placeholder="Age" value="${a == null ? '' : _esc(String(a))}" />`;
-    } else if (field === 'pa
+    } else if (field === 'password') {
+      title.textContent = 'Change password';
+      sub.textContent   = 'Enter your current password, then a new one.';
+      fields.innerHTML = `
+        <input class="pmodal-input" id="shellPmIn1" type="password" placeholder="Current password" autocomplete="current-password" />
+        <input class="pmodal-input" id="shellPmIn2" type="password" placeholder="New password" autocomplete="new-password" style="margin-top:10px;" />
+        <input class="pmodal-input" id="shellPmIn3" type="password" placeholder="Confirm new password" autocomplete="new-password" style="margin-top:10px;" />`;
+    } else if (field === 'delete') {
+      title.textContent = 'Delete account';
+      sub.textContent   = 'This wipes everything BRIAS knows about you. It cannot be undone. Enter your password to confirm.';
+      fields.innerHTML  = `<input class="pmodal-input" id="shellPmIn1" type="password" placeholder="Password" autocomplete="current-password" />`;
+      btn.classList.add('danger');
+      btn.textContent   = 'Delete';
+    }
+
+    document.getElementById('shellProfileModal')?.classList.add('open');
+    setTimeout(() => {
+      const inp = document.getElementById('shellPmIn1');
+      if (inp) { inp.focus(); inp.select?.(); }
+    }, 80);
+  }
+
+  function closeProfileModal() {
+    document.getElementById('shellProfileModal')?.classList.remove('open');
+    _pmField = null;
+  }
+
+  function _showErr(msg) {
+    const err = document.getElementById('shellPmErr');
+    err.textContent = msg;
+    err.classList.remove('shake');
+    void err.offsetWidth;
+    err.classList.add('visible', 'shake');
+  }
+
+  async function submitProfileModal() {
+    const btn = document.getElementById('shellPmSaveBtn');
+    const err = document.getElementById('shellPmErr');
+    err.textContent = ''; err.classList.remove('visible');
+
+    if (_pmField === 'name') {
+      const v = (document.getElementById('shellPmIn1').value || '').trim();
+      if (!v) return _showErr('Please enter a name.');
+      btn.disabled = true; btn.textContent = 'Saving…';
+      const res = await _saveProfile(v, _pAge());
+      btn.disabled = false; btn.textContent = 'Save';
+      if (res.ok) closeProfileModal();
+      else _showErr(res.error || 'Could not save. Try again.');
+
+    } else if (_pmField === 'age') {
+      const raw = (document.getElementById('shellPmIn1').value || '').trim();
+      if (!_pName()) return _showErr('Please set your name first.');
+      if (raw && (!/^\d+$/.test(raw) || parseInt(raw, 10) < 10 || parseInt(raw, 10) > 120)) {
+        return _showErr('Please enter a number between 10 and 120.');
+      }
+      btn.disabled = true; btn.textContent = 'Saving…';
+      const res = await _saveProfile(_pName(), raw === '' ? null : raw);
+      btn.disabled = false; btn.textContent = 'Save';
+      if (res.ok) closeProfileModal();
+      else _showErr(res.error || 'Could not save. Try again.');
+
+    } else if (_pmField === 'password') {
+      const oldP = document.getElementById('shellPmIn1').value;
+      const newP = document.getElementById('shellPmIn2').value;
+      const conf = document.getElementById('shellPmIn3').value;
+      if (!oldP || !newP) return _showErr('Please fill in both passwords.');
+      if (newP.length < 6) return _showErr('New password must be at least 6 characters.');
+      if (newP !== conf)   return _showErr('New passwords do not match.');
+      btn.disabled = true; btn.textContent = 'Saving…';
+      const res = await _changePassword(oldP, newP);
+      btn.disabled = false; btn.textContent = 'Save';
+      if (res.ok) closeProfileModal();
+      else _showErr(res.error || 'Could not change password.');
+
+    } else if (_pmField === 'delete') {
+      const pw = document.getElementById('shellPmIn1').value;
+      if (!pw) return _showErr('Please enter your password.');
+      btn.disabled = true; btn.textContent = 'Deleting…';
+      const res = await _deleteAccount(pw);
+      btn.disabled = false; btn.textContent = 'Delete';
+      if (res.ok) {
+        // Account is gone — wipe local data and bounce to auth.
+        try { localStorage.clear(); } catch (_) {}
+        window.location.href = 'login.html';
+      } else {
+        _showErr(res.error || 'Could not delete account.');
+      }
+    }
+  }
+
+  async function _saveProfile(display_name, age) {
+    const ageVal = age === '' || age == null ? null : parseInt(age, 10);
+    try {
+      const r = await _api('/api/profile', {
+        method: 'POST',
+        body: JSON.stringify({ display_name, age: ageVal }),
+      });
+      if (!r.ok) {
+        let detail = '';
+        try { const d = await r.json(); detail = d.detail || ''; } catch {}
+        return { ok: false, error: detail || `Could not save (HTTP ${r.status}).` };
+      }
+      // Optimistic local update so the UI reflects the change even if /api/me is slow.
+      localStorage.setItem('brias_display_name', display_name);
+      localStorage.setItem('brias_username', display_name);
+      if (ageVal == null) localStorage.removeItem('brias_age');
+      else localStorage.setItem('brias_age', String(ageVal));
+      if (_meData) {
+        _meData.display_name = display_name;
+        _meData.username = display_name;
+        _meData.age = ageVal;
+        _meData.profile_done = true;
+      }
+      _updateDrawerUser();
+      await _refreshMe();
+      return { ok: true };
+    } catch {
+      return { ok: false, error: 'Network error — could not reach BRIAS.' };
+    }
+  }
+
+  async function _changePassword(oldP, newP) {
+    try {
+      const r = await _api('/api/account/password', {
+        method: 'POST',
+        body: JSON.stringify({ old_password: oldP, new_password: newP }),
+      });
+      if (!r.ok) {
+        let detail = '';
+        try { const d = await r.json(); detail = d.detail || ''; } catch {}
+        return { ok: false, error: detail || `Could not change password (HTTP ${r.status}).` };
+      }
+      return { ok: true };
+    } catch {
+      return { ok: false, error: 'Network error — could not reach BRIAS.' };
+    }
+  }
+
+  async function _deleteAccount(password) {
+    try {
+      const r = await _api('/api/account/delete', {
+        method: 'POST',
+        body: JSON.stringify({ password }),
+      });
+      if (!r.ok) {
+        let detail = '';
+        try { const d = await r.json(); detail = d.detail || ''; } catch {}
+        return { ok: false, error: detail || `Could not delete account (HTTP ${r.status}).` };
+      }
+      return { ok: true };
+    } catch {
+      return { ok: false, error: 'Network error — could not reach BRIAS.' };
+    }
+  }
+
+  // ── Pass 8: Ripple wiring for shell elements ─────────────────────────────
+  // interactions.js is defer-loaded; guaranteed available by DOMContentLoaded
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof emitRipple !== 'function') return;
+    /* Pass 8 wiring: §7.3 ripple delegation on T2 nav items and s-btn (settings actions) */
+    document.addEventListener('click', e => {
+      const target = e.target.closest('.nav-item, .s-btn, .pmodal-save, .pmodal-cancel');
+      if (target) emitRipple(e, target);
+    }, { passive: true });
+  });
+
+  // ── Logout ───────────────────────────────────────────────────────────────
+  async function logout() {
+    if (_logoutFn) { _logoutFn(); return; }
+    try { await _api('/api/logout', { method: 'POST' }); } catch {}
+    ['brias_token','brias_username','brias_email','brias_display_name','brias_age'].forEach(k => localStorage.removeItem(k));
+    window.location.href = 'login.html';
+  }
+
+  // ── Public API ───────────────────────────────────────────────────────────
+  return {
+    init,
+    updateUser,
+    // drawer
+    toggleDrawer,
+    openDrawer,
+    closeDrawer,
+    // settings
+    openSettings,
+    closeSettings,
+    switchTab,
+    setTheme,
+    // profile modal
+    editName,
+    editAge,
+    editPassword,
+    editDelete,
+    closeProfileModal,
+    submitProfileModal,
+    // logout
+    logout,
+    // activePage (leesbaar, ook instelbaar)
+    get activePage() { return activePage; },
+    set activePage(v) { activePage = v; },
+  };
+
+})();

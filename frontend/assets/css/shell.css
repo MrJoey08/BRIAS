@@ -1,9 +1,6 @@
 /* ===== BRIAS · Shell Styles ===== */
 /* Drawer, Settings overlay, Profile modal — shared across all pages */
 
-/* Mobile: no grey tap-highlight on any interactive shell element. Warm :active bg below replaces it for visual feedback. */
-.nav-item,.drawer-settings-btn,.settings-close-btn,.s-btn,.pmodal-btn,.stab,.toggle,.theme-opt{-webkit-tap-highlight-color:transparent;}
-
 /* ── Drawer ── */
 .drawer{position:fixed;inset:0;z-index:40;pointer-events:none;}
 .drawer-backdrop{position:absolute;inset:0;background:rgba(8,6,8,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);opacity:0;transition:opacity .38s cubic-bezier(0,0,0.2,1);}
@@ -18,9 +15,8 @@ body.light .drawer-panel{background:var(--sidebar);}
 .nav-section-label{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--text-dim);padding:4px 12px 6px;font-weight:500;}
 /* Pass 8 wiring: §7.1 T2 nav items — transform lift + active press */
 .nav-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:16px;transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);width:100%;text-align:left;transform:translateZ(0);}
-.nav-item:hover{background:linear-gradient(90deg,rgba(255,140,90,0.05),rgba(255,90,140,0.022));transform:translateZ(0) translateX(2px);}
-.nav-item:not(.active):active{background:linear-gradient(90deg,rgba(255,140,90,0.05),rgba(255,90,140,0.022));transform:translateZ(0) scale(.94);transition-duration:var(--duration-instant);}
-.nav-item.active:active{transform:translateZ(0) scale(.94);transition-duration:var(--duration-instant);}
+.nav-item:hover{background:rgba(255,255,255,.05);transform:translateZ(0) translateX(2px);}
+.nav-item:active{transform:translateZ(0) scale(.98);transition-duration:var(--duration-instant);}
 .nav-item.active{background:linear-gradient(135deg,rgba(232,118,74,.1),rgba(212,74,122,.08));}
 .nav-icon{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .nav-item:not(.active) .nav-icon{background:rgba(255,255,255,.04);}
@@ -40,7 +36,7 @@ body.light .drawer-panel{background:var(--sidebar);}
 /* Pass 8 wiring: §7.1 T3 — scale hover + active press */
 .drawer-settings-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .18s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);transform:translateZ(0);}
 .drawer-settings-btn:hover{background:rgba(255,255,255,.08);transform:translateZ(0) scale(1.05);}
-.drawer-settings-btn:active{background:rgba(255,255,255,.08);transform:translateZ(0) scale(.86);transition-duration:var(--duration-instant);}
+.drawer-settings-btn:active{transform:translateZ(0) scale(.88);transition-duration:var(--duration-instant);}
 
 /* ── Settings overlay ── */
 .settings-overlay{
@@ -58,7 +54,7 @@ body.light .settings-overlay{background:rgba(228,214,199,.97);}
 /* Pass 8 wiring: §7.1 T3 — scale hover + active press */
 .settings-close-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:background .15s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);transform:translateZ(0);}
 .settings-close-btn:hover{background:rgba(255,255,255,.1);transform:translateZ(0) scale(1.05);}
-.settings-close-btn:active{background:rgba(255,255,255,.1);transform:translateZ(0) scale(.86);transition-duration:var(--duration-instant);}
+.settings-close-btn:active{transform:translateZ(0) scale(.88);transition-duration:var(--duration-instant);}
 .settings-tabs{display:flex;gap:0;padding:0 24px;flex-shrink:0;border-bottom:1px solid var(--border);overflow-x:auto;}
 .settings-tabs::-webkit-scrollbar{display:none;}
 /* Pass 8 wiring: §7.1 T3 settings tab — active press */
@@ -78,7 +74,7 @@ body.light .settings-overlay{background:rgba(228,214,199,.97);}
 /* Pass 8 wiring: §7.1 T2 settings action buttons — translateY lift + active press */
 .s-btn{padding:7px 15px;border-radius:10px;font-size:12.5px;font-weight:400;color:var(--text-sub);background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.07);transition:background .18s cubic-bezier(0.25,0.46,0.45,0.94),color .18s cubic-bezier(0.25,0.46,0.45,0.94),border-color .18s cubic-bezier(0.25,0.46,0.45,0.94),transform var(--duration-quick) var(--ease-spring-soft);white-space:nowrap;flex-shrink:0;letter-spacing:.01em;transform:translateZ(0);}
 .s-btn:hover{background:rgba(255,255,255,.09);color:var(--text);border-color:rgba(255,255,255,.11);transform:translateZ(0) translateY(-1px);}
-.s-btn:active{background:rgba(255,255,255,.09);color:var(--text);border-color:rgba(255,255,255,.11);transform:translateZ(0) scale(.97);transition-duration:var(--duration-instant);}
+.s-btn:active{transform:translateZ(0) scale(.97);transition-duration:var(--duration-instant);}
 .s-btn.danger{color:rgba(220,90,90,.65);background:transparent;border-color:rgba(220,90,90,.15);}
 .s-btn.danger:hover{background:rgba(220,70,70,.07);color:rgba(220,90,90,.85);border-color:rgba(220,90,90,.25);}
 
@@ -141,7 +137,7 @@ body.light .pmodal-input:focus{border-color:rgba(232,118,74,.55);background:rgba
 /* Pass 8 wiring: §7.1 T2 pmodal-cancel — translateY lift + active press */
 .pmodal-cancel{color:var(--text-sub);background:transparent;border:1px solid rgba(255,255,255,.08);transform:translateZ(0);}
 .pmodal-cancel:hover{background:rgba(255,255,255,.05);transform:translateZ(0) translateY(-1px);}
-.pmodal-cancel:active{background:rgba(255,255,255,.05);transform:translateZ(0) scale(.97);transition-duration:var(--duration-instant);}
+.pmodal-cancel:active{transform:translateZ(0) scale(.97);transition-duration:var(--duration-instant);}
 body.light .pmodal-cancel{border-color:rgba(80,40,20,.12);}
 body.light .pmodal-cancel:hover{background:rgba(80,40,20,.06);}
 /* Pass 8 wiring: §7.1 T1 pmodal-save — add scale(1.02) + active scale(.97) + ripple */
@@ -166,8 +162,7 @@ body.light .pmodal-cancel:hover{background:rgba(80,40,20,.06);}
   .nav-sub{font-size:11.5px;}
 }
 /* ── Light mode overrides for shell elements ── */
-body.light .nav-item:hover{background:linear-gradient(90deg,rgba(232,118,74,0.06),rgba(212,74,122,0.025));}
-body.light .nav-item:not(.active):active{background:linear-gradient(90deg,rgba(232,118,74,0.06),rgba(212,74,122,0.025));}
+body.light .nav-item:hover{background:rgba(80,40,20,.06);}
 body.light .nav-item.active{background:linear-gradient(135deg,rgba(232,118,74,.12),rgba(212,74,122,.09));}
 body.light .nav-item:not(.active) .nav-icon{background:rgba(80,40,20,.06);}
 body.light .nav-item:not(.active) .nav-icon svg{stroke:rgba(80,40,20,.4)!important;}
@@ -177,23 +172,18 @@ body.light .drawer-divider{background:rgba(80,40,20,.1);}
 body.light .drawer-backdrop{background:rgba(30,12,0,.38);backdrop-filter:blur(10px);}
 body.light .drawer-settings-btn{background:rgba(80,40,20,.07);}
 body.light .drawer-settings-btn:hover{background:rgba(80,40,20,.12);}
-body.light .drawer-settings-btn:active{background:rgba(80,40,20,.12);}
 body.light .soon-badge{background:rgba(80,40,20,.07);color:var(--text-dim);-webkit-text-fill-color:var(--text-dim);}
 body.light .s-row{background:rgba(80,40,20,.05);}
 body.light .s-btn{color:var(--text-sub);background:rgba(80,40,20,.07);border-color:rgba(80,40,20,.1);}
 body.light .s-btn:hover{background:rgba(80,40,20,.13);color:var(--text);border-color:rgba(80,40,20,.16);}
-body.light .s-btn:active{background:rgba(80,40,20,.13);color:var(--text);border-color:rgba(80,40,20,.16);}
 body.light .s-btn.danger{color:rgba(160,40,40,.8);background:transparent;border-color:rgba(160,40,40,.18);}
 body.light .s-btn.danger:hover{background:rgba(160,40,40,.07);}
-body.light .s-btn.danger:active{background:rgba(160,40,40,.07);}
 body.light .toggle{background:rgba(80,40,20,.16);}
 body.light .toggle.on{background:var(--grad);}
 body.light .toggle::after{background:#fff;}
 body.light .toggle.on::after{background:#ddc9b3;}
 body.light .settings-close-btn{background:rgba(80,40,20,.07);}
 body.light .settings-close-btn:hover{background:rgba(80,40,20,.13);}
-body.light .settings-close-btn:active{background:rgba(80,40,20,.13);}
-body.light .pmodal-cancel:active{background:rgba(80,40,20,.06);}
 body.light .sub-card{background:rgba(80,40,20,.05);border-color:rgba(80,40,20,.1);}
 body.light .sub-card-perks{border-top-color:rgba(80,40,20,.1);}
 body.light .theme-toggle{background:rgba(80,40,20,.06);border-color:rgba(80,40,20,.1);}
