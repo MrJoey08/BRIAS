@@ -94,7 +94,7 @@ const SHELL = (() => {
         soon: true,
         icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
           <defs><linearGradient id="shellNgM" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#e8764a"/><stop offset="100%" stop-color="#d44a7a"/></linearGradient></defs>
-          <path d="M7 18 A 3.5 3.5 0 0 1 7 11 A 4 4 0 0 1 11 8 A 4 4 0 0 1 15 11 A 3.5 3.5 0 0 1 17 18 Z" stroke="url(#shellNgM)" fill="none"/>
+          <path d="M6 20 A 4 4 0 0 1 6 12 A 5 5 0 0 1 12 8 A 5 5 0 0 1 18 12 A 4 4 0 0 1 18 20 Z" stroke="url(#shellNgM)" fill="none"/>
         </svg>`,
       },
     ];
